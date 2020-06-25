@@ -1,0 +1,21 @@
+dist: bionic
+language: java
+java: 11
+script: skip
+
+env:
+  NGROK_TOKEN: 1RER6BUC3QNNwYWY5LcIBjrv3A8_24QccmopTEQJGMErG9uzw
+
+jobs:
+  include:
+    - stage: build
+    - language: python
+      java: 11
+      services:
+        - docker
+      script:
+        # build
+        - mvn clean install -B -V
+
+
+

@@ -1,0 +1,30 @@
+server:
+  port: ${PORT:8080}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8090/eureka/v2}
+    instance:
+    preferIpAddress: true
+    enabled: false
+    healthcheck:
+      enabled: true
+  instance:
+    hostname: ${APP_IP:0.0.0.0}
+    home-page-url: /swagger-ui.html
+    health-check-url: /actuator/health
+
+
+spring:
+  application:
+    name: estuary-testrunner-java
+
+management:
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true
+    heapdump:
+      enabled: true

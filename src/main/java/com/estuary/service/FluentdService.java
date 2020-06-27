@@ -38,7 +38,7 @@ public class FluentdService {
     }
 
     private String emit(String loggingLevel, LinkedHashMap msg) {
-        if (System.getenv(FLUENTD_IP_PORT) != null) {
+        if (System.getenv(FLUENTD_IP_PORT) == null) {
             return String.format("Fluentd logging not enabled",
                     FLUENTD_IP_PORT);
         }

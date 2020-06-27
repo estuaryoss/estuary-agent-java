@@ -21,10 +21,19 @@ jobs: # a collection of steps
           paths:
             - ~/.m2
           key: estuary-testrunner-{{ checksum "pom.xml" }}
+      - run:
+          command: wget https://github.com/dinuta/estuary-testrunner/releases/download/4.0.5/start.py-linux
+          name: "download start.py"
+      - run:
+          command: mv start.py-linux start.py
+          name: "rename start.py-linux"
+      - run:
+          command: chmod +x start.py
+          name: "chmod +x start.py"
 
       - run: mvn clean install # run the actual tests
 
       - store_artifacts: # store the uberjar as an artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: target/testrunner-1.1.0.jar
+          path: target/testrunner-4.0.5.jar
       # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples

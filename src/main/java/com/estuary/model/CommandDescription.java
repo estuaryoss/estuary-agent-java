@@ -13,13 +13,13 @@ public class CommandDescription {
     @JsonProperty("started")
     private boolean started;
 
-    @JsonProperty("finishedat")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
-    private LocalDateTime finishedat;
-
     @JsonProperty("startedat")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
-    private LocalDateTime startedat;
+    private LocalDateTime startedat = LocalDateTime.now();
+
+    @JsonProperty("finishedat")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
+    private LocalDateTime finishedat = LocalDateTime.now();
 
     @JsonProperty("duration")
     private long duration = 0;
@@ -143,13 +143,13 @@ public class CommandDescription {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
 
-        sb.append("    finished: ").append(toIndentedString(finished)).append("\n");
-        sb.append("    started: ").append(toIndentedString(started)).append("\n");
-        sb.append("    startedat: ").append(toIndentedString(startedat)).append("\n");
-        sb.append("    finishedat: ").append(toIndentedString(finishedat)).append("\n");
-        sb.append("    duration: ").append(toIndentedString(duration)).append("\n");
-        sb.append("    pid: ").append(toIndentedString(pid)).append("\n");
-        sb.append("    commands: ").append(toIndentedString(commands)).append("\n");
+        sb.append("    finished: ").append(toIndentedString(finished));
+        sb.append("    started: ").append(toIndentedString(started));
+        sb.append("    startedat: ").append(toIndentedString(startedat));
+        sb.append("    finishedat: ").append(toIndentedString(finishedat));
+        sb.append("    duration: ").append(toIndentedString(duration));
+        sb.append("    pid: ").append(toIndentedString(pid));
+        sb.append("    commands: ").append(toIndentedString(commands));
         sb.append("}");
         return sb.toString();
     }

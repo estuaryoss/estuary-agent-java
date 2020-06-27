@@ -106,8 +106,8 @@ public class FileApiController implements FileApi {
             Files.writeString(path, content);
         } catch (Exception e) {
             return new ResponseEntity<ApiResponse>(new ApiResponse()
-                    .code(ApiResponseConstants.UPLOAD_TEST_CONFIG_FAILURE)
-                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.UPLOAD_TEST_CONFIG_FAILURE))
+                    .code(ApiResponseConstants.UPLOAD_FILE_FAILURE)
+                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.UPLOAD_FILE_FAILURE))
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())

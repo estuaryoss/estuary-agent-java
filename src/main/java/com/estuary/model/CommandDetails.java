@@ -86,13 +86,15 @@ public class CommandDetails {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        String arguments = (args != null) ? String.join(" ", args) : String.valueOf(args);
+
         sb.append("{\n");
 
-        sb.append("    out: ").append(toIndentedString(out)).append("\n");
-        sb.append("    err: ").append(toIndentedString(err)).append("\n");
-        sb.append("    code: ").append(toIndentedString(code)).append("\n");
-        sb.append("    pid: ").append(toIndentedString(pid)).append("\n");
-        sb.append("    args: ").append(toIndentedString(String.join(" ", args))).append("\n");
+        sb.append("    out: ").append(toIndentedString(out));
+        sb.append("    err: ").append(toIndentedString(err));
+        sb.append("    code: ").append(toIndentedString(code));
+        sb.append("    pid: ").append(toIndentedString(pid));
+        sb.append("    args: ").append(toIndentedString(arguments));
         sb.append("}");
         return sb.toString();
     }

@@ -4,7 +4,6 @@ import com.estuary.constants.About;
 import com.estuary.constants.ApiResponseConstants;
 import com.estuary.constants.ApiResponseMessage;
 import com.estuary.model.ApiResponse;
-import com.estuary.utils.Io;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.zeroturnaround.zip.NameMapper;
+import org.zeroturnaround.zip.ZipUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -62,9 +63,14 @@ public class FolderApiController implements FolderApi {
         File file;
         InputStreamResource resource;
         try {
-            Io.createZipFile(new File(folderPath), archiveNamePath);
-            resource = new InputStreamResource(new FileInputStream(archiveNamePath));
             file = new File(archiveNamePath);
+            ZipUtil.pack(new File(folderPath), file, new NameMapper() {
+                public String map(String name) {
+                    return name;
+                }
+            });
+
+            resource = new InputStreamResource(new FileInputStream(archiveNamePath));
         } catch (Exception e) {
             return new ResponseEntity<ApiResponse>(new ApiResponse()
                     .code(ApiResponseConstants.FOLDER_ZIP_FAILURE)

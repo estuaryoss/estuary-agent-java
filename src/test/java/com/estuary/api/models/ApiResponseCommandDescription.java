@@ -1,5 +1,6 @@
-package com.estuary.model;
+package com.estuary.api.models;
 
+import com.estuary.model.CommandDescription;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
@@ -16,7 +16,7 @@ import java.util.Objects;
 @Validated
 @javax.annotation.Generated(value = "com.estuary.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
 
-public class ApiResponse {
+public class ApiResponseCommandDescription {
     @JsonProperty("code")
     private String code = null;
 
@@ -24,7 +24,7 @@ public class ApiResponse {
     private String message = null;
 
     @JsonProperty("description")
-    private Object description = null;
+    private CommandDescription description = null;
 
     @JsonProperty("time")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
@@ -36,7 +36,7 @@ public class ApiResponse {
     @JsonProperty("version")
     private String version = null;
 
-    public ApiResponse message(String message) {
+    public ApiResponseCommandDescription message(String message) {
         this.message = message;
         return this;
     }
@@ -57,7 +57,7 @@ public class ApiResponse {
         this.code = code;
     }
 
-    public ApiResponse time(LocalDateTime time) {
+    public ApiResponseCommandDescription time(LocalDateTime time) {
         this.time = time;
         return this;
     }
@@ -78,7 +78,7 @@ public class ApiResponse {
         this.message = message;
     }
 
-    public ApiResponse description(Object description) {
+    public ApiResponseCommandDescription description(CommandDescription description) {
         this.description = description;
         return this;
     }
@@ -91,15 +91,15 @@ public class ApiResponse {
     @ApiModelProperty(value = "")
 
 
-    public Object getDescription() {
+    public CommandDescription getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(CommandDescription description) {
         this.description = description;
     }
 
-    public ApiResponse code(String code) {
+    public ApiResponseCommandDescription code(String code) {
         this.code = code;
         return this;
     }
@@ -121,7 +121,7 @@ public class ApiResponse {
         this.time = time;
     }
 
-    public ApiResponse name(String name) {
+    public ApiResponseCommandDescription name(String name) {
         this.name = name;
         return this;
     }
@@ -142,7 +142,7 @@ public class ApiResponse {
         this.name = name;
     }
 
-    public ApiResponse version(String version) {
+    public ApiResponseCommandDescription version(String version) {
         this.version = version;
         return this;
     }
@@ -165,14 +165,14 @@ public class ApiResponse {
 
 
     @Override
-    public boolean equals(java.lang.Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ApiResponse apiResponseSuccess = (ApiResponse) o;
+        ApiResponseCommandDescription apiResponseSuccess = (ApiResponseCommandDescription) o;
         return Objects.equals(this.message, apiResponseSuccess.message) &&
                 Objects.equals(this.description, apiResponseSuccess.description) &&
                 Objects.equals(this.code, apiResponseSuccess.code) &&
@@ -191,12 +191,12 @@ public class ApiResponse {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
 
-        sb.append("    message: ").append(toIndentedString(message));
-        sb.append("    description: ").append(toIndentedString(description));
-        sb.append("    code: ").append(toIndentedString(code));
-        sb.append("    time: ").append(toIndentedString(time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))));
-        sb.append("    name: ").append(toIndentedString(name));
-        sb.append("    version: ").append(toIndentedString(version));
+        sb.append("    message: ").append(toIndentedString(message)).append("\n");
+        sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    code: ").append(toIndentedString(code)).append("\n");
+        sb.append("    time: ").append(toIndentedString(time)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -205,7 +205,7 @@ public class ApiResponse {
      * Convert the given object to string with each line indented by 4 spaces
      * (except the first line).
      */
-    private String toIndentedString(java.lang.Object o) {
+    private String toIndentedString(Object o) {
         if (o == null) {
             return "null";
         }

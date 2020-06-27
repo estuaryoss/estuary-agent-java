@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,12 +69,8 @@ public class TestApiController implements TestApi {
         CommandDescription commandDescription = new CommandDescription();
         FileWriter fileWriter = null;
         try {
-            if (!testInfo.exists()) {
-                fileWriter = new FileWriter(testInfo);
-                fileWriter.write(objectMapper.writeValueAsString(commandDescription));
-                fileWriter.flush();
-                fileWriter.close();
-            }
+            if (!testInfo.exists())
+                writeContentInFile(testInfo, commandDescription);
             Path path = Paths.get(testInfoFilename);
             String fileContent = String.join("\n", Files.readAllLines(path));
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
@@ -98,6 +95,13 @@ public class TestApiController implements TestApi {
 
     public ResponseEntity<ApiResponse> testIdPost(@ApiParam(value = "Test id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String testFileContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
+        String testInfoFilename = new File(".").getAbsolutePath() + "/testinfo.json";
+        File testInfo = new File(testInfoFilename);
+        CommandDescription commandDescription = new CommandDescription()
+                .started(true)
+                .finished(false)
+                .id(id);
+
         if (testFileContent == null) {
             return new ResponseEntity<ApiResponse>(new ApiResponse()
                     .code(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)
@@ -109,6 +113,7 @@ public class TestApiController implements TestApi {
         }
 
         try {
+            writeContentInFile(testInfo, commandDescription);
             CommandRunner commandRunner = new CommandRunner();
             String commandsStripped = testFileContent.replace("\r\n", "\n").stripLeading().stripTrailing();
             List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
@@ -135,5 +140,12 @@ public class TestApiController implements TestApi {
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .time(LocalDateTime.now()), HttpStatus.OK);
+    }
+
+    private void writeContentInFile(File testInfo, CommandDescription commandDescription) throws IOException {
+        FileWriter fileWriter = new FileWriter(testInfo);
+        fileWriter.write(objectMapper.writeValueAsString(commandDescription));
+        fileWriter.flush();
+        fileWriter.close();
     }
 }

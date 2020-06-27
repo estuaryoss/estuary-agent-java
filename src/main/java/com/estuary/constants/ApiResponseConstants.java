@@ -12,7 +12,7 @@ public class ApiResponseConstants {
     public static final String GET_TEST_INFO_FAILURE = "1009";
     public static final String EMPTY_REQUEST_BODY_PROVIDED = "1010";
     public static final String TEST_STOP_FAILURE = "1011";
-    public static final String UPLOAD_TEST_CONFIG_FAILURE = "1012";
+    public static final String UPLOAD_FILE_FAILURE = "1012";
     public static final String HTTP_HEADER_NOT_PROVIDED = "1013";
     public static final String COMMAND_EXEC_FAILURE = "1014";
     public static final String EXEC_COMMAND_NOT_ALLOWED = "1015";

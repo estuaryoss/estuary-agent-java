@@ -1,7 +1,7 @@
 # About
-Estuary-testrunner written in Java (SpringBoot). 
+estuary-testrunner written in Java (SpringBoot). 
 
-The advantage of this implemetation is that java libraries can be integrated within, rather than executing the logic through cli commands pointing to a main class in, as per the original python implementation.
+The advantage of this implementation is that java libraries can be integrated within, rather than executing the logic through cli commands pointing to a main class in a jar, as per the original python implementation.
 
 ## Build status
 [![CircleCI](https://circleci.com/gh/dinuta/estuary-testrunner-java.svg?style=svg&circle-token=2036f4d0e07fadce8101e00e790970fcfb43e03f)](https://circleci.com/gh/dinuta/estuary-testrunner-java)
@@ -13,6 +13,7 @@ The advantage of this implemetation is that java libraries can be integrated wit
 Set the following env vars:  
 -  APP_IP -> the ip which this service binds to
 -  PORT  -> the port which this service binds to
+
 
 ## Fluentd logging
 -  FLUENTD_IP_PORT  -> the fluentd ip:port. Example: localhost:24224  

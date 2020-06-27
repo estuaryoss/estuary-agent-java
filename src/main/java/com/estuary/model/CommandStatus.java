@@ -93,11 +93,11 @@ public class CommandStatus {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
 
-        sb.append("    status: ").append(toIndentedString(status)).append("\n");
-        sb.append("    details: ").append(toIndentedString(details)).append("\n");
-        sb.append("    startedat: ").append(toIndentedString(startedat)).append("\n");
-        sb.append("    finishedat: ").append(toIndentedString(finishedat)).append("\n");
-        sb.append("    duration: ").append(toIndentedString(duration)).append("\n");
+        sb.append("    status: ").append(toIndentedString(status));
+        sb.append("    details: ").append(toIndentedString(details));
+        sb.append("    startedat: ").append(toIndentedString(startedat));
+        sb.append("    finishedat: ").append(toIndentedString(finishedat));
+        sb.append("    duration: ").append(toIndentedString(duration));
         sb.append("}");
         return sb.toString();
     }

@@ -31,7 +31,18 @@ jobs: # a collection of steps
           command: chmod +x start.py
           name: "chmod +x start.py"
 
-      - run: mvn clean install # run the actual tests
+      - run:
+          command: mvn clean package # run the actual tests
+          name: "clean package"
+      - run:
+          command: sudo apt-get update
+          name: "apt-get update"
+      - run:
+          command: sudo apt-get install gnupg2
+          name: "install gnupg2"
+      #      - run:
+      #          command: export GNUPGHOME="$(mktemp -d)" && export GPG_TTY=$(tty) && gpg --batch --generate-key .circleci/gpgtemplate && export GPG_KEYNAME=$(gpg2 --list-keys | head -4 | tail -1 |  sed 's/^\s+//g') && mvn -s settings.xml deploy -DskipTests=true
+      #          name: "deploy"
 
       - store_artifacts: # store the uberjar as an artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/

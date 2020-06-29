@@ -3,6 +3,9 @@ estuary-testrunner written in Java (SpringBoot).
 
 The advantage of this implementation is that java libraries can be integrated within, rather than executing the logic through cli commands pointing to a main class in a jar, as per the original python implementation.
 
+## Artifact
+![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.github.dinuta.estuary/testrunner?server=https%3A%2F%2Foss.sonatype.org)
+
 ## Build status
 [![CircleCI](https://circleci.com/gh/dinuta/estuary-testrunner-java.svg?style=svg&circle-token=2036f4d0e07fadce8101e00e790970fcfb43e03f)](https://circleci.com/gh/dinuta/estuary-testrunner-java)
 
@@ -35,3 +38,30 @@ You can view the api documentation in swagger-ui by pointing to
 http://localhost:8080/  
 
 Change default port value in application.properties
+
+
+## Maven dependency && settings.xml 
+Get this dependency:
+```xml
+<dependency>
+    <groupId>com.github.dinuta.estuary</groupId>
+    <artifactId>testrunner</artifactId>
+    <version>4.0.5-SNAPSHOT</version>
+</dependency>
+```
+
+Set the oss.sonatype.org repo in settings.xml:
+```xml
+<repository>
+    <id>snaphosts4</id>
+    <snapshots>
+        <enabled>true</enabled>
+    </snapshots>
+    <releases>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+    </releases>
+    <name>all-external8</name>
+    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+</repository>
+```

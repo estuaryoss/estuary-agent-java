@@ -4,6 +4,7 @@ estuary-testrunner written in Java (SpringBoot).
 The advantage of this implementation is that java libraries can be integrated within, rather than executing the logic through cli commands pointing to a main class in a jar, as per the original python implementation.
 
 ## Artifact
+![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/com.github.dinuta.estuary/testrunner/4.0.6)
 ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.github.dinuta.estuary/testrunner?server=https%3A%2F%2Foss.sonatype.org)
 
 ## Build status
@@ -46,11 +47,11 @@ Get this dependency:
 <dependency>
     <groupId>com.github.dinuta.estuary</groupId>
     <artifactId>testrunner</artifactId>
-    <version>4.0.5-SNAPSHOT</version>
+    <version>4.0.5</version>
 </dependency>
 ```
 
-Set the oss.sonatype.org repo in settings.xml:
+For using a snapshot version, set the oss.sonatype.org repo in settings.xml:
 ```xml
 <repository>
     <id>snaphosts4</id>

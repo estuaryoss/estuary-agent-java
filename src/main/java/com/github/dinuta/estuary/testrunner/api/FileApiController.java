@@ -1,0 +1,126 @@
+package com.github.dinuta.estuary.testrunner.api;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dinuta.estuary.testrunner.constants.About;
+import com.github.dinuta.estuary.testrunner.constants.ApiResponseConstants;
+import com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage;
+import com.github.dinuta.estuary.testrunner.model.ApiResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
+
+@Api(tags = {"estuary-testrunner"})
+@Controller
+public class FileApiController implements FileApi {
+
+    private static final Logger log = LoggerFactory.getLogger(FileApiController.class);
+
+    private final ObjectMapper objectMapper;
+
+    private final HttpServletRequest request;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public FileApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+        this.objectMapper = objectMapper;
+        this.request = request;
+    }
+
+    public ResponseEntity<? extends Object> fileGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token, @ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+        String accept = request.getHeader("Accept");
+        String headerName = "File-Path";
+        List<String> fileContent;
+
+        if (filePath == null) {
+            return new ResponseEntity<ApiResponse>(new ApiResponse()
+                    .code(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED)
+                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
+                    .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+        }
+
+        try {
+            Path path = Paths.get(filePath);
+            fileContent = Files.readAllLines(path);
+        } catch (Exception e) {
+            return new ResponseEntity<ApiResponse>(new ApiResponse()
+                    .code(ApiResponseConstants.GET_FILE_FAILURE)
+                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_FILE_FAILURE))
+                    .description(ExceptionUtils.getStackTrace(e))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("text/plain"))
+                .body(String.join("\n", fileContent));
+    }
+
+    public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file", required = true) @Valid @RequestBody String content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+        String accept = request.getHeader("Accept");
+        String headerName = "File-Path";
+        List<String> fileContent;
+
+        if (filePath == null) {
+            return new ResponseEntity<ApiResponse>(new ApiResponse()
+                    .code(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED)
+                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
+                    .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+        }
+
+        if (content == null) {
+            return new ResponseEntity<ApiResponse>(new ApiResponse()
+                    .code(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)
+                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
+                    .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+        }
+
+        try {
+            Path path = Paths.get(filePath);
+            Files.writeString(path, content);
+        } catch (Exception e) {
+            return new ResponseEntity<ApiResponse>(new ApiResponse()
+                    .code(ApiResponseConstants.UPLOAD_FILE_FAILURE)
+                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.UPLOAD_FILE_FAILURE))
+                    .description(ExceptionUtils.getStackTrace(e))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<ApiResponse>(new ApiResponse()
+                .code(ApiResponseConstants.SUCCESS)
+                .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .description(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .name(About.getAppName())
+                .version(About.getVersion())
+                .time(LocalDateTime.now()), HttpStatus.OK);
+    }
+
+}

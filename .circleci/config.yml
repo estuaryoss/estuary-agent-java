@@ -41,8 +41,10 @@ jobs: # a collection of steps
           command: sudo apt-get install gnupg2
           name: "install gnupg2"
       #      - run:
-      #          command: export GNUPGHOME="$(mktemp -d)" && export GPG_TTY=$(tty) && gpg --batch --generate-key .circleci/gpgtemplate && export GPG_KEYNAME=$(gpg2 --list-keys | head -4 | tail -1 |  sed 's/^\s+//g') && mvn -s settings.xml deploy -DskipTests=true
+      #          command: export GPG_KEYNAME=$(gpg2 --list-keys | head -4 | tail -1 |  sed 's/^\s+//g') && mvn -s settings.xml clean deploy -DskipTests=true
       #          name: "deploy"
+
+      # -> for new gpg2 key: export GNUPGHOME="$(mktemp -d)" && export GPG_TTY=$(tty) && gpg --batch --generate-key .circleci/gpgtemplate &&
 
       - store_artifacts: # store the uberjar as an artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/

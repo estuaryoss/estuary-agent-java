@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -45,7 +46,7 @@ public class TestApiController implements TestApi {
 
     private final HttpServletRequest request;
 
-    @org.springframework.beans.factory.annotation.Autowired
+    @Autowired
     public TestApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -122,7 +123,7 @@ public class TestApiController implements TestApi {
             startPyArgumentsList.add(id);
             startPyArgumentsList.add(String.join(";", commandsList.toArray(new String[0])));
 
-            commandRunner.runCommandDetached(startPyArgumentsList);
+            commandRunner.runStartCommandDetached(startPyArgumentsList);
         } catch (Exception e) {
             return new ResponseEntity<ApiResponse>(new ApiResponse()
                     .code(ApiResponseConstants.TEST_START_FAILURE)

@@ -46,7 +46,7 @@ jobs: # a collection of steps
 
       # -> for new gpg2 key: export GNUPGHOME="$(mktemp -d)" && export GPG_TTY=$(tty) && gpg --batch --generate-key .circleci/gpgtemplate &&
 
-      - store_artifacts: # store the uberjar as an artifact
+      - store_artifacts: # store the jar as an artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: target/testrunner-4.0.5.jar
+          path: target/testrunner-4.0.7-SNAPSHOT-exec.jar
       # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples

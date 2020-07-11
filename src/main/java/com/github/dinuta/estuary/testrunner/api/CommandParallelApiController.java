@@ -28,31 +28,31 @@ import java.util.stream.Collectors;
 
 @Api(tags = {"estuary-testrunner"})
 @Controller
-public class CommandApiController implements CommandApi {
+public class CommandParallelApiController implements CommandParallelApi {
 
-    private static final Logger log = LoggerFactory.getLogger(CommandApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(CommandParallelApiController.class);
 
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
 
     @Autowired
-    public CommandApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public CommandParallelApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
     }
 
     public ResponseEntity<ApiResponse> commandPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
-        String accept = request.getHeader("Accept");
         CommandRunner commandRunner = new CommandRunner();
         String commandsStripped = commands.replace("\r\n", "\n").stripLeading().stripTrailing();
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                 .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());
 
+        log.info("Executing commands", commandsList);
         return new ResponseEntity<ApiResponse>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(commandRunner.runCommands(commandsList.toArray(new String[0])))
+                .description(commandRunner.runCommandsParallel(commandsList.toArray(new String[0])))
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .time(LocalDateTime.now()), HttpStatus.OK);

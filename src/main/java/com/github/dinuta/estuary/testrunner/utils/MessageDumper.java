@@ -28,6 +28,7 @@ public class MessageDumper {
 
         dumpedRequest.put(BODY, body);
         dumpedRequest.put(HEADERS, headers);
+
         return dumpedRequest;
     }
 

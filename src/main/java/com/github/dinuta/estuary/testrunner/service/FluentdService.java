@@ -21,6 +21,25 @@ public class FluentdService {
         }
     }
 
+    /**
+     * Sends the log to the FluentD service. If FluentD is not enabled then it will only print the message back to the user.
+     *
+     * @param loggingLevel On which level to log the message
+     * @param msg          The message to be sent into FluentD
+     * @return A response which can be printed in console to be sure that it was sent to the FluentD service.
+     * For success, the return value should be: 'emit: true'.
+     */
+    public LinkedHashMap emit(String loggingLevel, Object msg) {
+        LinkedHashMap map = new LinkedHashMap();
+        LinkedHashMap<String, Object> message = this.enrichLog("DEBUG", msg);
+
+        map.put(FinalConsoleMessage.EMIT.getField(), this.emit(loggingLevel, message));
+        map.put(FinalConsoleMessage.MESSAGE.getField(), message);
+
+        System.out.println(map);
+        return map;
+    }
+
     private LinkedHashMap<String, Object> enrichLog(String levelCode, Object object) {
         DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
         LinkedHashMap<String, Object> enrichedLog = new LinkedHashMap<>();
@@ -42,17 +61,6 @@ public class FluentdService {
                     EnvConstants.FLUENTD_IP_PORT);
         }
         return String.valueOf(this.fluentLogger.log(loggingLevel, msg));
-    }
-
-    public LinkedHashMap emit(String loggingLevel, Object msg) {
-        LinkedHashMap map = new LinkedHashMap();
-        LinkedHashMap<String, Object> message = this.enrichLog("DEBUG", msg);
-
-        map.put(FinalConsoleMessage.EMIT.getField(), this.emit(loggingLevel, message));
-        map.put(FinalConsoleMessage.MESSAGE.getField(), message);
-
-        System.out.println(map);
-        return map;
     }
 
     private enum FinalConsoleMessage {

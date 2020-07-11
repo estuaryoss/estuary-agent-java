@@ -84,16 +84,16 @@ public class TestApiControllerTest {
         await().atMost(sleep2 + 1, SECONDS).until(isCommandFinished(command2));
         body1 = getApiResponseCommandDescriptionResponseEntity().getBody();
 
-        assertThat(body1.getDescription().getDuration()).isEqualTo(sleep1 + sleep2);
+        assertThat(Math.round(body1.getDescription().getDuration())).isEqualTo(Math.round(sleep1 + sleep2));
         assertThat(body1.getDescription().getFinishedat()).isBefore(LocalDateTime.now());
         assertThat(body1.getDescription().getStartedat()).isBefore(LocalDateTime.now());
         assertThat(body1.getDescription().getStarted()).isEqualTo(false);
         assertThat(body1.getDescription().getFinished()).isEqualTo(true);
         assertThat(body1.getDescription().getId()).isEqualTo(testId);
         assertThat(body1.getDescription().getPid()).isGreaterThanOrEqualTo(0);
-        assertThat(body1.getDescription().getCommands().get(command1).getDuration()).isEqualTo(sleep1);
+        assertThat(Math.round(body1.getDescription().getCommands().get(command1).getDuration())).isEqualTo(Math.round(sleep1));
         assertThat(body1.getDescription().getCommands().get(command1).getStatus()).isEqualTo("finished");
-        assertThat(body1.getDescription().getCommands().get(command2).getDuration()).isEqualTo(sleep2);
+        assertThat(Math.round(body1.getDescription().getCommands().get(command2).getDuration())).isEqualTo(Math.round(sleep2));
         assertThat(body1.getDescription().getCommands().get(command2).getStatus()).isEqualTo("finished");
         assertThat(body1.getName()).isEqualTo(About.getAppName());
         assertThat(body1.getVersion()).isEqualTo(About.getVersion());
@@ -108,7 +108,7 @@ public class TestApiControllerTest {
             if (body.getDescription().getCommands().get(command) == null)
                 return Boolean.FALSE;
 
-            return Boolean.valueOf(body.getDescription().getCommands().get(command).getDuration() > 0);
+            return Boolean.valueOf(body.getDescription().getCommands().get(command).getDuration() > 0F);
         };
     }
 

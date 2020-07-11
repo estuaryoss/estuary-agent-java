@@ -14,10 +14,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @RestController
 @EnableSwagger2
 @ComponentScan(basePackages = {"com.github.dinuta.estuary.testrunner", "com.github.dinuta.estuary.testrunner.api", "com.github.dinuta.estuary.testrunner.configuration"})
-public class Swagger2SpringBoot implements CommandLineRunner {
+public class TestRunnerSpringBoot implements CommandLineRunner {
 
     public static void main(String[] args) {
-        new SpringApplication(Swagger2SpringBoot.class).run(args);
+        new SpringApplication(TestRunnerSpringBoot.class).run(args);
     }
 
     @Override

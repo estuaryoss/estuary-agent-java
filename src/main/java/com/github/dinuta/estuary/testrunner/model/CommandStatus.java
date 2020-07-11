@@ -21,7 +21,7 @@ public class CommandStatus {
     private LocalDateTime finishedat = null;
 
     @JsonProperty("duration")
-    private long duration = 0;
+    private float duration = 0;
 
     public String getStatus() {
         return status;
@@ -47,11 +47,11 @@ public class CommandStatus {
         this.startedat = startedat;
     }
 
-    public long getDuration() {
+    public float getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(float duration) {
         this.duration = duration;
     }
 
@@ -83,7 +83,7 @@ public class CommandStatus {
         return this;
     }
 
-    public CommandStatus duration(long duration) {
+    public CommandStatus duration(float duration) {
         this.duration = duration;
         return this;
     }

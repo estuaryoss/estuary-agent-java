@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
-public class CommandApiControllerTest {
+public class CommandParallelApiControllerTest {
     private final static String SERVER_PREFIX = "http://localhost:";
 
     @LocalServerPort
@@ -55,7 +55,7 @@ public class CommandApiControllerTest {
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(
-                String.format(com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
 
         this.assertSuccessCommandDescriptionFields(commandInfo, body.getDescription());
 
@@ -65,7 +65,7 @@ public class CommandApiControllerTest {
     }
 
     @Test
-    public void whenSendingTwoCommandsThenApiReturnsSumOfTimeExecutionInSeconds() {
+    public void whenSendingTwoCommandsThenApiReturnsMaxOfExecutionTimeInSeconds() {
         float sleep1 = 1f;
         float sleep2 = 2f;
         String command1 = "sleep " + sleep1;
@@ -79,8 +79,8 @@ public class CommandApiControllerTest {
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(
-                String.format(com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
-        assertThat(Math.round(body.getDescription().getDuration())).isEqualTo(Math.round(sleep1 + sleep2));
+                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+        assertThat(Math.round(body.getDescription().getDuration())).isEqualTo(Math.round(sleep2));
         assertThat(body.getDescription().getDuration()).isInstanceOf(Float.class);
 
         assertThat(Math.round(body.getDescription().getCommands().get(command1).getDuration())).isEqualTo(Math.round(sleep1));
@@ -121,7 +121,7 @@ public class CommandApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate
-                .exchange(SERVER_PREFIX + port + "/command",
+                .exchange(SERVER_PREFIX + port + "/commandparallel",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(commandInfo.split(";")[0], headers),
                         ApiResponseCommandDescription.class);
@@ -164,6 +164,6 @@ public class CommandApiControllerTest {
         assertThat(body.getCommands().get(command).getStatus()).isEqualTo("finished");
 
         assertThat(body.getCommands().get(command).getDetails().getPid()).isGreaterThanOrEqualTo(0);
-        assertThat(body.getCommands().get(command).getDetails().getArgs()[2]).isEqualTo(command);
+        assertThat(body.getCommands().get(command).getDetails().getArgs()[0]).isEqualTo(command);
     }
 }

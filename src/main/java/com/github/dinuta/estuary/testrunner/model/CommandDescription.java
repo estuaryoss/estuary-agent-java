@@ -22,7 +22,7 @@ public class CommandDescription {
     private LocalDateTime finishedat = LocalDateTime.now();
 
     @JsonProperty("duration")
-    private long duration = 0;
+    private float duration = 0;
 
     @JsonProperty("pid")
     private long pid = 0;
@@ -65,11 +65,11 @@ public class CommandDescription {
         this.startedat = startedat;
     }
 
-    public long getDuration() {
+    public float getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(float duration) {
         this.duration = duration;
     }
 
@@ -110,7 +110,7 @@ public class CommandDescription {
         return this;
     }
 
-    public CommandDescription duration(long duration) {
+    public CommandDescription duration(float duration) {
         this.duration = duration;
         return this;
     }

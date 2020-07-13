@@ -25,7 +25,7 @@ import javax.validation.Valid;
 @RequestMapping(value = "")
 public interface CommandParallelApi {
 
-    @ApiOperation(value = "Starts multiple commands in blocking mode sequentially. Set the client timeout at needed value.", nickname = "commandPost", notes = "", response = ApiResponse.class, tags = {"estuary-testrunner",})
+    @ApiOperation(value = "Starts multiple commands in blocking mode parallel. Set the client timeout at needed value.", nickname = "commandPost", notes = "", response = ApiResponse.class, tags = {"estuary-testrunner",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "commands start success", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 404, message = "commands start failure", response = ApiResponse.class)})

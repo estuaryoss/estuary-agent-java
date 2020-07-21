@@ -45,9 +45,9 @@ public interface FileApi {
             @io.swagger.annotations.ApiResponse(code = 404, message = "Failure, the file content could not be uploaded", response = ApiResponse.class)})
     @RequestMapping(value = "/file",
             produces = {"application/json", "text/plain"},
-            consumes = {"application/json", "application/x-www-form-urlencoded", "text/plain"},
+            consumes = {"application/json", "application/x-www-form-urlencoded", "application/octet-stream", "text/plain"},
             method = RequestMethod.PUT)
-    default ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file", required = true) @Valid @RequestBody String content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    default ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file", required = true) @Valid @RequestBody byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
 
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }

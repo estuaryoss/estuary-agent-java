@@ -77,7 +77,7 @@ public class FileApiController implements FileApi {
                 .body(String.join("\n", fileContent));
     }
 
-    public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file", required = true) @Valid @RequestBody String content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file", required = true) @Valid @RequestBody byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
         String headerName = "File-Path";
         List<String> fileContent;
@@ -104,7 +104,7 @@ public class FileApiController implements FileApi {
 
         try {
             Path path = Paths.get(filePath);
-            Files.writeString(path, content);
+            Files.write(path, content);
         } catch (Exception e) {
             return new ResponseEntity<ApiResponse>(new ApiResponse()
                     .code(ApiResponseConstants.UPLOAD_FILE_FAILURE)

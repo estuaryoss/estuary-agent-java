@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dinuta.estuary.testrunner.constants.About;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage;
-import com.github.dinuta.estuary.testrunner.model.ApiResponse;
+import com.github.dinuta.estuary.testrunner.model.api.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
 
@@ -45,7 +46,7 @@ public class AboutApiController implements AboutApi {
                 .description(About.getAppName())
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now()), HttpStatus.OK);
+                .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.OK);
     }
 
 }

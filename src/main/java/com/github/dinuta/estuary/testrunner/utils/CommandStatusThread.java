@@ -1,9 +1,10 @@
 package com.github.dinuta.estuary.testrunner.utils;
 
-import com.github.dinuta.estuary.testrunner.model.CommandParallel;
+import com.github.dinuta.estuary.testrunner.model.api.CommandParallel;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class CommandStatusThread implements Runnable {
     private static final float DENOMINATOR = 1000F;
@@ -18,16 +19,18 @@ public class CommandStatusThread implements Runnable {
     public void run() {
         pCmd.getCmdsStatus().put(pCmd.getCmd(), pCmd.getCmdStatuses().get(pCmd.getId()).details(
                 commandRunner.getCmdDetailsOfProcess(new String[]{pCmd.getCmd()}, pCmd.getProcess())));
-        pCmd.getCmdStatuses().get(pCmd.getId()).finishedat(LocalDateTime.now());
+        LocalDateTime end = LocalDateTime.now();
+        pCmd.getCmdStatuses().get(pCmd.getId()).finishedat(end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
         pCmd.getCmdStatuses().get(pCmd.getId()).duration(Duration.between(
-                pCmd.getCmdStatuses().get(pCmd.getId()).getStartedat(),
-                pCmd.getCmdStatuses().get(pCmd.getId()).getFinishedat()).toMillis() / DENOMINATOR);
+                LocalDateTime.parse(pCmd.getCmdStatuses().get(pCmd.getId()).getStartedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")),
+                end).toMillis() / DENOMINATOR);
         pCmd.getCmdStatuses().get(pCmd.getId()).status("finished");
         pCmd.getCmdDescription().commands(pCmd.getCmdsStatus());
-        pCmd.getCmdDescription().finishedat(LocalDateTime.now());
+        LocalDateTime endTotal = LocalDateTime.now();
+        pCmd.getCmdDescription().finishedat(endTotal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
         pCmd.getCmdDescription().duration(Duration.between(
-                pCmd.getCmdDescription().getStartedat(),
-                pCmd.getCmdDescription().getFinishedat()).toMillis() / DENOMINATOR);
+                LocalDateTime.parse(pCmd.getCmdDescription().getStartedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")),
+                endTotal).toMillis() / DENOMINATOR);
         pCmd.getCmdDescription().finished(true);
         pCmd.getCmdDescription().started(false);
     }

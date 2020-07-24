@@ -5,8 +5,8 @@
  */
 package com.github.dinuta.estuary.testrunner.api;
 
-import com.github.dinuta.estuary.testrunner.model.ApiResponse;
 import com.github.dinuta.estuary.testrunner.model.Envvar;
+import com.github.dinuta.estuary.testrunner.model.api.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

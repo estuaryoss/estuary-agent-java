@@ -1,9 +1,7 @@
-package com.github.dinuta.estuary.testrunner.model;
+package com.github.dinuta.estuary.testrunner.model.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.time.LocalDateTime;
 
 public class CommandStatus {
     @JsonProperty("status")
@@ -14,11 +12,11 @@ public class CommandStatus {
 
     @JsonProperty("startedat")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
-    private LocalDateTime startedat = null;
+    private String startedat = null;
 
     @JsonProperty("finishedat")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
-    private LocalDateTime finishedat = null;
+    private String finishedat = null;
 
     @JsonProperty("duration")
     private float duration = 0;
@@ -31,19 +29,19 @@ public class CommandStatus {
         this.status = status;
     }
 
-    public LocalDateTime getFinishedat() {
+    public String getFinishedat() {
         return finishedat;
     }
 
-    public void setFinishedat(LocalDateTime finishedat) {
+    public void setFinishedat(String finishedat) {
         this.finishedat = finishedat;
     }
 
-    public LocalDateTime getStartedat() {
+    public String getStartedat() {
         return startedat;
     }
 
-    public void setStartedat(LocalDateTime startedat) {
+    public void setStartedat(String startedat) {
         this.startedat = startedat;
     }
 
@@ -73,12 +71,12 @@ public class CommandStatus {
         return this;
     }
 
-    public CommandStatus finishedat(LocalDateTime finishedat) {
+    public CommandStatus finishedat(String finishedat) {
         this.finishedat = finishedat;
         return this;
     }
 
-    public CommandStatus startedat(LocalDateTime startedat) {
+    public CommandStatus startedat(String startedat) {
         this.startedat = startedat;
         return this;
     }

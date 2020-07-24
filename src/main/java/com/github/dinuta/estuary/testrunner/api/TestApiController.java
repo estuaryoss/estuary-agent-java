@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dinuta.estuary.testrunner.constants.About;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage;
-import com.github.dinuta.estuary.testrunner.model.ApiResponse;
-import com.github.dinuta.estuary.testrunner.model.CommandDescription;
+import com.github.dinuta.estuary.testrunner.model.api.ApiResponse;
+import com.github.dinuta.estuary.testrunner.model.api.CommandDescription;
 import com.github.dinuta.estuary.testrunner.utils.CommandRunner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +61,7 @@ public class TestApiController implements TestApi {
                 .description(ApiResponseMessage.getMessage(ApiResponseConstants.NOT_IMPLEMENTED))
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now()), HttpStatus.NOT_IMPLEMENTED);
+                .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<ApiResponse> testGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
@@ -82,7 +83,7 @@ public class TestApiController implements TestApi {
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.OK);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.OK);
         }
 
         return new ResponseEntity<ApiResponse>(new ApiResponse()
@@ -91,7 +92,7 @@ public class TestApiController implements TestApi {
                 .description(commandDescription)
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now()), HttpStatus.OK);
+                .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.OK);
     }
 
     public ResponseEntity<ApiResponse> testIdPost(@ApiParam(value = "Test id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String testFileContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
@@ -110,7 +111,7 @@ public class TestApiController implements TestApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -131,7 +132,7 @@ public class TestApiController implements TestApi {
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<ApiResponse>(new ApiResponse()
@@ -140,7 +141,7 @@ public class TestApiController implements TestApi {
                 .description(id)
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now()), HttpStatus.OK);
+                .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.OK);
     }
 
     private void writeContentInFile(File testInfo, CommandDescription commandDescription) throws IOException {

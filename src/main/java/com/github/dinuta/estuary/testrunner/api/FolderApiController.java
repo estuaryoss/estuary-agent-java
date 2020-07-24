@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dinuta.estuary.testrunner.constants.About;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage;
-import com.github.dinuta.estuary.testrunner.model.ApiResponse;
+import com.github.dinuta.estuary.testrunner.model.api.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
@@ -58,11 +60,11 @@ public class FolderApiController implements FolderApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
         }
 
         File file;
-        InputStreamResource resource;
+        ByteArrayResource resource;
         try {
             file = new File(archiveNamePath);
             ZipUtil.pack(new File(folderPath), file, new NameMapper() {
@@ -71,7 +73,7 @@ public class FolderApiController implements FolderApi {
                 }
             });
 
-            resource = new InputStreamResource(new FileInputStream(archiveNamePath));
+            resource = new ByteArrayResource(IOUtils.toByteArray(new FileInputStream(archiveNamePath)));
         } catch (Exception e) {
             return new ResponseEntity<ApiResponse>(new ApiResponse()
                     .code(ApiResponseConstants.FOLDER_ZIP_FAILURE)
@@ -79,7 +81,7 @@ public class FolderApiController implements FolderApi {
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
         }
 
         return ResponseEntity.ok()

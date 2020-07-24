@@ -1,4 +1,4 @@
-package com.github.dinuta.estuary.testrunner.model;
+package com.github.dinuta.estuary.testrunner.model.api;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

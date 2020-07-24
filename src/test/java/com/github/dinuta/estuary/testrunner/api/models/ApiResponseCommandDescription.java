@@ -2,7 +2,7 @@ package com.github.dinuta.estuary.testrunner.api.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.dinuta.estuary.testrunner.model.CommandDescription;
+import com.github.dinuta.estuary.testrunner.model.api.CommandDescription;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 

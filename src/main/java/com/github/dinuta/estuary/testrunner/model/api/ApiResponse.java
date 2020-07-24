@@ -1,13 +1,10 @@
-package com.github.dinuta.estuary.testrunner.model;
+package com.github.dinuta.estuary.testrunner.model.api;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
@@ -27,8 +24,7 @@ public class ApiResponse {
     private Object description = null;
 
     @JsonProperty("time")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
-    private LocalDateTime time = null;
+    private String time = null;
 
     @JsonProperty("name")
     private String name = null;
@@ -57,7 +53,7 @@ public class ApiResponse {
         this.code = code;
     }
 
-    public ApiResponse time(LocalDateTime time) {
+    public ApiResponse time(String time) {
         this.time = time;
         return this;
     }
@@ -113,11 +109,11 @@ public class ApiResponse {
 
     @Valid
 
-    public LocalDateTime getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
@@ -194,7 +190,7 @@ public class ApiResponse {
         sb.append("    message: ").append(toIndentedString(message));
         sb.append("    description: ").append(toIndentedString(description));
         sb.append("    code: ").append(toIndentedString(code));
-        sb.append("    time: ").append(toIndentedString(time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))));
+        sb.append("    time: ").append(toIndentedString(time));
         sb.append("    name: ").append(toIndentedString(name));
         sb.append("    version: ").append(toIndentedString(version));
         sb.append("}");

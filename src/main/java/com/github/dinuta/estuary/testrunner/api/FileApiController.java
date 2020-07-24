@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dinuta.estuary.testrunner.constants.About;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage;
-import com.github.dinuta.estuary.testrunner.model.ApiResponse;
+import com.github.dinuta.estuary.testrunner.model.api.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
@@ -56,7 +57,7 @@ public class FileApiController implements FileApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -69,7 +70,7 @@ public class FileApiController implements FileApi {
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
         }
 
         return ResponseEntity.ok()
@@ -89,7 +90,7 @@ public class FileApiController implements FileApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
         }
 
         if (content == null) {
@@ -99,7 +100,7 @@ public class FileApiController implements FileApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -112,7 +113,7 @@ public class FileApiController implements FileApi {
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now()), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<ApiResponse>(new ApiResponse()
@@ -121,7 +122,7 @@ public class FileApiController implements FileApi {
                 .description(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now()), HttpStatus.OK);
+                .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.OK);
     }
 
 }

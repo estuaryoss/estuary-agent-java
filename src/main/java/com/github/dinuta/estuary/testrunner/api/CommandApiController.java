@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dinuta.estuary.testrunner.constants.About;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage;
-import com.github.dinuta.estuary.testrunner.model.ApiResponse;
+import com.github.dinuta.estuary.testrunner.model.api.ApiResponse;
 import com.github.dinuta.estuary.testrunner.utils.CommandRunner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +56,6 @@ public class CommandApiController implements CommandApi {
                 .description(commandRunner.runCommands(commandsList.toArray(new String[0])))
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now()), HttpStatus.OK);
+                .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.OK);
     }
 }

@@ -1,9 +1,9 @@
 package com.github.dinuta.estuary.testrunner.utils;
 
-import com.github.dinuta.estuary.testrunner.model.CommandDescription;
-import com.github.dinuta.estuary.testrunner.model.CommandDetails;
-import com.github.dinuta.estuary.testrunner.model.CommandParallel;
-import com.github.dinuta.estuary.testrunner.model.CommandStatus;
+import com.github.dinuta.estuary.testrunner.model.api.CommandDescription;
+import com.github.dinuta.estuary.testrunner.model.api.CommandDetails;
+import com.github.dinuta.estuary.testrunner.model.api.CommandParallel;
+import com.github.dinuta.estuary.testrunner.model.api.CommandStatus;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.BufferedReader;
@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -52,25 +53,29 @@ public class CommandRunner {
         LinkedHashMap commandsStatus = new LinkedHashMap<String, CommandStatus>();
         CommandDescription commandDescription = new CommandDescription();
 
-        commandDescription.startedat(LocalDateTime.now());
+        LocalDateTime startTotal = LocalDateTime.now();
+        commandDescription.startedat(startTotal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
         commandDescription.started(true);
         commandDescription.finished(false);
         commandDescription.pid(ProcessHandle.current().pid());
 
         for (String cmd : commands) {
             CommandStatus commandStatus = new CommandStatus();
-            commandStatus.startedat(LocalDateTime.now());
+            LocalDateTime start = LocalDateTime.now();
+            commandStatus.startedat(start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
             commandsStatus.put(cmd, commandStatus.details(this.runCommand(cmd)));
-            commandStatus.finishedat(LocalDateTime.now());
+            LocalDateTime end = LocalDateTime.now();
+            commandStatus.finishedat(end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
             commandStatus.duration(
-                    Duration.between(commandStatus.getStartedat(), commandStatus.getFinishedat()).toMillis() / DENOMINATOR);
+                    Duration.between(start, end).toMillis() / DENOMINATOR);
             commandStatus.status("finished");
             commandDescription.commands(commandsStatus);
         }
 
-        commandDescription.finishedat(LocalDateTime.now());
+        LocalDateTime endTotal = LocalDateTime.now();
+        commandDescription.finishedat(endTotal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
         commandDescription.duration(
-                Duration.between(commandDescription.getStartedat(), commandDescription.getFinishedat()).toMillis() / DENOMINATOR);
+                Duration.between(startTotal, endTotal).toMillis() / DENOMINATOR);
         commandDescription.finished(true);
         commandDescription.started(false);
 
@@ -130,14 +135,15 @@ public class CommandRunner {
         LinkedHashMap<String, CommandStatus> commandsStatus = new LinkedHashMap();
         CommandDescription commandDescription = new CommandDescription();
 
-        commandDescription.startedat(LocalDateTime.now());
+        LocalDateTime startTotal = LocalDateTime.now();
+        commandDescription.startedat(startTotal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
         commandDescription.started(true);
         commandDescription.finished(false);
         commandDescription.pid(ProcessHandle.current().pid());
 
         for (int i = 0; i < commands.length; i++) {
             commandStatuses.add(new CommandStatus());
-            commandStatuses.get(i).startedat(LocalDateTime.now());
+            commandStatuses.get(i).startedat(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
             processes.add(this.runCommandDetached(commands[i].split(" ")));
         }
 

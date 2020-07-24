@@ -12,6 +12,7 @@ The advantage of this implementation is that java libraries can be integrated wi
 
 ## Code quality
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/dfbb5fd3b7cb4055a71d0f0b886917e3)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dinuta/estuary-testrunner-java&amp;utm_campaign=Badge_Grade)
+[![Maintainability](https://api.codeclimate.com/v1/badges/13925efd81d683c97123/maintainability)](https://codeclimate.com/github/dinuta/estuary-testrunner-java/maintainability)
 
 ## Eureka client registration
 Set the following env vars:  

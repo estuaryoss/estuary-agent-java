@@ -1,9 +1,9 @@
-package com.github.dinuta.estuary.testrunner.model;
+package com.github.dinuta.estuary.testrunner.model.api;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 
 public class CommandDescription {
@@ -14,12 +14,10 @@ public class CommandDescription {
     private boolean started;
 
     @JsonProperty("startedat")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
-    private LocalDateTime startedat = LocalDateTime.now();
+    private String startedat = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
 
     @JsonProperty("finishedat")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
-    private LocalDateTime finishedat = LocalDateTime.now();
+    private String finishedat = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
 
     @JsonProperty("duration")
     private float duration = 0;
@@ -49,19 +47,19 @@ public class CommandDescription {
         this.started = started;
     }
 
-    public LocalDateTime getFinishedat() {
+    public String getFinishedat() {
         return finishedat;
     }
 
-    public void setFinishedat(LocalDateTime finishedat) {
+    public void setFinishedat(String finishedat) {
         this.finishedat = finishedat;
     }
 
-    public LocalDateTime getStartedat() {
+    public String getStartedat() {
         return startedat;
     }
 
-    public void setStartedat(LocalDateTime startedat) {
+    public void setStartedat(String startedat) {
         this.startedat = startedat;
     }
 
@@ -100,12 +98,12 @@ public class CommandDescription {
         return this;
     }
 
-    public CommandDescription finishedat(LocalDateTime finishedat) {
+    public CommandDescription finishedat(String finishedat) {
         this.finishedat = finishedat;
         return this;
     }
 
-    public CommandDescription startedat(LocalDateTime startedat) {
+    public CommandDescription startedat(String startedat) {
         this.startedat = startedat;
         return this;
     }

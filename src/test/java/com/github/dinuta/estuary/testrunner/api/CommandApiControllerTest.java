@@ -5,6 +5,7 @@ import com.github.dinuta.estuary.testrunner.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.testrunner.constants.About;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage;
+import com.github.dinuta.estuary.testrunner.constants.DateTimeConstants;
 import com.github.dinuta.estuary.testrunner.model.api.CommandDescription;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -151,16 +151,16 @@ public class CommandApiControllerTest {
     }
 
     private void assertCommonCommonDescriptionFields(String command, CommandDescription body) {
-        assertThat(LocalDateTime.parse(body.getFinishedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))).isBefore(LocalDateTime.now());
-        assertThat(LocalDateTime.parse(body.getStartedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getStartedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
         assertThat(body.getFinished()).isEqualTo(true);
         assertThat(body.getStarted()).isEqualTo(false);
         assertThat(body.getDuration()).isGreaterThanOrEqualTo(0);
         assertThat(body.getPid()).isGreaterThan(0);
         assertThat(body.getId()).isEqualTo("none");
 
-        assertThat(LocalDateTime.parse(body.getCommands().get(command).getFinishedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))).isBefore(LocalDateTime.now());
-        assertThat(LocalDateTime.parse(body.getCommands().get(command).getStartedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getCommands().get(command).getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getCommands().get(command).getStartedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
         assertThat(body.getCommands().get(command).getDuration()).isGreaterThanOrEqualTo(0);
         assertThat(body.getCommands().get(command).getStatus()).isEqualTo("finished");
 

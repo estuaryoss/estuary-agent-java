@@ -6,6 +6,7 @@ import com.github.dinuta.estuary.testrunner.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.testrunner.constants.About;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage;
+import com.github.dinuta.estuary.testrunner.constants.DateTimeConstants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -75,8 +75,8 @@ public class TestApiControllerTest {
         ApiResponseCommandDescription body1 =
                 getApiResponseCommandDescriptionResponseEntity().getBody();
 
-        assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))).isBefore(LocalDateTime.now());
-        assertThat(LocalDateTime.parse(body1.getDescription().getStartedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body1.getDescription().getStartedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
         assertThat(body1.getDescription().getStarted()).isEqualTo(true);
         assertThat(body1.getDescription().getFinished()).isEqualTo(false);
         assertThat(body1.getDescription().getCommands().get(command1).getStatus()).isEqualTo("finished");
@@ -86,8 +86,8 @@ public class TestApiControllerTest {
         body1 = getApiResponseCommandDescriptionResponseEntity().getBody();
 
         assertThat(Math.round(body1.getDescription().getDuration())).isEqualTo(Math.round(sleep1 + sleep2));
-        assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))).isBefore(LocalDateTime.now());
-        assertThat(LocalDateTime.parse(body1.getDescription().getStartedat(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body1.getDescription().getStartedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
         assertThat(body1.getDescription().getStarted()).isEqualTo(false);
         assertThat(body1.getDescription().getFinished()).isEqualTo(true);
         assertThat(body1.getDescription().getId()).isEqualTo(testId);

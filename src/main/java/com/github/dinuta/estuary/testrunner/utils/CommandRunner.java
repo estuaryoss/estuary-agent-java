@@ -1,5 +1,6 @@
 package com.github.dinuta.estuary.testrunner.utils;
 
+import com.github.dinuta.estuary.testrunner.constants.DateTimeConstants;
 import com.github.dinuta.estuary.testrunner.model.api.CommandDescription;
 import com.github.dinuta.estuary.testrunner.model.api.CommandDetails;
 import com.github.dinuta.estuary.testrunner.model.api.CommandParallel;
@@ -12,7 +13,6 @@ import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,29 +53,27 @@ public class CommandRunner {
         LinkedHashMap commandsStatus = new LinkedHashMap<String, CommandStatus>();
         CommandDescription commandDescription = new CommandDescription();
 
-        LocalDateTime startTotal = LocalDateTime.now();
-        commandDescription.startedat(startTotal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
+        commandDescription.startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
         commandDescription.started(true);
         commandDescription.finished(false);
         commandDescription.pid(ProcessHandle.current().pid());
 
         for (String cmd : commands) {
             CommandStatus commandStatus = new CommandStatus();
-            LocalDateTime start = LocalDateTime.now();
-            commandStatus.startedat(start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
+            commandStatus.startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             commandsStatus.put(cmd, commandStatus.details(this.runCommand(cmd)));
-            LocalDateTime end = LocalDateTime.now();
-            commandStatus.finishedat(end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
-            commandStatus.duration(
-                    Duration.between(start, end).toMillis() / DENOMINATOR);
+            commandStatus.finishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
+            commandStatus.duration(Duration.between(
+                    LocalDateTime.parse(commandStatus.getStartedat(), DateTimeConstants.PATTERN),
+                    LocalDateTime.parse(commandStatus.getFinishedat(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
             commandStatus.status("finished");
             commandDescription.commands(commandsStatus);
         }
 
-        LocalDateTime endTotal = LocalDateTime.now();
-        commandDescription.finishedat(endTotal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
-        commandDescription.duration(
-                Duration.between(startTotal, endTotal).toMillis() / DENOMINATOR);
+        commandDescription.finishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
+        commandDescription.duration(Duration.between(
+                LocalDateTime.parse(commandDescription.getStartedat(), DateTimeConstants.PATTERN),
+                LocalDateTime.parse(commandDescription.getFinishedat(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
         commandDescription.finished(true);
         commandDescription.started(false);
 
@@ -135,15 +133,14 @@ public class CommandRunner {
         LinkedHashMap<String, CommandStatus> commandsStatus = new LinkedHashMap();
         CommandDescription commandDescription = new CommandDescription();
 
-        LocalDateTime startTotal = LocalDateTime.now();
-        commandDescription.startedat(startTotal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
+        commandDescription.startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
         commandDescription.started(true);
         commandDescription.finished(false);
         commandDescription.pid(ProcessHandle.current().pid());
 
         for (int i = 0; i < commands.length; i++) {
             commandStatuses.add(new CommandStatus());
-            commandStatuses.get(i).startedat(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")));
+            commandStatuses.get(i).startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             processes.add(this.runCommandDetached(commands[i].split(" ")));
         }
 

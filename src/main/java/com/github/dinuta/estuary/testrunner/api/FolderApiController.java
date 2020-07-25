@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dinuta.estuary.testrunner.constants.About;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.testrunner.constants.ApiResponseMessage;
+import com.github.dinuta.estuary.testrunner.constants.DateTimeConstants;
 import com.github.dinuta.estuary.testrunner.model.api.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -26,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
@@ -60,7 +60,7 @@ public class FolderApiController implements FolderApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
         }
 
         File file;
@@ -81,7 +81,7 @@ public class FolderApiController implements FolderApi {
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))), HttpStatus.NOT_FOUND);
+                    .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
         }
 
         return ResponseEntity.ok()

@@ -4,8 +4,12 @@ import com.github.dinuta.estuary.testrunner.constants.HeaderConstants;
 import org.apache.catalina.connector.RequestFacade;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -13,16 +17,14 @@ import java.util.UUID;
 
 import static com.github.dinuta.estuary.testrunner.constants.EnvConstants.HTTP_AUTH_TOKEN;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
-
 @Component
-public class ApiOriginFilter implements Filter {
+public class ApiOriginFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         httpResponse.addHeader("Access-Control-Allow-Origin", "*");
         httpResponse.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
@@ -39,6 +41,7 @@ public class ApiOriginFilter implements Filter {
         if (!(String.valueOf(tokenHeader)
                 .equals(String.valueOf(System.getenv(HTTP_AUTH_TOKEN))))) {
             httpResponse.sendError(HttpStatus.UNAUTHORIZED.value());
+            return;
         }
 
         chain.doFilter(request, response);
@@ -46,9 +49,5 @@ public class ApiOriginFilter implements Filter {
 
     @Override
     public void destroy() {
-    }
-
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
     }
 }

@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
-
 @Api(tags = {"estuary-testrunner"}, description = "estuary-testrunner swagger API")
 @Controller
 public class AboutApiController implements AboutApi {

@@ -9,8 +9,6 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-@javax.annotation.Generated(value = "com.github.dinuta.estuary.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
-
 @Configuration
 public class SwaggerDocumentationConfig {
 

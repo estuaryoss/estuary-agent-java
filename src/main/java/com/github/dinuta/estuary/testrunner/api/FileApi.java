@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
-
 @Api(value = "file", description = "the file API")
 @RequestMapping(value = "")
 public interface FileApi {

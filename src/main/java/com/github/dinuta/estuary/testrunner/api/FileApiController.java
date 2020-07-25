@@ -27,8 +27,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
-
 @Api(tags = {"estuary-testrunner"})
 @Controller
 public class FileApiController implements FileApi {

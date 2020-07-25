@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
-
 @Api(value = "env", description = "the env API")
 @RequestMapping(value = "")
 public interface EnvApi {

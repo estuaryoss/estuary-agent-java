@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
-
 @Api(value = "command", description = "the command API")
 @RequestMapping(value = "")
 public interface CommandParallelApi {

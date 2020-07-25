@@ -25,8 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
-
 @Api(tags = {"estuary-testrunner"})
 @Controller
 public class CommandParallelApiController implements CommandParallelApi {

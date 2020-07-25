@@ -1,7 +1,5 @@
 package com.github.dinuta.estuary.testrunner.api;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
-
 public class NotFoundException extends ApiException {
     private int code;
 

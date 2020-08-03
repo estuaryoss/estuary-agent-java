@@ -24,11 +24,12 @@ import static com.github.dinuta.estuary.testrunner.constants.DefaultConstants.*;
 import static com.github.dinuta.estuary.testrunner.constants.EnvConstants.COMMAND_TIMEOUT;
 
 public class CommandRunner {
-    private static final float DENOMINATOR = 1000F;
     private static final String EXEC_WIN = "cmd.exe";
     private static final String ARGS_WIN = "/c";
     private static final String EXEC_LINUX = "/bin/sh";
     private static final String ARGS_LINUX = "-c";
+
+    private static final float DENOMINATOR = 1000F;
 
     /**
      * Runs a single system command
@@ -95,7 +96,7 @@ public class CommandRunner {
      * This start.py is platform dependent and it must be downloaded in the same path along with this jar
      *
      * @param command The commands to be executed separated by semicolon ;
-     * @return A reference to a Future of ProcessResult
+     * @return A reference to a Future of {@link ProcessResult}
      * @throws IOException if the process could not be started
      */
     public Future<ProcessResult> runStartCommandDetached(List<String> command) throws IOException {
@@ -122,7 +123,7 @@ public class CommandRunner {
      * Runs one command in detached mode, aka Non-blocking mode.
      *
      * @param command The system command to be executed
-     * @return A reference to a ProcessExecutor
+     * @return A reference to a {@link ProcessExecutor}
      */
     public ProcessExecutor runCommandDetached(String[] command) {
         ArrayList<String> fullCommand = getPlatformCommand();
@@ -182,12 +183,9 @@ public class CommandRunner {
     }
 
     /**
-     * Used in conjunction with {@link #runCmdDetached(String[] command)}
-     * The process was already started and a process reference is passed to it
-     *
      * @param command         The command to be executed
-     * @param processExecutor An optional reference to a previously started process
-     * @return The command details of the previously executed command
+     * @param processExecutor A reference to a {@link ProcessExecutor}
+     * @return The command details of the command executed
      */
     public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessExecutor processExecutor) {
         CommandDetails commandDetails = new CommandDetails();

@@ -26,12 +26,12 @@ public class FluentdService {
     private FluentLogger fluentLogger;
     private EnrichedMessage enrichedMsgCopy;
 
+
     public FluentdService() {
-        if (System.getenv(EnvConstants.FLUENTD_IP_PORT) != null) {
+        if (System.getenv(EnvConstants.FLUENTD_IP_PORT) != null)
             this.fluentLogger = FluentLogger.getLogger(About.getAppName(),
                     System.getenv(EnvConstants.FLUENTD_IP_PORT).split(":")[0],
                     Integer.parseInt(System.getenv(EnvConstants.FLUENTD_IP_PORT).split(":")[1]));
-        }
     }
 
     /**

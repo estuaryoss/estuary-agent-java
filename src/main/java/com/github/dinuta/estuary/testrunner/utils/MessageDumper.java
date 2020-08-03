@@ -15,7 +15,7 @@ public class MessageDumper {
     private static final String REQUEST_URI = "Request-Uri";
 
     public static ParentMessage dumpRequest(ServletRequest request) throws IOException {
-        ParentMessage parrentMessage = new ParentMessage();
+        ParentMessage parentMessage = new ParentMessage();
         LinkedHashMap<String, String> headers = new LinkedHashMap<>();
         HashMap<String, Object> body = new HashMap<>();
         Enumeration<String> headerNames = ((RequestFacade) request).getHeaderNames();
@@ -26,14 +26,14 @@ public class MessageDumper {
         headers.put(REQUEST_URI, ((RequestFacade) request).getRequestURI());
         body.put(MESSAGE, request.getReader().lines().collect(Collectors.joining(System.lineSeparator())));
 
-        parrentMessage.setHeaders(headers);
-        parrentMessage.setBody(body);
+        parentMessage.setHeaders(headers);
+        parentMessage.setBody(body);
 
-        return parrentMessage;
+        return parentMessage;
     }
 
     public static ParentMessage dumpRequest(HttpServletRequest request, Object body) {
-        ParentMessage parrentMessage = new ParentMessage();
+        ParentMessage parentMessage = new ParentMessage();
         LinkedHashMap<String, String> headers = new LinkedHashMap<>();
         HashMap<String, Object> enrichedBody = new HashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
@@ -43,34 +43,34 @@ public class MessageDumper {
         headers.put(REQUEST_URI, request.getRequestURI());
         enrichedBody.put(MESSAGE, body);
 
-        parrentMessage.setHeaders(headers);
-        parrentMessage.setBody(enrichedBody);
+        parentMessage.setHeaders(headers);
+        parentMessage.setBody(enrichedBody);
 
-        return parrentMessage;
+        return parentMessage;
     }
 
     public static ParentMessage dumpResponse(HttpServletResponse servletResponse, Object body) {
-        ParentMessage parrentMessage = new ParentMessage();
+        ParentMessage parentMessage = new ParentMessage();
         LinkedHashMap<String, String> headers = new LinkedHashMap<>();
         Collection<String> headerNames = servletResponse.getHeaderNames();
         for (String headerName : headerNames) {
             headers.put(headerName, servletResponse.getHeader(headerName));
         }
 
-        parrentMessage.setHeaders(headers);
-        parrentMessage.setBody(body);
+        parentMessage.setHeaders(headers);
+        parentMessage.setBody(body);
 
-        return parrentMessage;
+        return parentMessage;
     }
 
-    public ParentMessage dumpMessage(String message) {
-        ParentMessage parrentMessage = new ParentMessage();
+    public static ParentMessage dumpMessage(String message) {
+        ParentMessage parentMessage = new ParentMessage();
         HashMap<String, String> body = new HashMap<>();
         body.put("message", message);
 
-        parrentMessage.setHeaders(new LinkedHashMap<String, String>());
-        parrentMessage.setBody(body);
+        parentMessage.setHeaders(new LinkedHashMap<String, String>());
+        parentMessage.setBody(body);
 
-        return parrentMessage;
+        return parentMessage;
     }
 }

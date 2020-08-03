@@ -33,6 +33,8 @@ jobs: # a collection of steps
 
       - run:
           command: mvn clean package # run the actual tests
+          environment:
+            COMMAND_TIMEOUT: 3
           name: "clean package"
       - run:
           command: sudo apt-get update
@@ -48,5 +50,5 @@ jobs: # a collection of steps
 
       - store_artifacts: # store the jar as an artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: target/testrunner-4.0.7-SNAPSHOT-exec.jar
+          path: target/testrunner-4.0.8-SNAPSHOT-exec.jar
       # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples

@@ -16,15 +16,18 @@ The advantage of this implementation is that java libraries can be integrated wi
 
 ## Eureka client registration
 Set the following env vars:  
--  APP_IP -> the ip which this service binds to
--  PORT  -> the port which this service binds to
+-   APP_IP -> the ip which this service binds to
+-   PORT  -> the port which this service binds to
 
 
 ## Fluentd logging
--  FLUENTD_IP_PORT  -> the fluentd ip:port. Example: localhost:24224  
+-   FLUENTD_IP_PORT  -> This env var sets the fluentd ip:port connection. Example: localhost:24224  
 
 ## Token Authentication
--  HTTP_AUTH_TOKEN -> the auth token for the service. Will be matched with the header 'Token'
+-   HTTP_AUTH_TOKEN -> This env var sets the auth token for the service. Will be matched with the header 'Token'
+
+## Command timeout
+-   COMMAND_TIMEOUT -> This env var sets the command timeout for the system commands. Default is **1200** seconds.  
 
 ## More information
 This service acts with small differences as the original [python implementation](https://github.com/dinuta/estuary-testrunner).  

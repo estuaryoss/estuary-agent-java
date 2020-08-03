@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CommandDetails {
     @JsonProperty("out")
-    private String out = null;
+    private String out = "";
 
     @JsonProperty("err")
-    private String err = null;
+    private String err = "";
 
     @JsonProperty("code")
     private long code = 0;

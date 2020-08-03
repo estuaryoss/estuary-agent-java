@@ -6,20 +6,29 @@ import com.github.dinuta.estuary.testrunner.model.api.CommandDetails;
 import com.github.dinuta.estuary.testrunner.model.api.CommandParallel;
 import com.github.dinuta.estuary.testrunner.model.api.CommandStatus;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.ProcessResult;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static com.github.dinuta.estuary.testrunner.constants.DefaultConstants.*;
+import static com.github.dinuta.estuary.testrunner.constants.EnvConstants.COMMAND_TIMEOUT;
 
 public class CommandRunner {
     private static final float DENOMINATOR = 1000F;
+    private static final String EXEC_WIN = "cmd.exe";
+    private static final String ARGS_WIN = "/c";
+    private static final String EXEC_LINUX = "/bin/sh";
+    private static final String ARGS_LINUX = "-c";
 
     /**
      * Runs a single system command
@@ -86,34 +95,36 @@ public class CommandRunner {
      * This start.py is platform dependent and it must be downloaded in the same path along with this jar
      *
      * @param command The commands to be executed separated by semicolon ;
-     * @return A reference to an Optional of Process
+     * @return A reference to a Future of ProcessResult
+     * @throws IOException if the process could not be started
      */
-    public Optional<Process> runStartCommandDetached(List<String> command) {
+    public Future<ProcessResult> runStartCommandDetached(List<String> command) throws IOException {
+        String pythonExec = "start.py";
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         ArrayList<String> fullCommand = getPlatformCommand();
 
         if (isWindows) {
-            fullCommand.add(String.format("%s/start.py", Paths.get("").toAbsolutePath().toString()));
+            fullCommand.add(String.format("%s/%s ", Paths.get("").toAbsolutePath().toString(), pythonExec));
             for (String cmd : command) {
                 fullCommand.add(this.doQuoteCmd(cmd));
             }
         } else {
-            fullCommand.add(String.format("%s/start.py ", Paths.get("").toAbsolutePath().toString())
+            fullCommand.add(String.format("%s/%s ", Paths.get("").toAbsolutePath().toString(), pythonExec)
                     + this.doQuoteCmd(command.get(0)) + " " + this.doQuoteCmd(command.get(1)));
         }
 
         fullCommand.add(this.doQuoteCmd(String.join(" ", command)));
 
-        return this.runCmdDetached(fullCommand.toArray(new String[0]));
+        return this.runStartCmdDetached(fullCommand.toArray(new String[0])).start().getFuture();
     }
 
     /**
      * Runs one command in detached mode, aka Non-blocking mode.
      *
      * @param command The system command to be executed
-     * @return A reference to an Optional of Process
+     * @return A reference to a ProcessExecutor
      */
-    public Optional<Process> runCommandDetached(String[] command) {
+    public ProcessExecutor runCommandDetached(String[] command) {
         ArrayList<String> fullCommand = getPlatformCommand();
         fullCommand.add(String.join(" ", command));
 
@@ -127,7 +138,7 @@ public class CommandRunner {
      * @return The description of all commands
      */
     public CommandDescription runCommandsParallel(String[] commands) {
-        ArrayList<Optional> processes = new ArrayList<>();
+        ArrayList<ProcessExecutor> processExecutors = new ArrayList<>();
         ArrayList<Thread> threads = new ArrayList<>();
         ArrayList<CommandStatus> commandStatuses = new ArrayList<>();
         LinkedHashMap<String, CommandStatus> commandsStatus = new LinkedHashMap();
@@ -141,25 +152,25 @@ public class CommandRunner {
         for (int i = 0; i < commands.length; i++) {
             commandStatuses.add(new CommandStatus());
             commandStatuses.get(i).startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-            processes.add(this.runCommandDetached(commands[i].split(" ")));
+            processExecutors.add(this.runCommandDetached(commands[i].split(" ")));
         }
 
         //start threads that reads the stdout, stderr, pid and others
-        for (int i = 0; i < processes.size(); i++) {
+        for (int i = 0; i < processExecutors.size(); i++) {
             threads.add(new Thread(
                     new CommandStatusThread(new CommandParallel()
                             .commandDescription(commandDescription)
                             .commandStatuses(commandStatuses)
                             .commandsStatus(commandsStatus)
                             .command(commands[i])
-                            .process(processes.get(i))
+                            .process(processExecutors.get(i))
                             .threadId(i)
                     )));
             threads.get(i).start();
         }
 
         //join threads
-        for (int i = 0; i < processes.size(); i++) {
+        for (int i = 0; i < processExecutors.size(); i++) {
             try {
                 threads.get(i).join();
             } catch (InterruptedException e) {
@@ -174,43 +185,36 @@ public class CommandRunner {
      * Used in conjunction with {@link #runCmdDetached(String[] command)}
      * The process was already started and a process reference is passed to it
      *
-     * @param command           The command to be executed
-     * @param optionalOfProcess An optional reference to a previously started process
+     * @param command         The command to be executed
+     * @param processExecutor An optional reference to a previously started process
      * @return The command details of the previously executed command
      */
-    public CommandDetails getCmdDetailsOfProcess(String[] command, Optional optionalOfProcess) {
+    public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessExecutor processExecutor) {
         CommandDetails commandDetails = new CommandDetails();
-        String out = "";
-        String err = "";
-        String s;
-        Process process = (Process) optionalOfProcess.get();
 
         try {
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(process.getInputStream()));
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(process.getErrorStream()));
-
-            while ((s = stdInput.readLine()) != null) {
-                out += s + "\n";
-            }
-
-            while ((s = stdError.readLine()) != null) {
-                err += s + "\n";
-            }
+            ProcessResult processResult = processExecutor.execute();
+            int code = processResult.getExitValue();
+            String out = (code == 0) ? processResult.getOutput().getString() : "";
+            String err = (code == 0) ? "" : processResult.getOutput().getString();
 
             commandDetails
-                    .out(out.stripLeading().stripTrailing())
-                    .err(err.stripLeading().stripTrailing())
-                    .code(process.waitFor())
-                    .pid(process.pid())
+                    .out(out)
+                    .err(err)
+                    .code(code)
+                    .pid(PROCESS_ID_DEFAULT)
                     .args(command);
-
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+            commandDetails
+                    .err(ExceptionUtils.getStackTrace(e))
+                    .code(PROCESS_EXCEPTION_TIMEOUT)
+                    .args(command);
         } catch (Exception e) {
             e.printStackTrace();
             commandDetails
                     .err(ExceptionUtils.getStackTrace(e))
-                    .code(1)
+                    .code(PROCESS_EXCEPTION_GENERAL)
                     .args(command);
         }
 
@@ -222,38 +226,43 @@ public class CommandRunner {
         ArrayList<String> fullCommand = new ArrayList<>();
 
         if (isWindows) {
-            fullCommand.add("cmd.exe");
-            fullCommand.add("/c");
+            fullCommand.add(EXEC_WIN);
+            fullCommand.add(ARGS_WIN);
         } else {
-            fullCommand.add("/bin/sh");
-            fullCommand.add("-c");
+            fullCommand.add(EXEC_LINUX);
+            fullCommand.add(ARGS_LINUX);
 
         }
 
         return fullCommand;
     }
 
-    private Optional<Process> runCmdDetached(String[] command) {
-        Process process = getProcess(command);
+    private ProcessExecutor runStartCmdDetached(String[] command) {
+        return new ProcessExecutor()
+                .command(command)
+                .destroyOnExit()
+                .readOutput(true);
+    }
 
-        return Optional.of(process);
+    private ProcessExecutor runCmdDetached(String[] command) {
+        return getProcessExecutor(command);
     }
 
     private CommandDetails getCommandDetails(String[] command) {
-        Process process = getProcess(command);
+        ProcessExecutor pExecutor = getProcessExecutor(command);
 
-        return this.getCmdDetailsOfProcess(command, Optional.of(process));
+        return this.getCmdDetailsOfProcess(command, pExecutor);
     }
 
-    private Process getProcess(String[] command) {
-        Process process = null;
-        try {
-            process = new ProcessBuilder().command(command).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private ProcessExecutor getProcessExecutor(String[] command) {
+        int timeout = System.getenv(COMMAND_TIMEOUT) != null ?
+                Integer.parseInt(System.getenv(COMMAND_TIMEOUT)) : COMMAND_TIMEOUT_DEFAULT;
 
-        return process;
+        return new ProcessExecutor()
+                .command(command)
+                .timeout(timeout, TimeUnit.SECONDS)
+                .destroyOnExit()
+                .readOutput(true);
     }
 
     private String doQuoteCmd(String s) {

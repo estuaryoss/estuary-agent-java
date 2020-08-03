@@ -66,6 +66,41 @@ public class CommandParallelApiControllerTest {
     }
 
     @Test
+    public void whenSendingTwoCommandsAndOneOfTheCommandsTakesLongerThanTheGlobalTimeoutThenCommandTimeouts() {
+        float sleep1 = 2f;
+        float sleep2 = 4f;
+        float timeout = 3f;
+
+        String command1 = "sleep " + sleep1;
+        String command2 = "sleep " + sleep2;
+        String command = command1 + "\n" + command2;
+        ResponseEntity<ApiResponseCommandDescription> responseEntity =
+                getApiResponseCommandDescriptionResponseEntity(command);
+
+        ApiResponseCommandDescription body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(
+                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+        assertThat(Math.round(body.getDescription().getDuration())).isEqualTo(Math.round(timeout));
+        assertThat(body.getDescription().getDuration()).isInstanceOf(Float.class);
+
+        assertThat(Math.round(body.getDescription().getCommands().get(command1).getDuration())).isEqualTo(Math.round(sleep1));
+        assertThat(body.getDescription().getCommands().get(command1).getDuration()).isInstanceOf(Float.class);
+
+        assertThat(Math.round(body.getDescription().getCommands().get(command2).getDuration())).isEqualTo(Math.round(timeout));
+        assertThat(body.getDescription().getCommands().get(command2).getDetails().getErr()).containsIgnoringCase("TimeoutException");
+        assertThat(body.getDescription().getCommands().get(command2).getDetails().getOut()).isEqualTo("");
+        assertThat(body.getDescription().getCommands().get(command2).getDetails().getCode()).isEqualTo(-1);
+        assertThat(body.getDescription().getCommands().get(command2).getDuration()).isInstanceOf(Float.class);
+
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+    }
+
+    @Test
     public void whenSendingTwoCommandsThenApiReturnsMaxOfExecutionTimeInSeconds() {
         float sleep1 = 1f;
         float sleep2 = 2f;

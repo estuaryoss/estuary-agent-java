@@ -38,6 +38,7 @@ public class CommandRunner {
      *
      * @param command The command to be executed
      * @return The details of the command
+     * @throws IOException if the process could not be started
      */
     public CommandDetails runCommand(String command) throws IOException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
@@ -60,6 +61,7 @@ public class CommandRunner {
      *
      * @param commands The system commands to be executed
      * @return The description of all commands
+     * @throws IOException if the process could not be started
      */
     public CommandDescription runCommands(String[] commands) throws IOException {
         LinkedHashMap commandsStatus = new LinkedHashMap<String, CommandStatus>();
@@ -126,6 +128,7 @@ public class CommandRunner {
      *
      * @param command The system command to be executed
      * @return A reference to a {@link ProcessExecutor}
+     * @throws IOException if the process could not be started
      */
     public ProcessState runCommandDetached(String[] command) throws IOException {
         ArrayList<String> fullCommand = getPlatformCommand();
@@ -139,6 +142,7 @@ public class CommandRunner {
      *
      * @param commands The system commands to be executed in parallel
      * @return The description of all commands
+     * @throws IOException if the process could not be started
      */
     public CommandDescription runCommandsParallel(String[] commands) throws IOException {
         ArrayList<ProcessState> processStates = new ArrayList<>();

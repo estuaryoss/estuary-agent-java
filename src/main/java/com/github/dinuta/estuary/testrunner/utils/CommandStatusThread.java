@@ -20,7 +20,7 @@ public class CommandStatusThread implements Runnable {
     @Override
     public void run() {
         pCmd.getCmdsStatus().put(pCmd.getCmd(), pCmd.getCmdStatuses().get(pCmd.getId()).details(
-                commandRunner.getCmdDetailsOfProcess(new String[]{pCmd.getCmd()}, pCmd.getProcessExecutor())));
+                commandRunner.getCmdDetailsOfProcess(new String[]{pCmd.getCmd()}, pCmd.getProcessState())));
         pCmd.getCmdStatuses().get(pCmd.getId()).finishedat(LocalDateTime.now().format(PATTERN));
         pCmd.getCmdStatuses().get(pCmd.getId()).duration(Duration.between(
                 LocalDateTime.parse(pCmd.getCmdStatuses().get(pCmd.getId()).getStartedat(), PATTERN),

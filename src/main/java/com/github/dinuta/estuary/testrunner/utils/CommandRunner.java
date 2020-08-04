@@ -1,6 +1,7 @@
 package com.github.dinuta.estuary.testrunner.utils;
 
 import com.github.dinuta.estuary.testrunner.constants.DateTimeConstants;
+import com.github.dinuta.estuary.testrunner.model.ProcessState;
 import com.github.dinuta.estuary.testrunner.model.api.CommandDescription;
 import com.github.dinuta.estuary.testrunner.model.api.CommandDetails;
 import com.github.dinuta.estuary.testrunner.model.api.CommandParallel;
@@ -8,6 +9,7 @@ import com.github.dinuta.estuary.testrunner.model.api.CommandStatus;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
+import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -37,7 +39,7 @@ public class CommandRunner {
      * @param command The command to be executed
      * @return The details of the command
      */
-    public CommandDetails runCommand(String command) {
+    public CommandDetails runCommand(String command) throws IOException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         ArrayList<String> fullCommand = getPlatformCommand();
         String commandWithSingleSpaces = command.trim().replaceAll("\\s+", " ");
@@ -59,7 +61,7 @@ public class CommandRunner {
      * @param commands The system commands to be executed
      * @return The description of all commands
      */
-    public CommandDescription runCommands(String[] commands) {
+    public CommandDescription runCommands(String[] commands) throws IOException {
         LinkedHashMap commandsStatus = new LinkedHashMap<String, CommandStatus>();
         CommandDescription commandDescription = new CommandDescription();
 
@@ -125,7 +127,7 @@ public class CommandRunner {
      * @param command The system command to be executed
      * @return A reference to a {@link ProcessExecutor}
      */
-    public ProcessExecutor runCommandDetached(String[] command) {
+    public ProcessState runCommandDetached(String[] command) throws IOException {
         ArrayList<String> fullCommand = getPlatformCommand();
         fullCommand.add(String.join(" ", command));
 
@@ -138,8 +140,8 @@ public class CommandRunner {
      * @param commands The system commands to be executed in parallel
      * @return The description of all commands
      */
-    public CommandDescription runCommandsParallel(String[] commands) {
-        ArrayList<ProcessExecutor> processExecutors = new ArrayList<>();
+    public CommandDescription runCommandsParallel(String[] commands) throws IOException {
+        ArrayList<ProcessState> processStates = new ArrayList<>();
         ArrayList<Thread> threads = new ArrayList<>();
         ArrayList<CommandStatus> commandStatuses = new ArrayList<>();
         LinkedHashMap<String, CommandStatus> commandsStatus = new LinkedHashMap();
@@ -153,25 +155,25 @@ public class CommandRunner {
         for (int i = 0; i < commands.length; i++) {
             commandStatuses.add(new CommandStatus());
             commandStatuses.get(i).startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-            processExecutors.add(this.runCommandDetached(commands[i].split(" ")));
+            processStates.add(this.runCommandDetached(commands[i].split(" ")));
         }
 
         //start threads that reads the stdout, stderr, pid and others
-        for (int i = 0; i < processExecutors.size(); i++) {
+        for (int i = 0; i < processStates.size(); i++) {
             threads.add(new Thread(
                     new CommandStatusThread(new CommandParallel()
                             .commandDescription(commandDescription)
                             .commandStatuses(commandStatuses)
                             .commandsStatus(commandsStatus)
                             .command(commands[i])
-                            .process(processExecutors.get(i))
+                            .process(processStates.get(i))
                             .threadId(i)
                     )));
             threads.get(i).start();
         }
 
         //join threads
-        for (int i = 0; i < processExecutors.size(); i++) {
+        for (int i = 0; i < processStates.size(); i++) {
             try {
                 threads.get(i).join();
             } catch (InterruptedException e) {
@@ -183,15 +185,17 @@ public class CommandRunner {
     }
 
     /**
-     * @param command         The command to be executed
-     * @param processExecutor A reference to a {@link ProcessExecutor}
+     * @param command      The command to be executed
+     * @param processState A reference to a {@link ProcessState}
      * @return The command details of the command executed
      */
-    public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessExecutor processExecutor) {
+    public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessState processState) {
         CommandDetails commandDetails = new CommandDetails();
+        int timeout = System.getenv(COMMAND_TIMEOUT) != null ?
+                Integer.parseInt(System.getenv(COMMAND_TIMEOUT)) : COMMAND_TIMEOUT_DEFAULT;
 
         try {
-            ProcessResult processResult = processExecutor.execute();
+            ProcessResult processResult = processState.getProcessResult().get(timeout, TimeUnit.SECONDS);
             int code = processResult.getExitValue();
             String out = (code == 0) ? processResult.getOutput().getString() : "";
             String err = (code == 0) ? "" : processResult.getOutput().getString();
@@ -200,7 +204,7 @@ public class CommandRunner {
                     .out(out)
                     .err(err)
                     .code(code)
-                    .pid(PROCESS_ID_DEFAULT)
+                    .pid(processState.getProcess().pid())
                     .args(command);
         } catch (TimeoutException e) {
             e.printStackTrace();
@@ -242,25 +246,28 @@ public class CommandRunner {
                 .readOutput(true);
     }
 
-    private ProcessExecutor runCmdDetached(String[] command) {
-        return getProcessExecutor(command);
+    private ProcessState runCmdDetached(String[] command) throws IOException {
+        return getProcessState(command);
     }
 
-    private CommandDetails getCommandDetails(String[] command) {
-        ProcessExecutor pExecutor = getProcessExecutor(command);
+    private CommandDetails getCommandDetails(String[] command) throws IOException {
+        ProcessState pState = getProcessState(command);
 
-        return this.getCmdDetailsOfProcess(command, pExecutor);
+        return this.getCmdDetailsOfProcess(command, pState);
     }
 
-    private ProcessExecutor getProcessExecutor(String[] command) {
-        int timeout = System.getenv(COMMAND_TIMEOUT) != null ?
-                Integer.parseInt(System.getenv(COMMAND_TIMEOUT)) : COMMAND_TIMEOUT_DEFAULT;
-
-        return new ProcessExecutor()
+    private ProcessState getProcessState(String[] command) throws IOException {
+        ProcessState processState = new ProcessState();
+        StartedProcess startedProcess = new ProcessExecutor()
                 .command(command)
-                .timeout(timeout, TimeUnit.SECONDS)
                 .destroyOnExit()
-                .readOutput(true);
+                .readOutput(true).start();
+
+        processState.startedProcess(startedProcess);
+        processState.process(startedProcess.getProcess());
+        processState.processResult(startedProcess.getFuture());
+
+        return processState;
     }
 
     private String doQuoteCmd(String s) {

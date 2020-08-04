@@ -1,6 +1,6 @@
 package com.github.dinuta.estuary.testrunner.model.api;
 
-import org.zeroturnaround.exec.ProcessExecutor;
+import com.github.dinuta.estuary.testrunner.model.ProcessState;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -9,7 +9,7 @@ public class CommandParallel {
     private CommandDescription cmdDescription;
     private ArrayList<CommandStatus> cmdStatuses;
     private LinkedHashMap<String, CommandStatus> cmdsStatus;
-    private ProcessExecutor processExecutor;
+    private ProcessState processState;
     private String cmd;
     private int id;
 
@@ -28,8 +28,8 @@ public class CommandParallel {
         return this;
     }
 
-    public CommandParallel process(ProcessExecutor processExecutor) {
-        this.processExecutor = processExecutor;
+    public CommandParallel process(ProcessState processState) {
+        this.processState = processState;
         return this;
     }
 
@@ -67,12 +67,12 @@ public class CommandParallel {
         this.cmdsStatus = cmdsStatus;
     }
 
-    public ProcessExecutor getProcessExecutor() {
-        return processExecutor;
+    public ProcessState getProcessState() {
+        return processState;
     }
 
-    public void setProcessExecutor(ProcessExecutor processExecutor) {
-        this.processExecutor = processExecutor;
+    public void setProcessState(ProcessState processState) {
+        this.processState = processState;
     }
 
     public String getCmd() {

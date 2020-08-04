@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -41,14 +42,14 @@ public class CommandParallelApiController implements CommandParallelApi {
         this.request = request;
     }
 
-    public ResponseEntity<ApiResponse> commandPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> commandPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) throws IOException {
         CommandRunner commandRunner = new CommandRunner();
         String commandsStripped = commands.replace("\r\n", "\n").stripLeading().stripTrailing();
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                 .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());
 
         log.info("Executing commands", commandsList);
-        return new ResponseEntity<ApiResponse>(new ApiResponse()
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
                 .description(commandRunner.runCommandsParallel(commandsList.toArray(new String[0])))

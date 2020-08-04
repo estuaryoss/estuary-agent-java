@@ -13,7 +13,7 @@ jobs:
       services:
         - docker
       before_script:
-        - wget https://github.com/dinuta/estuary-testrunner/releases/download/4.0.5/start.py-linux
+        - wget https://github.com/dinuta/estuary-agent/releases/download/4.0.7/start.py-linux
         - mv start.py-linux start.py
         - chmod +x start.py
         - sudo apt-get install gnupg2

@@ -2,13 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.dinuta.estuary</groupId>
-    <artifactId>testrunner</artifactId>
+    <artifactId>agent</artifactId>
     <version>4.0.8-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Estuary Test Runner</name>
-    <description>RestAPI service which runs commands and tests</description>
-    <url>https://github.com/dinuta/estuary-testrunner-java</url>
+    <name>Estuary Agent</name>
+    <description>RestAPI service which runs shell commands via REST API</description>
+    <url>https://github.com/dinuta/estuary-agent-java</url>
 
     <licenses>
         <license>
@@ -28,9 +28,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/dinuta/estuary-testrunner-java.git</connection>
-        <developerConnection>scm:git:ssh://github.com:dinuta/estuary-testrunner-java.git</developerConnection>
-        <url>https://github.com/dinuta/estuary-testrunner-java/tree/master</url>
+        <connection>scm:git:git://github.com/dinuta/estuary-agent-java.git</connection>
+        <developerConnection>scm:git:ssh://github.com:dinuta/estuary-agent-java.git</developerConnection>
+        <url>https://github.com/dinuta/estuary-agent-java/tree/master</url>
     </scm>
 
     <distributionManagement>
@@ -86,24 +86,24 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-gpg-plugin</artifactId>-->
-            <!--                <version>1.6</version>-->
-            <!--                <executions>-->
-            <!--                    <execution>-->
-            <!--                        <id>sign-artifacts</id>-->
-            <!--                        <phase>verify</phase>-->
-            <!--                        <goals>-->
-            <!--                            <goal>sign</goal>-->
-            <!--                        </goals>-->
-            <!--                        <configuration>-->
-            <!--                            <keyname>${gpg.keyname}</keyname>-->
-            <!--                            <passphraseServerId>${gpg.keyname}</passphraseServerId>-->
-            <!--                        </configuration>-->
-            <!--                    </execution>-->
-            <!--                </executions>-->
-            <!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <keyname>${gpg.keyname}</keyname>
+                            <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>

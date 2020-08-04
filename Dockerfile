@@ -8,6 +8,6 @@ ENV COMMAND_TIMEOUT 1200
 RUN mkdir $APP_DIR
 WORKDIR $APP_DIR
 
-COPY target/testrunner-4.0.8-SNAPSHOT-exec.jar $APP_DIR
+COPY target/agent-4.0.8-SNAPSHOT-exec.jar $APP_DIR
 
-CMD ["java", "-jar", "/app/testrunner-4.0.8-SNAPSHOT-exec.jar"]
+CMD ["java", "-jar", "/app/agent-4.0.8-SNAPSHOT-exec.jar"]

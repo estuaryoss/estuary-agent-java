@@ -19,7 +19,7 @@ eureka:
 
 spring:
   application:
-    name: estuary-testrunner-java
+    name: estuary-agent-java
 
 management:
   endpoint:

@@ -26,7 +26,7 @@ Set the following env vars:
 -   HTTP_AUTH_TOKEN -> This env var sets the auth token for the service. Will be matched with the header 'Token'
 
 ## Command timeout
--   COMMAND_TIMEOUT -> This env var sets the command timeout for the system commands. Default is **1200** seconds.  
+-   COMMAND_TIMEOUT -> This env var sets the command timeout for the system commands. Default is **1800** seconds.  
 
 ## More information
 This service acts with small differences as the original [python implementation](https://github.com/dinuta/estuary-agent).  

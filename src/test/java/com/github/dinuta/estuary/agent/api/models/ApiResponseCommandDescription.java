@@ -18,7 +18,7 @@ import java.util.Objects;
 
 public class ApiResponseCommandDescription {
     @JsonProperty("code")
-    private String code = null;
+    private int code;
 
     @JsonProperty("message")
     private String message = null;
@@ -49,11 +49,11 @@ public class ApiResponseCommandDescription {
     @ApiModelProperty(value = "")
 
 
-    public String getCode() {
+    public int getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(int code) {
         this.code = code;
     }
 
@@ -99,7 +99,7 @@ public class ApiResponseCommandDescription {
         this.description = description;
     }
 
-    public ApiResponseCommandDescription code(String code) {
+    public ApiResponseCommandDescription code(int code) {
         this.code = code;
         return this;
     }

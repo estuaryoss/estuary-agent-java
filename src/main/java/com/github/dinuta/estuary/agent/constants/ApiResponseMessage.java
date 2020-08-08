@@ -3,7 +3,7 @@ package com.github.dinuta.estuary.agent.constants;
 import java.util.HashMap;
 
 public class ApiResponseMessage {
-    private static HashMap<String, String> message = new HashMap<>();
+    private static HashMap<Integer, String> message = new HashMap<>();
 
     static {
         message.put(ApiResponseConstants.SUCCESS, "Success");
@@ -26,7 +26,7 @@ public class ApiResponseMessage {
         message.put(ApiResponseConstants.NOT_IMPLEMENTED, "Not implemented");
     }
 
-    public static String getMessage(String apiResponseCode) {
+    public static String getMessage(int apiResponseCode) {
         return message.get(apiResponseCode);
     }
 }

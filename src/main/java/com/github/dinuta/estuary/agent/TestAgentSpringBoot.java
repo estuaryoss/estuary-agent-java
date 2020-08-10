@@ -18,12 +18,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @RestController
 @EnableSwagger2
 @ComponentScan(basePackages = {"com.github.dinuta.estuary.agent", "com.github.dinuta.estuary.agent.api", "com.github.dinuta.estuary.agent.configuration"})
-public class TestRunnerSpringBoot implements CommandLineRunner {
+public class TestAgentSpringBoot implements CommandLineRunner {
     @Autowired
     FluentdService fluentdService;
 
     public static void main(String[] args) {
-        new SpringApplication(TestRunnerSpringBoot.class).run(args);
+        new SpringApplication(TestAgentSpringBoot.class).run(args);
     }
 
     @Override

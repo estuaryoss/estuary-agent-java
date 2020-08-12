@@ -10,15 +10,6 @@ public class ProcessState {
     private Process process;
     private Future<ProcessResult> processResult;
 
-
-    public Future<ProcessResult> getProcessResult() {
-        return processResult;
-    }
-
-    public void setProcessResult(Future<ProcessResult> processResult) {
-        this.processResult = processResult;
-    }
-
     public ProcessState startedProcess(StartedProcess startedProcess) {
         this.startedProcess = startedProcess;
         return this;
@@ -32,6 +23,14 @@ public class ProcessState {
     public ProcessState processResult(Future<ProcessResult> processResult) {
         this.processResult = processResult;
         return this;
+    }
+
+    public Future<ProcessResult> getProcessResult() {
+        return processResult;
+    }
+
+    public void setProcessResult(Future<ProcessResult> processResult) {
+        this.processResult = processResult;
     }
 
     public StartedProcess getStartedProcess() {

@@ -182,7 +182,6 @@ public class CommandParallelApiControllerTest {
 
         assertThat(body.getCommands().get(command).getDetails().getCode()).isNotEqualTo(0);
         assertThat(body.getCommands().get(command).getDetails().getErr()).contains(expected);
-        assertThat(body.getCommands().get(command).getDetails().getOut()).isEqualTo("");
     }
 
     private void assertCommonCommonDescriptionFields(String command, CommandDescription body) {

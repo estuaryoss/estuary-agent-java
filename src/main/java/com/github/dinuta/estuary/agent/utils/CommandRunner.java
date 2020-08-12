@@ -201,8 +201,8 @@ public class CommandRunner {
         try {
             ProcessResult processResult = processState.getProcessResult().get(timeout, TimeUnit.SECONDS);
             int code = processResult.getExitValue();
-            String out = (code == 0) ? processResult.getOutput().getString() : "";
-            String err = (code == 0) ? "" : processResult.getOutput().getString();
+            String out = processResult.getOutput().getString();
+            String err = (code == 0) ? "" : out;
 
             commandDetails
                     .out(out)
@@ -265,7 +265,8 @@ public class CommandRunner {
         StartedProcess startedProcess = new ProcessExecutor()
                 .command(command)
                 .destroyOnExit()
-                .readOutput(true).start();
+                .readOutput(true)
+                .start();
 
         processState.startedProcess(startedProcess);
         processState.process(startedProcess.getProcess());

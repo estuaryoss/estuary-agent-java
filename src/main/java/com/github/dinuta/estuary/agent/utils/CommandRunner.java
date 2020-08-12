@@ -6,12 +6,17 @@ import com.github.dinuta.estuary.agent.model.api.CommandDescription;
 import com.github.dinuta.estuary.agent.model.api.CommandDetails;
 import com.github.dinuta.estuary.agent.model.api.CommandParallel;
 import com.github.dinuta.estuary.agent.model.api.CommandStatus;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -32,6 +37,7 @@ public class CommandRunner {
     private static final String ARGS_LINUX = "-c";
 
     private static final float DENOMINATOR = 1000F;
+    PipedOutputStream outputStream = new PipedOutputStream();
 
     /**
      * Runs a single system command
@@ -200,9 +206,11 @@ public class CommandRunner {
 
         try {
             ProcessResult processResult = processState.getProcessResult().get(timeout, TimeUnit.SECONDS);
+            processState.getOutputStream().close();
+
             int code = processResult.getExitValue();
             String out = processResult.getOutput().getString();
-            String err = (code == 0) ? "" : out;
+            String err = IOUtils.toString(processState.getInputStream(), Charset.defaultCharset());
 
             commandDetails
                     .out(out)
@@ -222,6 +230,12 @@ public class CommandRunner {
                     .err(ExceptionUtils.getStackTrace(e))
                     .code(PROCESS_EXCEPTION_GENERAL)
                     .args(command);
+        } finally {
+            try {
+                processState.getOutputStream().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return commandDetails;
@@ -262,15 +276,21 @@ public class CommandRunner {
 
     private ProcessState getProcessState(String[] command) throws IOException {
         ProcessState processState = new ProcessState();
+        PipedInputStream inputStream = new PipedInputStream();
+        OutputStream outputStream = new PipedOutputStream(inputStream);
+
         StartedProcess startedProcess = new ProcessExecutor()
                 .command(command)
                 .destroyOnExit()
                 .readOutput(true)
+                .redirectError(outputStream)
                 .start();
 
         processState.startedProcess(startedProcess);
         processState.process(startedProcess.getProcess());
         processState.processResult(startedProcess.getFuture());
+        processState.inputStream(inputStream);
+        processState.outputStream(outputStream);
 
         return processState;
     }

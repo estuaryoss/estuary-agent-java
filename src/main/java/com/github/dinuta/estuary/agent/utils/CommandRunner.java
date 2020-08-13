@@ -8,6 +8,8 @@ import com.github.dinuta.estuary.agent.model.api.CommandParallel;
 import com.github.dinuta.estuary.agent.model.api.CommandStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.StartedProcess;
@@ -30,13 +32,14 @@ import static com.github.dinuta.estuary.agent.constants.DefaultConstants.*;
 import static com.github.dinuta.estuary.agent.constants.EnvConstants.COMMAND_TIMEOUT;
 
 public class CommandRunner {
+    private static final Logger log = LoggerFactory.getLogger(CommandRunner.class);
+
     private static final String EXEC_WIN = "cmd.exe";
     private static final String ARGS_WIN = "/c";
     private static final String EXEC_LINUX = "/bin/sh";
     private static final String ARGS_LINUX = "-c";
 
     private static final float DENOMINATOR = 1000F;
-    PipedOutputStream outputStream = new PipedOutputStream();
 
     /**
      * Runs a single system command
@@ -186,7 +189,7 @@ public class CommandRunner {
             try {
                 threads.get(i).join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.debug(ExceptionUtils.getStackTrace(e));
             }
         }
 
@@ -218,13 +221,13 @@ public class CommandRunner {
                     .pid(processState.getProcess().pid())
                     .args(command);
         } catch (TimeoutException e) {
-            e.printStackTrace();
+            log.debug(ExceptionUtils.getStackTrace(e));
             commandDetails
                     .err(ExceptionUtils.getStackTrace(e))
                     .code(PROCESS_EXCEPTION_TIMEOUT)
                     .args(command);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug(ExceptionUtils.getStackTrace(e));
             commandDetails
                     .err(ExceptionUtils.getStackTrace(e))
                     .code(PROCESS_EXCEPTION_GENERAL)
@@ -233,7 +236,7 @@ public class CommandRunner {
             try {
                 processState.closeStreams();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.debug(ExceptionUtils.getStackTrace(e));
             }
         }
 

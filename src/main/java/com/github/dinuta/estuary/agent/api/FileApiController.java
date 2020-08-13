@@ -48,8 +48,9 @@ public class FileApiController implements FileApi {
         String headerName = "File-Path";
         List<String> fileContent;
 
+        log.debug(headerName + " Header: " + filePath);
         if (filePath == null) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse()
+            return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED)
                     .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
@@ -62,7 +63,7 @@ public class FileApiController implements FileApi {
             Path path = Paths.get(filePath);
             fileContent = Files.readAllLines(path);
         } catch (Exception e) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse()
+            return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.GET_FILE_FAILURE)
                     .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_FILE_FAILURE))
                     .description(ExceptionUtils.getStackTrace(e))
@@ -79,10 +80,10 @@ public class FileApiController implements FileApi {
     public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file", required = true) @Valid @RequestBody byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
         String headerName = "File-Path";
-        List<String> fileContent;
 
+        log.debug(headerName + " Header: " + filePath);
         if (filePath == null) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse()
+            return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED)
                     .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
@@ -92,7 +93,7 @@ public class FileApiController implements FileApi {
         }
 
         if (content == null) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse()
+            return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)
                     .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
@@ -105,7 +106,7 @@ public class FileApiController implements FileApi {
             Path path = Paths.get(filePath);
             Files.write(path, content);
         } catch (Exception e) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse()
+            return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.UPLOAD_FILE_FAILURE)
                     .message(ApiResponseMessage.getMessage(ApiResponseConstants.UPLOAD_FILE_FAILURE))
                     .description(ExceptionUtils.getStackTrace(e))
@@ -114,7 +115,7 @@ public class FileApiController implements FileApi {
                     .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<ApiResponse>(new ApiResponse()
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
                 .description(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))

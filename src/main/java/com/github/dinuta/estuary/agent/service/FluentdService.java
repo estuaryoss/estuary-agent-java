@@ -9,6 +9,8 @@ import com.github.dinuta.estuary.agent.model.logging.EnrichedMessage;
 import com.github.dinuta.estuary.agent.model.logging.ParentMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.fluentd.logger.FluentLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,8 @@ import java.util.LinkedHashMap;
 
 @Component
 public class FluentdService {
+    private static final Logger log = LoggerFactory.getLogger(FluentdService.class);
+
     @Autowired
     private Environment environment;
 
@@ -50,9 +54,9 @@ public class FluentdService {
         map.put(FinalConsoleMessage.MESSAGE.getField(), enrichedMsgCopy);
 
         try {
-            System.out.println(new ObjectMapper().writeValueAsString(map));
+            log.debug(new ObjectMapper().writeValueAsString(map));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.debug(ExceptionUtils.getStackTrace(e));
         }
 
         return map;

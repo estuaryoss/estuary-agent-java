@@ -20,14 +20,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.zeroturnaround.zip.NameMapper;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Api(tags = {"estuary-agent"})
 @Controller
@@ -49,8 +47,8 @@ public class FolderApiController implements FolderApi {
         String accept = request.getHeader("Accept");
         String archiveNamePath = "results.zip";
         String headerName = "Folder-Path";
-        List<String> fileContent;
 
+        log.debug(headerName + " Header: " + folderPath);
         if (folderPath == null) {
             return new ResponseEntity<ApiResponse>(new ApiResponse()
                     .code(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED)
@@ -65,15 +63,11 @@ public class FolderApiController implements FolderApi {
         ByteArrayResource resource;
         try {
             file = new File(archiveNamePath);
-            ZipUtil.pack(new File(folderPath), file, new NameMapper() {
-                public String map(String name) {
-                    return name;
-                }
-            });
+            ZipUtil.pack(new File(folderPath), file, name -> name);
 
             resource = new ByteArrayResource(IOUtils.toByteArray(new FileInputStream(archiveNamePath)));
         } catch (Exception e) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse()
+            return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.FOLDER_ZIP_FAILURE)
                     .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.FOLDER_ZIP_FAILURE), folderPath))
                     .description(ExceptionUtils.getStackTrace(e))

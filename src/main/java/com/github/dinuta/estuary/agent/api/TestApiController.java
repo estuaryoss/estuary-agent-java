@@ -53,7 +53,7 @@ public class TestApiController implements TestApi {
 
     public ResponseEntity<ApiResponse> testDelete(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        return new ResponseEntity<ApiResponse>(new ApiResponse()
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.NOT_IMPLEMENTED)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.NOT_IMPLEMENTED))
                 .description(ApiResponseMessage.getMessage(ApiResponseConstants.NOT_IMPLEMENTED))
@@ -64,7 +64,10 @@ public class TestApiController implements TestApi {
 
     public ResponseEntity<ApiResponse> testGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        String testInfoFilename = new File(".").getAbsolutePath() + "/testinfo.json";
+        String testInfoName = "testinfo.json";
+        String testInfoFilename = new File(".").getAbsolutePath() + "/" + testInfoName;
+        log.debug(testInfoName + " Path: " + testInfoFilename);
+
         File testInfo = new File(testInfoFilename);
         CommandDescription commandDescription = new CommandDescription();
         try {
@@ -117,10 +120,13 @@ public class TestApiController implements TestApi {
             String commandsStripped = testFileContent.replace("\r\n", "\n").stripLeading().stripTrailing();
             List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                     .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());
+            log.debug("Executing commands: " + commandsList.toString());
+
             List<String> startPyArgumentsList = new ArrayList<>();
             startPyArgumentsList.add(id);
             startPyArgumentsList.add(String.join(";", commandsList.toArray(new String[0])));
 
+            log.debug("Sending args: " + startPyArgumentsList.toString());
             commandRunner.runStartCommandDetached(startPyArgumentsList);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()

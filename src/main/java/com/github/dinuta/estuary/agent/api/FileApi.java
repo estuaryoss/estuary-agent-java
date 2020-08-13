@@ -27,7 +27,6 @@ public interface FileApi {
             consumes = {"application/json", "application/octet-stream", "text/plain"},
             method = RequestMethod.GET)
     default ResponseEntity<? extends Object> fileGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token, @ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
-
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -41,7 +40,6 @@ public interface FileApi {
             consumes = {"application/json", "application/x-www-form-urlencoded", "application/octet-stream", "text/plain"},
             method = RequestMethod.PUT)
     default ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file", required = true) @Valid @RequestBody byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
-
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

@@ -4,17 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * ApiResponseSuccess
- */
-@Validated
-@javax.annotation.Generated(value = "com.github.dinuta.estuary.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
 
 public class ApiResponseCommandDescription {
     @JsonProperty("code")

@@ -67,7 +67,6 @@ public class TestApiController implements TestApi {
         String testInfoFilename = new File(".").getAbsolutePath() + "/testinfo.json";
         File testInfo = new File(testInfoFilename);
         CommandDescription commandDescription = new CommandDescription();
-        FileWriter fileWriter = null;
         try {
             if (!testInfo.exists())
                 writeContentInFile(testInfo, commandDescription);
@@ -75,7 +74,7 @@ public class TestApiController implements TestApi {
             String fileContent = String.join("\n", Files.readAllLines(path));
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
         } catch (Exception e) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse()
+            return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.GET_TEST_INFO_FAILURE)
                     .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_TEST_INFO_FAILURE))
                     .description(ExceptionUtils.getStackTrace(e))
@@ -84,7 +83,7 @@ public class TestApiController implements TestApi {
                     .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.OK);
         }
 
-        return new ResponseEntity<ApiResponse>(new ApiResponse()
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
                 .description(commandDescription)
@@ -103,7 +102,7 @@ public class TestApiController implements TestApi {
                 .id(id);
 
         if (testFileContent == null) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse()
+            return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)
                     .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
@@ -124,7 +123,7 @@ public class TestApiController implements TestApi {
 
             commandRunner.runStartCommandDetached(startPyArgumentsList);
         } catch (Exception e) {
-            return new ResponseEntity<ApiResponse>(new ApiResponse()
+            return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.TEST_START_FAILURE)
                     .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.TEST_START_FAILURE)))
                     .description(ExceptionUtils.getStackTrace(e))
@@ -133,7 +132,7 @@ public class TestApiController implements TestApi {
                     .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<ApiResponse>(new ApiResponse()
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)))
                 .description(id)

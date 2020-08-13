@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.Valid;
 import java.util.Objects;
 
-public class ApiResponse {
+public class ApiResponseCommandDescription {
     @JsonProperty("code")
     private int code;
 
@@ -14,7 +14,7 @@ public class ApiResponse {
     private String message = null;
 
     @JsonProperty("description")
-    private Object description = null;
+    private CommandDescription description = null;
 
     @JsonProperty("time")
     private String time = null;
@@ -25,7 +25,7 @@ public class ApiResponse {
     @JsonProperty("version")
     private String version = null;
 
-    public ApiResponse message(String message) {
+    public ApiResponseCommandDescription message(String message) {
         this.message = message;
         return this;
     }
@@ -46,7 +46,7 @@ public class ApiResponse {
         this.code = code;
     }
 
-    public ApiResponse time(String time) {
+    public ApiResponseCommandDescription time(String time) {
         this.time = time;
         return this;
     }
@@ -67,7 +67,7 @@ public class ApiResponse {
         this.message = message;
     }
 
-    public ApiResponse description(Object description) {
+    public ApiResponseCommandDescription description(CommandDescription description) {
         this.description = description;
         return this;
     }
@@ -84,11 +84,11 @@ public class ApiResponse {
         return description;
     }
 
-    public void setDescription(Object description) {
+    public void setDescription(CommandDescription description) {
         this.description = description;
     }
 
-    public ApiResponse code(int code) {
+    public ApiResponseCommandDescription code(int code) {
         this.code = code;
         return this;
     }
@@ -110,7 +110,7 @@ public class ApiResponse {
         this.time = time;
     }
 
-    public ApiResponse name(String name) {
+    public ApiResponseCommandDescription name(String name) {
         this.name = name;
         return this;
     }
@@ -131,7 +131,7 @@ public class ApiResponse {
         this.name = name;
     }
 
-    public ApiResponse version(String version) {
+    public ApiResponseCommandDescription version(String version) {
         this.version = version;
         return this;
     }
@@ -154,14 +154,14 @@ public class ApiResponse {
 
 
     @Override
-    public boolean equals(java.lang.Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ApiResponse apiResponseSuccess = (ApiResponse) o;
+        ApiResponseCommandDescription apiResponseSuccess = (ApiResponseCommandDescription) o;
         return Objects.equals(this.message, apiResponseSuccess.message) &&
                 Objects.equals(this.description, apiResponseSuccess.description) &&
                 Objects.equals(this.code, apiResponseSuccess.code) &&
@@ -194,7 +194,7 @@ public class ApiResponse {
      * Convert the given object to string with each line indented by 4 spaces
      * (except the first line).
      */
-    private String toIndentedString(java.lang.Object o) {
+    private String toIndentedString(Object o) {
         if (o == null) {
             return "null";
         }

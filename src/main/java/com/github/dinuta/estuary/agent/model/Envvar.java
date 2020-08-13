@@ -1,14 +1,6 @@
 package com.github.dinuta.estuary.agent.model;
 
-import org.springframework.validation.annotation.Validated;
-
 import java.util.Objects;
-
-/**
- * Envvar
- */
-@Validated
-@javax.annotation.Generated(value = "com.github.dinuta.estuary.codegen.languages.SpringCodegen", date = "2020-06-14T18:02:50.529Z")
 
 public class Envvar {
 

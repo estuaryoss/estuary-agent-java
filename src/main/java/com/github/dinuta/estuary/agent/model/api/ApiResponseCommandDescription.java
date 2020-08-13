@@ -80,7 +80,7 @@ public class ApiResponseCommandDescription {
     @ApiModelProperty(value = "")
 
 
-    public Object getDescription() {
+    public CommandDescription getDescription() {
         return description;
     }
 

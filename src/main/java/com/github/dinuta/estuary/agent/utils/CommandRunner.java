@@ -13,7 +13,6 @@ import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.charset.Charset;
@@ -206,7 +205,7 @@ public class CommandRunner {
 
         try {
             ProcessResult processResult = processState.getProcessResult().get(timeout, TimeUnit.SECONDS);
-            processState.getOutputStream().close();
+            processState.closeErrOutputStream();
 
             int code = processResult.getExitValue();
             String out = processResult.getOutput().getString();
@@ -232,7 +231,7 @@ public class CommandRunner {
                     .args(command);
         } finally {
             try {
-                processState.getOutputStream().close();
+                processState.closeStreams();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -276,8 +275,8 @@ public class CommandRunner {
 
     private ProcessState getProcessState(String[] command) throws IOException {
         ProcessState processState = new ProcessState();
-        PipedInputStream inputStream = new PipedInputStream();
-        OutputStream outputStream = new PipedOutputStream(inputStream);
+        PipedOutputStream outputStream = new PipedOutputStream();
+        PipedInputStream inputStream = new PipedInputStream(outputStream);
 
         StartedProcess startedProcess = new ProcessExecutor()
                 .command(command)
@@ -290,7 +289,7 @@ public class CommandRunner {
         processState.process(startedProcess.getProcess());
         processState.processResult(startedProcess.getFuture());
         processState.inputStream(inputStream);
-        processState.outputStream(outputStream);
+        processState.errOutputStream(outputStream);
 
         return processState;
     }

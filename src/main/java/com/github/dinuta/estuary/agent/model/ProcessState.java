@@ -3,6 +3,7 @@ package com.github.dinuta.estuary.agent.model;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.StartedProcess;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.Future;
@@ -12,15 +13,15 @@ public class ProcessState {
     private Process process;
     private Future<ProcessResult> processResult;
     private InputStream inputStream;
-    private OutputStream outputStream;
+    private OutputStream errOutputStream;
 
     public ProcessState inputStream(InputStream inputStream) {
         this.inputStream = inputStream;
         return this;
     }
 
-    public ProcessState outputStream(OutputStream outputStream) {
-        this.outputStream = outputStream;
+    public ProcessState errOutputStream(OutputStream errOutputStream) {
+        this.errOutputStream = errOutputStream;
         return this;
     }
 
@@ -37,6 +38,19 @@ public class ProcessState {
     public ProcessState processResult(Future<ProcessResult> processResult) {
         this.processResult = processResult;
         return this;
+    }
+
+    public void closeInputStream() throws IOException {
+        if (inputStream != null) inputStream.close();
+    }
+
+    public void closeErrOutputStream() throws IOException {
+        if (errOutputStream != null) errOutputStream.close();
+    }
+
+    public void closeStreams() throws IOException {
+        closeErrOutputStream();
+        closeInputStream();
     }
 
     public Future<ProcessResult> getProcessResult() {
@@ -71,11 +85,11 @@ public class ProcessState {
         this.inputStream = inputStream;
     }
 
-    public OutputStream getOutputStream() {
-        return outputStream;
+    public OutputStream getErrOutputStream() {
+        return errOutputStream;
     }
 
-    public void setOutputStream(OutputStream outputStream) {
-        this.outputStream = outputStream;
+    public void setErrOutputStream(OutputStream errOutputStream) {
+        this.errOutputStream = errOutputStream;
     }
 }

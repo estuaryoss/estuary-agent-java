@@ -128,6 +128,34 @@ public class CommandParallelApiControllerTest {
         assertThat(body.getTime()).isBefore(LocalDateTime.now());
     }
 
+    @Test
+    public void whenSendingTwoCommandsOneSuccessOneFailureThenApiReturnsTheCorrectDetailsForEachOne() {
+        String command1 = "ls -lrt";
+        String command2 = "whatever";
+        String command = command1 + "\n" + command2;
+        ResponseEntity<ApiResponseCommandDescription> responseEntity =
+                getApiResponseCommandDescriptionResponseEntity(command);
+
+        ApiResponseCommandDescription body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(
+                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+        assertThat(body.getDescription().getDuration()).isInstanceOf(Float.class);
+
+        assertThat(body.getDescription().getCommands().get(command1).getDetails().getCode()).isEqualTo(0L);
+        assertThat(body.getDescription().getCommands().get(command2).getDetails().getCode()).isNotEqualTo(0L);
+        assertThat(body.getDescription().getCommands().get(command1).getDetails().getOut()).isNotEqualTo("");
+        assertThat(body.getDescription().getCommands().get(command2).getDetails().getOut()).isEqualTo("");
+        assertThat(body.getDescription().getCommands().get(command1).getDetails().getErr()).isEqualTo("");
+        assertThat(body.getDescription().getCommands().get(command2).getDetails().getErr()).isNotEqualTo("");
+
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+    }
+
     @ParameterizedTest
     @ValueSource(
             strings = {

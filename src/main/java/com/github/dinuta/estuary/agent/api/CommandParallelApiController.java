@@ -48,7 +48,7 @@ public class CommandParallelApiController implements CommandParallelApi {
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                 .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());
 
-        log.info("Executing commands: " + commandsList.toString());
+        log.debug("Executing commands: " + commandsList.toString());
         return new ResponseEntity<>(new ApiResponseCommandDescription()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))

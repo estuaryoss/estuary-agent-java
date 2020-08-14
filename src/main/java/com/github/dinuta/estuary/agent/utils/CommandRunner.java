@@ -14,9 +14,10 @@ import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.StartedProcess;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -203,16 +204,17 @@ public class CommandRunner {
      */
     public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessState processState) {
         CommandDetails commandDetails = new CommandDetails();
+        InputStream inputStream = null;
         int timeout = System.getenv(COMMAND_TIMEOUT) != null ?
                 Integer.parseInt(System.getenv(COMMAND_TIMEOUT)) : COMMAND_TIMEOUT_DEFAULT;
 
         try {
             ProcessResult processResult = processState.getProcessResult().get(timeout, TimeUnit.SECONDS);
-            processState.closeErrOutputStream();
 
             int code = processResult.getExitValue();
             String out = processResult.getOutput().getString();
-            String err = IOUtils.toString(processState.getInputStream(), Charset.defaultCharset());
+            inputStream = new ByteArrayInputStream(processState.getErrOutputStream().toByteArray());
+            String err = IOUtils.toString(inputStream, Charset.defaultCharset());
 
             commandDetails
                     .out(out)
@@ -234,7 +236,8 @@ public class CommandRunner {
                     .args(command);
         } finally {
             try {
-                processState.closeStreams();
+                processState.closeErrOutputStream();
+                if (inputStream != null) inputStream.close();
             } catch (IOException e) {
                 log.debug(ExceptionUtils.getStackTrace(e));
             }
@@ -278,8 +281,7 @@ public class CommandRunner {
 
     private ProcessState getProcessState(String[] command) throws IOException {
         ProcessState processState = new ProcessState();
-        PipedOutputStream outputStream = new PipedOutputStream();
-        PipedInputStream inputStream = new PipedInputStream(outputStream);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         StartedProcess startedProcess = new ProcessExecutor()
                 .command(command)
@@ -291,7 +293,6 @@ public class CommandRunner {
         processState.startedProcess(startedProcess);
         processState.process(startedProcess.getProcess());
         processState.processResult(startedProcess.getFuture());
-        processState.inputStream(inputStream);
         processState.errOutputStream(outputStream);
 
         return processState;

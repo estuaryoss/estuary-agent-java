@@ -60,7 +60,7 @@ curl -X POST -d 'ls -lrt' http://localhost:8080/command
             "ls -lrt": {
                 "status": "finished",
                 "details": {
-                    "out": "total 371436\n-rwxr-xr-x 1 dinuta qa  13258464 Jun 24 09:25 main-linux\ndrwxr-xr-x 4 dinuta qa        40 Jul  1 11:42 tmp\n-rw-r--r-- 1 dinuta qa  77707265 Jul 25 19:38 testrunner-linux.zip\n-rw-r--r-- 1 dinuta qa 106655730 Jul 27 09:05 testrunner-1.2-20200727.090514-12-exec.jar\n-rw-r--r-- 1 dinuta qa  59349111 Jul 30 08:03 ats-ops.jar\n-rw-r--r-- 1 dinuta qa     11348 Jul 30 08:03 LICENSE\n-rwxr-xr-x 1 dinuta qa  11635504 Jul 30 08:03 start.py\n-rw-r--r-- 1 dinuta qa 106811336 Aug 14 07:42 agent-exec.jar\n-rw------- 1 dinuta qa   4911271 Aug 14 10:00 nohup.out\n",
+                    "out": "total 371436\n-rwxr-xr-x 1 dinuta qa  13258464 Jun 24 09:25 main-linux\ndrwxr-xr-x 4 dinuta qa        40 Jul  1 11:42 tmp\n-rw-r--r-- 1 dinuta qa  77707265 Jul 25 19:38 testrunner-linux.zip\n-rw------- 1 dinuta qa   4911271 Aug 14 10:00 nohup.out\n",
                     "err": "",
                     "code": 0,
                     "pid": 6803,

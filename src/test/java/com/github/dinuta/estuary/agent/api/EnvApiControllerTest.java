@@ -4,7 +4,6 @@ import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
-import com.github.dinuta.estuary.agent.model.api.ApiResponseMap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +33,16 @@ public class EnvApiControllerTest {
 
     @Test
     public void whenCallingGetThenInformationIsRetrivedOk() {
-        ResponseEntity<ApiResponseMap> responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponseMap.class);
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
 
-        ApiResponseMap body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
         assertThat(body.getDescription()).isInstanceOf(Map.class);
-        assertThat(body.getDescription().get("PATH")).isNotEqualTo("");
+        assertThat(((Map) body.getDescription()).get("PATH")).isNotEqualTo("");
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getPath()).isEqualTo("/env?");
         assertThat(body.getVersion()).isEqualTo(About.getVersion());

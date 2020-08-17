@@ -6,6 +6,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
+import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -38,6 +39,9 @@ public class FileApiController implements FileApi {
     private final HttpServletRequest request;
 
     @Autowired
+    private RequestUtil requestUtil;
+
+    @Autowired
     public FileApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -56,7 +60,8 @@ public class FileApiController implements FileApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -69,7 +74,8 @@ public class FileApiController implements FileApi {
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         return ResponseEntity.ok()
@@ -89,7 +95,8 @@ public class FileApiController implements FileApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         if (content == null) {
@@ -99,7 +106,8 @@ public class FileApiController implements FileApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -112,7 +120,8 @@ public class FileApiController implements FileApi {
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(new ApiResponse()
@@ -121,7 +130,8 @@ public class FileApiController implements FileApi {
                 .description(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.OK);
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(requestUtil.getRequestUri()), HttpStatus.OK);
     }
 
 }

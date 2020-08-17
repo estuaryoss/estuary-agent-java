@@ -1,14 +1,11 @@
-package com.github.dinuta.estuary.agent.api.models;
+package com.github.dinuta.estuary.agent.model.api;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
-
 
 public class ApiResponseMap {
     @JsonProperty("code")
@@ -20,9 +17,11 @@ public class ApiResponseMap {
     @JsonProperty("description")
     private Map description = null;
 
-    @JsonProperty("time")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
-    private LocalDateTime time = null;
+    @JsonProperty("timestamp")
+    private String timestamp = null;
+
+    @JsonProperty("path")
+    private String path = null;
 
     @JsonProperty("name")
     private String name = null;
@@ -35,41 +34,14 @@ public class ApiResponseMap {
         return this;
     }
 
-    /**
-     * Get code
-     *
-     * @return code
-     **/
-    @ApiModelProperty(value = "")
-
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public ApiResponseMap time(LocalDateTime time) {
-        this.time = time;
+    public ApiResponseMap timestamp(String timestamp) {
+        this.timestamp = timestamp;
         return this;
     }
 
-    /**
-     * Get message
-     *
-     * @return message
-     **/
-    @ApiModelProperty(value = "")
-
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+    public ApiResponseMap path(String path) {
+        this.path = path;
+        return this;
     }
 
     public ApiResponseMap description(Map description) {
@@ -77,63 +49,14 @@ public class ApiResponseMap {
         return this;
     }
 
-    /**
-     * Get description
-     *
-     * @return description
-     **/
-    @ApiModelProperty(value = "")
-
-
-    public Object getDescription() {
-        return description;
-    }
-
-    public void setDescription(Map description) {
-        this.description = description;
-    }
-
     public ApiResponseMap code(int code) {
         this.code = code;
         return this;
     }
 
-    /**
-     * Get time
-     *
-     * @return time
-     **/
-    @ApiModelProperty(value = "")
-
-    @Valid
-
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-        this.time = time;
-    }
-
     public ApiResponseMap name(String name) {
         this.name = name;
         return this;
-    }
-
-    /**
-     * Get name
-     *
-     * @return name
-     **/
-    @ApiModelProperty(value = "")
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public ApiResponseMap version(String version) {
@@ -142,13 +65,97 @@ public class ApiResponseMap {
     }
 
     /**
+     * Get code
+     *
+     * @return code
+     **/
+    @ApiModelProperty(value = "")
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    /**
+     * Get message
+     *
+     * @return message
+     **/
+    @ApiModelProperty(value = "")
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    /**
+     * Get path
+     *
+     * @return path
+     **/
+    @ApiModelProperty(value = "")
+    @Valid
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    /**
+     * Get description
+     *
+     * @return description
+     **/
+    @ApiModelProperty(value = "")
+    public Map getDescription() {
+        return description;
+    }
+
+    public void setDescription(Map description) {
+        this.description = description;
+    }
+
+    /**
+     * Get timestamp
+     *
+     * @return timestamp
+     **/
+    @ApiModelProperty(value = "")
+    @Valid
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
+     * Get name
+     *
+     * @return name
+     **/
+    @ApiModelProperty(value = "")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Get version
      *
      * @return version
      **/
     @ApiModelProperty(value = "")
-
-
     public String getVersion() {
         return version;
     }
@@ -170,14 +177,15 @@ public class ApiResponseMap {
         return Objects.equals(this.message, apiResponseSuccess.message) &&
                 Objects.equals(this.description, apiResponseSuccess.description) &&
                 Objects.equals(this.code, apiResponseSuccess.code) &&
-                Objects.equals(this.time, apiResponseSuccess.time) &&
+                Objects.equals(this.timestamp, apiResponseSuccess.timestamp) &&
+                Objects.equals(this.path, apiResponseSuccess.path) &&
                 Objects.equals(this.name, apiResponseSuccess.name) &&
                 Objects.equals(this.version, apiResponseSuccess.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(message, description, code, time, name, version);
+        return Objects.hash(code, message, description, path, timestamp, name, version);
     }
 
     @Override
@@ -185,12 +193,13 @@ public class ApiResponseMap {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
 
-        sb.append("    message: ").append(toIndentedString(message)).append("\n");
-        sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    code: ").append(toIndentedString(code)).append("\n");
-        sb.append("    time: ").append(toIndentedString(time)).append("\n");
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    version: ").append(toIndentedString(version)).append("\n");
+        sb.append("    code: ").append(toIndentedString(code));
+        sb.append("    message: ").append(toIndentedString(message));
+        sb.append("    description: ").append(toIndentedString(description.toString()));
+        sb.append("    path: ").append(toIndentedString(path));
+        sb.append("    timestamp: ").append(toIndentedString(timestamp));
+        sb.append("    name: ").append(toIndentedString(name));
+        sb.append("    version: ").append(toIndentedString(version));
         sb.append("}");
         return sb.toString();
     }

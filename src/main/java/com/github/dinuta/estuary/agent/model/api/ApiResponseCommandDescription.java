@@ -16,8 +16,11 @@ public class ApiResponseCommandDescription {
     @JsonProperty("description")
     private CommandDescription description = null;
 
-    @JsonProperty("time")
-    private String time = null;
+    @JsonProperty("timestamp")
+    private String timestamp = null;
+
+    @JsonProperty("path")
+    private String path = null;
 
     @JsonProperty("name")
     private String name = null;
@@ -25,8 +28,38 @@ public class ApiResponseCommandDescription {
     @JsonProperty("version")
     private String version = null;
 
+    public ApiResponseCommandDescription code(int code) {
+        this.code = code;
+        return this;
+    }
+
     public ApiResponseCommandDescription message(String message) {
         this.message = message;
+        return this;
+    }
+
+    public ApiResponseCommandDescription description(CommandDescription description) {
+        this.description = description;
+        return this;
+    }
+
+    public ApiResponseCommandDescription path(String path) {
+        this.path = path;
+        return this;
+    }
+
+    public ApiResponseCommandDescription timestamp(String timestamp) {
+        this.timestamp = timestamp;
+        return this;
+    }
+
+    public ApiResponseCommandDescription name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public ApiResponseCommandDescription version(String version) {
+        this.version = version;
         return this;
     }
 
@@ -36,8 +69,6 @@ public class ApiResponseCommandDescription {
      * @return code
      **/
     @ApiModelProperty(value = "")
-
-
     public int getCode() {
         return code;
     }
@@ -46,19 +77,12 @@ public class ApiResponseCommandDescription {
         this.code = code;
     }
 
-    public ApiResponseCommandDescription time(String time) {
-        this.time = time;
-        return this;
-    }
-
     /**
      * Get message
      *
      * @return message
      **/
     @ApiModelProperty(value = "")
-
-
     public String getMessage() {
         return message;
     }
@@ -67,19 +91,12 @@ public class ApiResponseCommandDescription {
         this.message = message;
     }
 
-    public ApiResponseCommandDescription description(CommandDescription description) {
-        this.description = description;
-        return this;
-    }
-
     /**
      * Get description
      *
      * @return description
      **/
     @ApiModelProperty(value = "")
-
-
     public CommandDescription getDescription() {
         return description;
     }
@@ -88,31 +105,20 @@ public class ApiResponseCommandDescription {
         this.description = description;
     }
 
-    public ApiResponseCommandDescription code(int code) {
-        this.code = code;
-        return this;
-    }
 
     /**
-     * Get time
+     * Get timestamp
      *
-     * @return time
+     * @return timestamp
      **/
     @ApiModelProperty(value = "")
-
     @Valid
-
-    public String getTime() {
-        return time;
+    public String getTimestamp() {
+        return timestamp;
     }
 
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public ApiResponseCommandDescription name(String name) {
-        this.name = name;
-        return this;
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     /**
@@ -121,8 +127,6 @@ public class ApiResponseCommandDescription {
      * @return name
      **/
     @ApiModelProperty(value = "")
-
-
     public String getName() {
         return name;
     }
@@ -131,19 +135,12 @@ public class ApiResponseCommandDescription {
         this.name = name;
     }
 
-    public ApiResponseCommandDescription version(String version) {
-        this.version = version;
-        return this;
-    }
-
     /**
      * Get version
      *
      * @return version
      **/
     @ApiModelProperty(value = "")
-
-
     public String getVersion() {
         return version;
     }
@@ -165,14 +162,15 @@ public class ApiResponseCommandDescription {
         return Objects.equals(this.message, apiResponseSuccess.message) &&
                 Objects.equals(this.description, apiResponseSuccess.description) &&
                 Objects.equals(this.code, apiResponseSuccess.code) &&
-                Objects.equals(this.time, apiResponseSuccess.time) &&
+                Objects.equals(this.timestamp, apiResponseSuccess.timestamp) &&
+                Objects.equals(this.path, apiResponseSuccess.path) &&
                 Objects.equals(this.name, apiResponseSuccess.name) &&
                 Objects.equals(this.version, apiResponseSuccess.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(message, description, code, time, name, version);
+        return Objects.hash(code, message, description, path, timestamp, name, version);
     }
 
     @Override
@@ -180,10 +178,11 @@ public class ApiResponseCommandDescription {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
 
+        sb.append("    code: ").append(toIndentedString(code));
         sb.append("    message: ").append(toIndentedString(message));
         sb.append("    description: ").append(toIndentedString(description.toString()));
-        sb.append("    code: ").append(toIndentedString(code));
-        sb.append("    time: ").append(toIndentedString(time));
+        sb.append("    path: ").append(toIndentedString(path));
+        sb.append("    timestamp: ").append(toIndentedString(timestamp));
         sb.append("    name: ").append(toIndentedString(name));
         sb.append("    version: ").append(toIndentedString(version));
         sb.append("}");
@@ -199,6 +198,14 @@ public class ApiResponseCommandDescription {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }
 

@@ -54,9 +54,9 @@ public class FluentdService {
         map.put(FinalConsoleMessage.MESSAGE.getField(), enrichedMsgCopy);
 
         try {
-            log.debug(new ObjectMapper().writeValueAsString(map));
+            log.info(new ObjectMapper().writeValueAsString(map));
         } catch (JsonProcessingException e) {
-            log.debug(ExceptionUtils.getStackTrace(e));
+            log.info(ExceptionUtils.getStackTrace(e));
         }
 
         return map;

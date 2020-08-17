@@ -6,6 +6,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
+import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -30,6 +31,9 @@ public class PingApiController implements PingApi {
     private final HttpServletRequest request;
 
     @Autowired
+    private RequestUtil requestUtil;
+
+    @Autowired
     public PingApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -43,7 +47,8 @@ public class PingApiController implements PingApi {
                 .description("pong")
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.OK);
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(requestUtil.getRequestUri()), HttpStatus.OK);
     }
 
 }

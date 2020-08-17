@@ -1,11 +1,11 @@
 package com.github.dinuta.estuary.agent.api;
 
-import com.github.dinuta.estuary.agent.api.models.ApiResponseCommandDescription;
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
+import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -49,7 +50,7 @@ public class CommandApiControllerTest {
             }
     )
     public void whenSendingCorrectCommandsThenApiReturnsZeroExitCode(String commandInfo) {
-        ResponseEntity<ApiResponseCommandDescription> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo);
+        ResponseEntity<ApiResponseCommandDescription> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo.split(";")[0]);
 
         ApiResponseCommandDescription body = responseEntity.getBody();
 
@@ -62,7 +63,7 @@ public class CommandApiControllerTest {
 
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     @Test
@@ -89,7 +90,7 @@ public class CommandApiControllerTest {
         assertThat(body.getDescription().getCommands().get(command).getDetails().getErr()).containsIgnoringCase("TimeoutException");
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     @Test
@@ -125,7 +126,7 @@ public class CommandApiControllerTest {
 
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     @Test
@@ -153,7 +154,7 @@ public class CommandApiControllerTest {
         assertThat(body.getDescription().getCommands().get(command2).getDuration()).isInstanceOf(Float.class);
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     @Test
@@ -181,7 +182,7 @@ public class CommandApiControllerTest {
 
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     @ParameterizedTest
@@ -193,7 +194,7 @@ public class CommandApiControllerTest {
             }
     )
     public void whenSendingIncorrectCommandsThenApiReturnsNonZeroExitCode(String commandInfo) {
-        ResponseEntity<ApiResponseCommandDescription> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo);
+        ResponseEntity<ApiResponseCommandDescription> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo.split(";")[0]);
 
         ApiResponseCommandDescription body = responseEntity.getBody();
 
@@ -205,17 +206,18 @@ public class CommandApiControllerTest {
         this.assertFailureCommandDescriptionFields(commandInfo, body.getDescription());
 
         assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getPath()).isEqualTo("/command?");
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
-    private ResponseEntity<ApiResponseCommandDescription> getApiResponseCommandDescriptionResponseEntity(String commandInfo) {
+    private ResponseEntity<ApiResponseCommandDescription> getApiResponseCommandDescriptionResponseEntity(String command) {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/command",
                         HttpMethod.POST,
-                        httpRequestUtils.getRequestEntityContentTypeAppJson(commandInfo.split(";")[0], headers),
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
                         ApiResponseCommandDescription.class);
     }
 

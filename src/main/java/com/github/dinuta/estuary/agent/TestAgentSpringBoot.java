@@ -17,7 +17,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableEurekaClient
 @RestController
 @EnableSwagger2
-@ComponentScan(basePackages = {"com.github.dinuta.estuary.agent", "com.github.dinuta.estuary.agent.api", "com.github.dinuta.estuary.agent.configuration"})
+@ComponentScan(basePackages = {
+        "com.github.dinuta.estuary.agent",
+        "com.github.dinuta.estuary.agent.api",
+        "com.github.dinuta.estuary.agent.utils",
+        "com.github.dinuta.estuary.agent.config",
+        "com.github.dinuta.estuary.agent.configuration"
+})
 public class TestAgentSpringBoot implements CommandLineRunner {
     @Autowired
     FluentdService fluentdService;

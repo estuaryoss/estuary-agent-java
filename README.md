@@ -76,7 +76,8 @@ curl -X POST -d 'ls -lrt' http://localhost:8080/command
             }
         }
     },
-    "time": "2020-08-15 19:38:16.151113",
+    "timestamp": "2020-08-15 19:38:16.151113",
+    "path": "/command?",
     "name": "estuary-agent",
     "version": "4.0.8"
 }

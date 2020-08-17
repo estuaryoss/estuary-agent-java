@@ -6,6 +6,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
+import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -31,6 +32,9 @@ public class EnvApiController implements EnvApi {
     private final HttpServletRequest request;
 
     @Autowired
+    private RequestUtil requestUtil;
+
+    @Autowired
     public EnvApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -45,7 +49,8 @@ public class EnvApiController implements EnvApi {
                 .description(System.getenv(envName))
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.OK);
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(requestUtil.getRequestUri()), HttpStatus.OK);
     }
 
     public ResponseEntity<ApiResponse> envGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
@@ -57,6 +62,7 @@ public class EnvApiController implements EnvApi {
                 .description(System.getenv())
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.OK);
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(requestUtil.getRequestUri()), HttpStatus.OK);
     }
 }

@@ -6,6 +6,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
+import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -30,6 +31,9 @@ public class AboutApiController implements AboutApi {
     private final HttpServletRequest request;
 
     @Autowired
+    private RequestUtil requestUtil;
+
+    @Autowired
     public AboutApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -38,13 +42,14 @@ public class AboutApiController implements AboutApi {
     public ResponseEntity<ApiResponse> aboutGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
 
-        return new ResponseEntity<ApiResponse>(new ApiResponse()
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
                 .description(About.getAppName())
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.OK);
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(requestUtil.getRequestUri()), HttpStatus.OK);
     }
 
 }

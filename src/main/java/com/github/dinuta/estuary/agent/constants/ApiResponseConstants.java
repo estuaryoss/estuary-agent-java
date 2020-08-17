@@ -4,7 +4,7 @@ public class ApiResponseConstants {
     public static final int SUCCESS = 1000;
     public static final int JINJA2_RENDER_FAILURE = 1001;
     public static final int GET_FILE_FAILURE = 1002;
-    public static final int TEST_START_FAILURE = 1003;
+    public static final int COMMAND_DETACHED_START_FAILURE = 1003;
     public static final int FOLDER_ZIP_FAILURE = 1005;
     public static final int GET_FILE_FAILURE_IS_DIR = 1006;
     public static final int GET_ENV_VAR_FAILURE = 1007;

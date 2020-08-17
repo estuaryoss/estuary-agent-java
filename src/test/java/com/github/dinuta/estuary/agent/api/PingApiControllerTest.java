@@ -1,9 +1,9 @@
 package com.github.dinuta.estuary.agent.api;
 
-import com.github.dinuta.estuary.agent.api.models.ApiResponseString;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
+import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 
+import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,17 +32,18 @@ public class PingApiControllerTest {
 
     @Test
     public void whenCallingGetThenInformationIsRetrivedOk() {
-        ResponseEntity<ApiResponseString> responseEntity = this.restTemplate.getForEntity(SERVER_PREFIX + port + "/ping",
-                ApiResponseString.class);
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.getForEntity(SERVER_PREFIX + port + "/ping",
+                ApiResponse.class);
 
-        ApiResponseString body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
         assertThat(body.getDescription()).isEqualTo("pong");
         assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getPath()).isEqualTo("/ping?");
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 }

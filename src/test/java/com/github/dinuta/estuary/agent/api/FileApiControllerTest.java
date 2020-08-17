@@ -1,11 +1,11 @@
 package com.github.dinuta.estuary.agent.api;
 
 import com.github.dinuta.estuary.agent.api.constants.HeaderConstants;
-import com.github.dinuta.estuary.agent.api.models.ApiResponseString;
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
+import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -59,14 +60,14 @@ public class FileApiControllerTest {
     public void whenFilePathIsMissingThenApiReturnsError() {
         Map<String, String> headers = new HashMap<>();
 
-        ResponseEntity<ApiResponseString> responseEntity =
+        ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate
                         .exchange(SERVER_PREFIX + port + "/file",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                                ApiResponseString.class);
+                                ApiResponse.class);
 
-        ApiResponseString body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED);
@@ -76,7 +77,7 @@ public class FileApiControllerTest {
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), HeaderConstants.FILE_PATH));
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
     }
 
@@ -85,23 +86,23 @@ public class FileApiControllerTest {
         Map<String, String> headers = new HashMap<>();
         headers.put(HeaderConstants.FILE_PATH, "whateverinvalid");
 
-        ResponseEntity<ApiResponseString> responseEntity =
+        ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate
                         .exchange(SERVER_PREFIX + port + "/file",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                                ApiResponseString.class);
+                                ApiResponse.class);
 
-        ApiResponseString body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.GET_FILE_FAILURE);
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.GET_FILE_FAILURE)));
-        assertThat(body.getDescription()).contains("Exception");
+        assertThat(body.getDescription().toString()).contains("Exception");
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     @Test
@@ -109,23 +110,23 @@ public class FileApiControllerTest {
         Map<String, String> headers = new HashMap<>();
         headers.put(HeaderConstants.FILE_PATH, "whateverinvalid/a/imlazytoday/lazy.txt");
 
-        ResponseEntity<ApiResponseString> responseEntity =
+        ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate
                         .exchange(SERVER_PREFIX + port + "/file",
                                 HttpMethod.PUT,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson("doesnotmatter", headers),
-                                ApiResponseString.class);
+                                ApiResponse.class);
 
-        ApiResponseString body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.UPLOAD_FILE_FAILURE);
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.UPLOAD_FILE_FAILURE)));
-        assertThat(body.getDescription()).contains("Exception");
+        assertThat(body.getDescription().toString()).contains("Exception");
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     @Test
@@ -133,14 +134,14 @@ public class FileApiControllerTest {
         Map<String, String> headers = new HashMap<>();
         headers.put(HeaderConstants.FILE_PATH, "config.properties");
 
-        ResponseEntity<ApiResponseString> responseEntity =
+        ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate
                         .exchange(SERVER_PREFIX + port + "/file",
                                 HttpMethod.PUT,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson("{\"ip\": \"localhost\"}", headers),
-                                ApiResponseString.class);
+                                ApiResponse.class);
 
-        ApiResponseString body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
@@ -149,7 +150,8 @@ public class FileApiControllerTest {
         assertThat(body.getDescription()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
         assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getPath()).isEqualTo("/file?");
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(body.getTime()).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 }

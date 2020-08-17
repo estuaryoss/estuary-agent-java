@@ -9,7 +9,7 @@ public class ApiResponseMessage {
         message.put(ApiResponseConstants.SUCCESS, "Success");
         message.put(ApiResponseConstants.JINJA2_RENDER_FAILURE, "Jinja2 render failed");
         message.put(ApiResponseConstants.GET_FILE_FAILURE, "Getting file or folder from the estuary agent service failed");
-        message.put(ApiResponseConstants.TEST_START_FAILURE, "Starting test id %s failed");
+        message.put(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE, "Starting test id %s failed");
         message.put(ApiResponseConstants.TEST_STOP_FAILURE, "Stopping running test %s failed");
         message.put(ApiResponseConstants.GET_FILE_FAILURE_IS_DIR, "Getting %s from %s failed. It is a directory, not a file.");
         message.put(ApiResponseConstants.GET_ENV_VAR_FAILURE, "Getting env var %s failed.");

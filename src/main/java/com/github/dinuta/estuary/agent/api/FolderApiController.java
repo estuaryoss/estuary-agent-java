@@ -6,6 +6,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
+import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.compress.utils.IOUtils;
@@ -38,6 +39,9 @@ public class FolderApiController implements FolderApi {
     private final HttpServletRequest request;
 
     @Autowired
+    private RequestUtil requestUtil;
+
+    @Autowired
     public FolderApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -56,7 +60,8 @@ public class FolderApiController implements FolderApi {
                     .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.HTTP_HEADER_NOT_PROVIDED), headerName))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         File file;
@@ -73,7 +78,8 @@ public class FolderApiController implements FolderApi {
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
-                    .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.NOT_FOUND);
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         return ResponseEntity.ok()

@@ -7,6 +7,7 @@ import com.github.dinuta.estuary.agent.model.api.CommandDetails;
 import com.github.dinuta.estuary.agent.model.api.CommandParallel;
 import com.github.dinuta.estuary.agent.model.api.CommandStatus;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -115,21 +117,25 @@ public class CommandRunner {
     public Future<ProcessResult> runStartCommandDetached(List<String> command) throws IOException {
         String pythonExec = "start.py";
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
-        ArrayList<String> fullCommand = getPlatformCommand();
+        ArrayList<String> fullCmd = getPlatformCommand();
+        String cmdsSeparatedBySemicolon = "";
 
-        if (isWindows) {
-            fullCommand.add(String.format("%s/%s ", Paths.get("").toAbsolutePath().toString(), pythonExec));
-            for (String cmd : command) {
-                fullCommand.add(this.doQuoteCmd(cmd));
-            }
-        } else {
-            fullCommand.add(String.format("%s/%s ", Paths.get("").toAbsolutePath().toString(), pythonExec)
-                    + this.doQuoteCmd(command.get(0)) + " " + this.doQuoteCmd(command.get(1)));
+        for (int i = 1; i < command.size(); i++) {
+            cmdsSeparatedBySemicolon += command.get(i) + ";";
         }
 
-        fullCommand.add(this.doQuoteCmd(String.join(" ", command)));
+        if (isWindows) {
+            fullCmd.add(String.format("%s/%s", Paths.get("").toAbsolutePath().toString(), pythonExec));
+            fullCmd.add(this.doQuoteCmd(command.get(0)) + " " +
+                    this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";")));
+        } else {
+            fullCmd.add(
+                    this.doQuoteCmd(String.format("%s/%s", Paths.get("").toAbsolutePath().toString(), pythonExec)) + " " +
+                            this.doQuoteCmd(command.get(0)) + " " +
+                            this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";")));
+        }
 
-        return this.runStartCmdDetached(fullCommand.toArray(new String[0])).start().getFuture();
+        return this.runStartCmdDetached(fullCmd.toArray(new String[0])).start().getFuture();
     }
 
     /**
@@ -263,6 +269,7 @@ public class CommandRunner {
     }
 
     private ProcessExecutor runStartCmdDetached(String[] command) {
+        log.debug("Executing detached: " + Arrays.asList(command).toString());
         return new ProcessExecutor()
                 .command(command)
                 .destroyOnExit()

@@ -7,6 +7,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
 import com.github.dinuta.estuary.agent.utils.CommandRunner;
+import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -37,6 +38,9 @@ public class CommandApiController implements CommandApi {
     private final HttpServletRequest request;
 
     @Autowired
+    private RequestUtil requestUtil;
+
+    @Autowired
     public CommandApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -56,6 +60,7 @@ public class CommandApiController implements CommandApi {
                 .description(commandRunner.runCommands(commandsList.toArray(new String[0])))
                 .name(About.getAppName())
                 .version(About.getVersion())
-                .time(LocalDateTime.now().format(DateTimeConstants.PATTERN)), HttpStatus.OK);
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(requestUtil.getRequestUri()), HttpStatus.OK);
     }
 }

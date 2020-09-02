@@ -87,7 +87,7 @@ public class EnvApiControllerTest {
             }
     )
     @Order(1)
-    public void whenGettingExternalEnvVarsFromFileThenInformationIsRetrivedOk(String envInfo) {
+    public void whenSettingExternalEnvVarsFromFileThenInformationIsRetrivedOk(String envInfo) {
         String envVar = envInfo.split(";")[0];
         String expectedValue = envInfo.split(";")[1];
         ResponseEntity<ApiResponse> responseEntity =
@@ -100,6 +100,26 @@ public class EnvApiControllerTest {
         assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
         assertThat(body.getDescription()).isInstanceOf(String.class);
         assertThat(body.getDescription()).isEqualTo(expectedValue);
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    @Order(2)
+    public void whenSettingExternalEnvVarsFromFileAndItsASystemOneThenItDoesntGetOverwritten() {
+        String envVar = "PATH";
+        String notExpectedValue = "whatever";
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getDescription()).isInstanceOf(String.class);
+        assertThat(body.getDescription()).isNotEqualTo(notExpectedValue);
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());

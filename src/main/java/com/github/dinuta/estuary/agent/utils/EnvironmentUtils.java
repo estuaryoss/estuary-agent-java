@@ -34,6 +34,7 @@ public class EnvironmentUtils {
             properties.load(fileInputStream);
             virtualEnvironment.putAll(properties.entrySet()
                     .stream()
+                    .filter(elem -> !environment.containsKey(elem.getKey()))
                     .collect(Collectors.toMap(elem -> elem.getKey().toString(),
                             elem -> elem.getValue().toString())));
         } catch (Exception e) {

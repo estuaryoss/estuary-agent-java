@@ -109,7 +109,7 @@ public class EnvApiControllerTest {
     @Order(2)
     public void whenSettingExternalEnvVarsFromFileAndItsASystemOneThenItDoesntGetOverwritten() {
         String envVar = "PATH";
-        String notExpectedValue = "whatever";
+        String notExpectedValue = "this_value_wont_be_injected_because_its_an_existing_system_env_var";
         ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
 

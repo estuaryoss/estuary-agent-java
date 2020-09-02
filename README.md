@@ -41,6 +41,12 @@ java -jar \
 ## Command timeout
 -   COMMAND_TIMEOUT -> This env var sets the command timeout for the system commands. Default is **1800** seconds.  
 
+## Environment variables injection
+User defined environment variables will be stored in a 'virtual' environment. The extra env vars will be used by the process that executes system commands.  
+There are two ways to inject user defined environment variables.    
+-   call POST on **/env** endpoint. The body will contain the env vars in JSON format. E.g. {"FOO1":"BAR1"}  
+-   create an **environment.properties** file with the extra env vars needed. Example in this repo.  
+
 ## More information
 This service acts with small differences as the original [python implementation](https://github.com/dinuta/estuary-agent).  
 All the documentation should be matched, minus some differences in terms how this service registers to eureka.

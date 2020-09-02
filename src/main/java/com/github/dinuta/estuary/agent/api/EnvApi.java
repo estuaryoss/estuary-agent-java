@@ -45,7 +45,7 @@ public interface EnvApi {
     @RequestMapping(value = "/env",
             produces = {"application/json"},
             method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> envPost(@ApiParam(value = "List of env vars by key-value pair", required = true) @Valid @RequestBody String envVars, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    default ResponseEntity<ApiResponse> envPost(@ApiParam(value = "List of env vars by key-value pair in JSON format", required = true) @Valid @RequestBody String envVars, @ApiParam(value = "{\"FOO1\":\"BAR1\"}") @RequestHeader(value = "Token", required = false) String token) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

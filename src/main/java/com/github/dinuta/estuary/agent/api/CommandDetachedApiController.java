@@ -46,6 +46,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     private final HttpServletRequest request;
 
+    private CommandRunner commandRunner = new CommandRunner();
+
     @Autowired
     private RequestUtil requestUtil;
 
@@ -124,7 +126,6 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
         try {
             writeContentInFile(testInfo, commandDescription);
-            CommandRunner commandRunner = new CommandRunner();
             String commandsStripped = commandContent.replace("\r\n", "\n").stripLeading().stripTrailing();
             List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                     .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());

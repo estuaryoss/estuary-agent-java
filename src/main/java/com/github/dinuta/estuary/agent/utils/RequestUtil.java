@@ -19,4 +19,8 @@ public class RequestUtil {
 
         return fullRequestUri;
     }
+
+    public HttpServletRequest getRequest() {
+        return httpServletRequest;
+    }
 }

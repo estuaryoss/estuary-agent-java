@@ -37,6 +37,8 @@ public class CommandApiController implements CommandApi {
 
     private final HttpServletRequest request;
 
+    private CommandRunner commandRunner = new CommandRunner();
+
     @Autowired
     private RequestUtil requestUtil;
 
@@ -48,7 +50,6 @@ public class CommandApiController implements CommandApi {
 
     public ResponseEntity<ApiResponseCommandDescription> commandPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) throws IOException {
         String accept = request.getHeader("Accept");
-        CommandRunner commandRunner = new CommandRunner();
         String commandsStripped = commands.replace("\r\n", "\n").stripLeading().stripTrailing();
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                 .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());

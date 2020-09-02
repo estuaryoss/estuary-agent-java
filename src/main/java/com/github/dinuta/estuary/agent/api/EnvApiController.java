@@ -6,6 +6,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
+import com.github.dinuta.estuary.agent.utils.EnvironmentUtils;
 import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -20,16 +21,16 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Api(tags = {"estuary-agent"})
 @Controller
 public class EnvApiController implements EnvApi {
-
     private static final Logger log = LoggerFactory.getLogger(EnvApiController.class);
 
     private final ObjectMapper objectMapper;
-
     private final HttpServletRequest request;
+    private final Map<String, String> environment = EnvironmentUtils.getEnvironmentWithExternalEnvVars();
 
     @Autowired
     private RequestUtil requestUtil;
@@ -43,10 +44,10 @@ public class EnvApiController implements EnvApi {
     public ResponseEntity<ApiResponse> envEnvNameGet(@ApiParam(value = "The name of the env var to get value from", required = true) @PathVariable("env_name") String envName, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
 
-        return new ResponseEntity<ApiResponse>(new ApiResponse()
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(System.getenv(envName))
+                .description(environment.get(envName))
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -56,10 +57,10 @@ public class EnvApiController implements EnvApi {
     public ResponseEntity<ApiResponse> envGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
 
-        return new ResponseEntity<ApiResponse>(new ApiResponse()
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(System.getenv())
+                .description(environment)
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

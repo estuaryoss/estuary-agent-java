@@ -6,6 +6,7 @@ import com.github.dinuta.estuary.agent.model.api.CommandDescription;
 import com.github.dinuta.estuary.agent.model.api.CommandDetails;
 import com.github.dinuta.estuary.agent.model.api.CommandParallel;
 import com.github.dinuta.estuary.agent.model.api.CommandStatus;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -43,6 +44,8 @@ public class CommandRunner {
     private static final String ARGS_LINUX = "-c";
 
     private static final float DENOMINATOR = 1000F;
+
+    private ImmutableMap<String, String> externalExtraEnvVars = ImmutableMap.copyOf(EnvironmentUtils.getExtraEnvVarsFromFile());
 
     /**
      * Runs a single system command
@@ -270,8 +273,10 @@ public class CommandRunner {
 
     private ProcessExecutor runStartCmdDetached(String[] command) {
         log.debug("Executing detached: " + Arrays.asList(command).toString());
+
         return new ProcessExecutor()
                 .command(command)
+                .environment(externalExtraEnvVars)
                 .destroyOnExit()
                 .readOutput(true);
     }
@@ -292,6 +297,7 @@ public class CommandRunner {
 
         StartedProcess startedProcess = new ProcessExecutor()
                 .command(command)
+                .environment(externalExtraEnvVars)
                 .destroyOnExit()
                 .readOutput(true)
                 .redirectError(outputStream)

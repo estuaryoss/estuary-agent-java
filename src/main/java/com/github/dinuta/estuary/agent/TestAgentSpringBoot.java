@@ -2,6 +2,7 @@ package com.github.dinuta.estuary.agent;
 
 import com.github.dinuta.estuary.agent.constants.FluentdServiceConstants;
 import com.github.dinuta.estuary.agent.service.FluentdService;
+import com.github.dinuta.estuary.agent.utils.EnvironmentUtils;
 import com.github.dinuta.estuary.agent.utils.MessageDumper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -34,7 +35,7 @@ public class TestAgentSpringBoot implements CommandLineRunner {
 
     @Override
     public void run(String... arg0) {
-        fluentdService.emit(FluentdServiceConstants.STARTUP, MessageDumper.dumpMessage(System.getenv().toString()));
+        fluentdService.emit(FluentdServiceConstants.STARTUP, MessageDumper.dumpMessage(EnvironmentUtils.getEnvironmentWithExternalEnvVars().toString()));
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }

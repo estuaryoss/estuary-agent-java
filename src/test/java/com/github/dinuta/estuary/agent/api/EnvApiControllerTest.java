@@ -5,7 +5,10 @@ import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -27,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class EnvApiControllerTest {
     private final static String SERVER_PREFIX = "http://localhost:";
 
@@ -82,6 +86,7 @@ public class EnvApiControllerTest {
                     "FOO2;BAR2"
             }
     )
+    @Order(1)
     public void whenGettingExternalEnvVarsFromFileThenInformationIsRetrivedOk(String envInfo) {
         String envVar = envInfo.split(";")[0];
         String expectedValue = envInfo.split(";")[1];
@@ -133,6 +138,46 @@ public class EnvApiControllerTest {
 
         assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(((Map) body.getDescription()).get(envVarName)).isEqualTo(expectedEnvVarValue);
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                    "FOO1;BARx",
+                    "FOO3;BAR3"
+            }
+    )
+    public void whenSettingExternalEnvVarsWithRestAPIThenSystemEnvVarsAreNotOverwritten(String envVars) {
+        String envVarName = envVars.split(";")[0];
+        String expectedEnvVarValue = envVars.split(";")[1];
+        String attemptedShellEnvVarValue = "must_be_immutable";
+
+        String envVarsJson = String.format("{\"%s\":\"%s\", \"PATH\": \"%s\"}",
+                envVarName, expectedEnvVarValue, attemptedShellEnvVarValue);
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/env",
+                        HttpMethod.POST,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(envVarsJson, new HashMap<>()),
+                        ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(((Map) body.getDescription()).size()).isEqualTo(1);
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+
+        responseEntity =
+                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+        body = responseEntity.getBody();
+
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(((Map) body.getDescription()).get(envVarName)).isEqualTo(expectedEnvVarValue);
+        assertThat(((Map) body.getDescription()).get("SHELL")).isNotEqualTo(attemptedShellEnvVarValue);
     }
 
     @Test

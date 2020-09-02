@@ -75,6 +75,7 @@ public class EnvApiController implements EnvApi {
 
     public ResponseEntity<ApiResponse> envPost(@ApiParam(value = "List of env vars by key-value pair in JSON format", required = true) @Valid @RequestBody String envVars, @ApiParam(value = "Authentication Token") @RequestHeader(value = "Token", required = false) String token) {
         Map<String, String> envVarsToBeAdded = new LinkedHashMap<>();
+        Map<String, String> virtualEnvVarsAdded = new LinkedHashMap<>();
 
         try {
             envVarsToBeAdded = objectMapper.readValue(envVars, LinkedHashMap.class);
@@ -92,10 +93,14 @@ public class EnvApiController implements EnvApi {
                     .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
+        envVarsToBeAdded.forEach((key, value) -> {
+            if (environment.getVirtualEnvironment().containsKey(key)) virtualEnvVarsAdded.put(key, value);
+        });
+
         return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(envVarsToBeAdded)
+                .description(virtualEnvVarsAdded)
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

@@ -43,12 +43,14 @@ public class EnvironmentUtils {
         log.debug("External env vars read from file '" + EXT_ENV_VAR_PATH + "' are: " + new JSONObject(virtualEnvironment).toString());
     }
 
-    public void setExternalEnvVar(String name, String value) {
-        virtualEnvironment.put(name, value);
+    public void setExternalEnvVar(String key, String value) {
+        if (!environment.containsKey(key)) virtualEnvironment.put(key, value);
     }
 
     public void setExternalEnvVars(Map<String, String> envVars) {
-        envVars.forEach((key, value) -> virtualEnvironment.put(key, value));
+        envVars.forEach((key, value) -> {
+            if (!environment.containsKey(key)) virtualEnvironment.put(key, value);
+        });
     }
 
     /**
@@ -59,7 +61,10 @@ public class EnvironmentUtils {
     public Map<String, String> getEnvironmentAndVirtualEnvironment() {
         Map<String, String> systemAndExternalEnvVars = new LinkedHashMap<>();
         systemAndExternalEnvVars.putAll(environment);
-        systemAndExternalEnvVars.putAll(virtualEnvironment);
+
+        virtualEnvironment.forEach((key, value) -> {
+            if (!systemAndExternalEnvVars.containsKey(key)) systemAndExternalEnvVars.put(key, value);
+        });
 
         return systemAndExternalEnvVars;
     }

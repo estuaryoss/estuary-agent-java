@@ -1,5 +1,6 @@
 package com.github.dinuta.estuary.agent.api;
 
+import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
@@ -12,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
@@ -29,6 +32,9 @@ public class EnvApiControllerTest {
 
     @LocalServerPort
     private int port;
+
+    @Autowired
+    private HttpRequestUtils httpRequestUtils;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -89,6 +95,63 @@ public class EnvApiControllerTest {
         assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
         assertThat(body.getDescription()).isInstanceOf(String.class);
         assertThat(body.getDescription()).isEqualTo(expectedValue);
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                    "FOO1;BARx",
+                    "FOO3;BAR3"
+            }
+    )
+    public void whenSettingExternalEnvVarsWithRestAPIThenInformationIsRetrivedOk(String envVars) {
+        String envVarName = envVars.split(";")[0];
+        String expectedEnvVarValue = envVars.split(";")[1];
+        String envVarsJson = String.format("{\"%s\":\"%s\"}", envVarName, expectedEnvVarValue);
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/env",
+                        HttpMethod.POST,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(envVarsJson, new HashMap<>()),
+                        ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+
+        responseEntity =
+                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+        body = responseEntity.getBody();
+
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(((Map) body.getDescription()).get(envVarName)).isEqualTo(expectedEnvVarValue);
+    }
+
+    @Test
+    public void whenSettingExternalEnvVarsWithInvalidBodyWithRestAPIThenError() {
+        String envVars = "{whatever_invalid_json}";
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/env",
+                        HttpMethod.POST,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(envVars, new HashMap<>()),
+                        ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SET_ENV_VAR_FAILURE);
+        assertThat(body.getMessage()).isEqualTo(
+                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SET_ENV_VAR_FAILURE), envVars), envVars);
+        assertThat(body.getDescription()).isInstanceOf(String.class);
+        assertThat(body.getDescription().toString()).contains("Exception");
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());

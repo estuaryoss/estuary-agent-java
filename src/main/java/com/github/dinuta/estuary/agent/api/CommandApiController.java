@@ -37,7 +37,8 @@ public class CommandApiController implements CommandApi {
 
     private final HttpServletRequest request;
 
-    private CommandRunner commandRunner = new CommandRunner();
+    @Autowired
+    private CommandRunner commandRunner;
 
     @Autowired
     private RequestUtil requestUtil;

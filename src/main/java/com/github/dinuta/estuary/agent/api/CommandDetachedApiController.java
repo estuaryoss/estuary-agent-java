@@ -46,7 +46,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     private final HttpServletRequest request;
 
-    private CommandRunner commandRunner = new CommandRunner();
+    @Autowired
+    private CommandRunner commandRunner;
 
     @Autowired
     private RequestUtil requestUtil;

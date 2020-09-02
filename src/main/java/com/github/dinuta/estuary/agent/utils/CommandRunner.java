@@ -6,12 +6,13 @@ import com.github.dinuta.estuary.agent.model.api.CommandDescription;
 import com.github.dinuta.estuary.agent.model.api.CommandDetails;
 import com.github.dinuta.estuary.agent.model.api.CommandParallel;
 import com.github.dinuta.estuary.agent.model.api.CommandStatus;
-import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.StartedProcess;
@@ -35,6 +36,7 @@ import java.util.concurrent.TimeoutException;
 import static com.github.dinuta.estuary.agent.constants.DefaultConstants.*;
 import static com.github.dinuta.estuary.agent.constants.EnvConstants.COMMAND_TIMEOUT;
 
+@Component
 public class CommandRunner {
     private static final Logger log = LoggerFactory.getLogger(CommandRunner.class);
 
@@ -45,7 +47,8 @@ public class CommandRunner {
 
     private static final float DENOMINATOR = 1000F;
 
-    private ImmutableMap<String, String> externalExtraEnvVars = ImmutableMap.copyOf(EnvironmentUtils.getExtraEnvVarsFromFile());
+    @Autowired
+    private EnvironmentUtils environment;
 
     /**
      * Runs a single system command
@@ -276,7 +279,7 @@ public class CommandRunner {
 
         return new ProcessExecutor()
                 .command(command)
-                .environment(externalExtraEnvVars)
+                .environment(environment.getVirtualEnvironment())
                 .destroyOnExit()
                 .readOutput(true);
     }
@@ -297,7 +300,7 @@ public class CommandRunner {
 
         StartedProcess startedProcess = new ProcessExecutor()
                 .command(command)
-                .environment(externalExtraEnvVars)
+                .environment(environment.getVirtualEnvironment())
                 .destroyOnExit()
                 .readOutput(true)
                 .redirectError(outputStream)

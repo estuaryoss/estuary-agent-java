@@ -18,7 +18,7 @@ import java.io.IOException;
 public class CustomRequestInterceptorAdapter implements HandlerInterceptor {
 
     @Autowired
-    FluentdService fluentdService;
+    private FluentdService fluentdService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,

@@ -1,6 +1,5 @@
 package com.github.dinuta.estuary.agent.api;
 
-import com.github.dinuta.estuary.agent.model.Envvar;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,7 +45,7 @@ public interface EnvApi {
     @RequestMapping(value = "/env",
             produces = {"application/json"},
             method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> envPost(@ApiParam(value = "List of env vars by key-value pair", required = true) @Valid @RequestBody Envvar envVars, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    default ResponseEntity<ApiResponse> envPost(@ApiParam(value = "List of env vars by key-value pair", required = true) @Valid @RequestBody String envVars, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

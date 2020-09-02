@@ -27,7 +27,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 })
 public class TestAgentSpringBoot implements CommandLineRunner {
     @Autowired
-    FluentdService fluentdService;
+    private FluentdService fluentdService;
+
+    @Autowired
+    private EnvironmentUtils environment;
 
     public static void main(String[] args) {
         new SpringApplication(TestAgentSpringBoot.class).run(args);
@@ -35,7 +38,7 @@ public class TestAgentSpringBoot implements CommandLineRunner {
 
     @Override
     public void run(String... arg0) {
-        fluentdService.emit(FluentdServiceConstants.STARTUP, MessageDumper.dumpMessage(EnvironmentUtils.getEnvironmentWithExternalEnvVars().toString()));
+        fluentdService.emit(FluentdServiceConstants.STARTUP, MessageDumper.dumpMessage(environment.getEnvironmentAndVirtualEnvironment().toString()));
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }

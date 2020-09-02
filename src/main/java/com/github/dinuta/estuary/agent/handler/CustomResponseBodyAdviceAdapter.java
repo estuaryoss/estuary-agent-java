@@ -18,7 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class CustomResponseBodyAdviceAdapter implements ResponseBodyAdvice<Object> {
 
     @Autowired
-    FluentdService fluentdService;
+    private FluentdService fluentdService;
 
     @Override
     public boolean supports(MethodParameter methodParameter,

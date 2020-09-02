@@ -17,10 +17,10 @@ import java.lang.reflect.Type;
 public class CustomRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
 
     @Autowired
-    FluentdService fluentdService;
+    private FluentdService fluentdService;
 
     @Autowired
-    HttpServletRequest httpServletRequest;
+    private HttpServletRequest httpServletRequest;
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type type,

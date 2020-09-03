@@ -1,14 +1,14 @@
 package com.github.dinuta.estuary.agent.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dinuta.estuary.agent.component.ClientRequest;
+import com.github.dinuta.estuary.agent.component.CommandRunner;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
-import com.github.dinuta.estuary.agent.utils.CommandRunner;
-import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -50,7 +50,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
     private CommandRunner commandRunner;
 
     @Autowired
-    private RequestUtil requestUtil;
+    private ClientRequest clientRequest;
 
     @Autowired
     public CommandDetachedApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -67,7 +67,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(requestUtil.getRequestUri()), HttpStatus.NOT_IMPLEMENTED);
+                .path(clientRequest.getRequestUri()), HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<ApiResponse> commandDetachedGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
@@ -92,7 +92,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(requestUtil.getRequestUri()), HttpStatus.OK);
+                    .path(clientRequest.getRequestUri()), HttpStatus.OK);
         }
 
         return new ResponseEntity<>(new ApiResponse()
@@ -102,7 +102,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(requestUtil.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri()), HttpStatus.OK);
     }
 
     public ResponseEntity<ApiResponse> commandDetachedIdPost(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
@@ -122,7 +122,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
+                    .path(clientRequest.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -146,7 +146,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
+                    .path(clientRequest.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(new ApiResponse()
@@ -156,7 +156,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(requestUtil.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri()), HttpStatus.OK);
     }
 
     private void writeContentInFile(File testInfo, CommandDescription commandDescription) throws IOException {

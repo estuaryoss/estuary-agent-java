@@ -1,6 +1,7 @@
 package com.github.dinuta.estuary.agent.utils;
 
 
+import com.github.dinuta.estuary.agent.component.CommandRunner;
 import com.github.dinuta.estuary.agent.model.api.CommandParallel;
 
 import java.time.Duration;
@@ -10,8 +11,8 @@ import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTER
 
 public class CommandStatusThread implements Runnable {
     private static final float DENOMINATOR = 1000F;
-    private CommandRunner commandRunner = new CommandRunner();
-    private CommandParallel pCmd;
+    private final CommandRunner commandRunner = new CommandRunner();
+    private final CommandParallel pCmd;
 
     public CommandStatusThread(CommandParallel commandParallel) {
         this.pCmd = commandParallel;

@@ -1,4 +1,4 @@
-package com.github.dinuta.estuary.agent.utils;
+package com.github.dinuta.estuary.agent.component;
 
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.ProcessState;
@@ -6,6 +6,7 @@ import com.github.dinuta.estuary.agent.model.api.CommandDescription;
 import com.github.dinuta.estuary.agent.model.api.CommandDetails;
 import com.github.dinuta.estuary.agent.model.api.CommandParallel;
 import com.github.dinuta.estuary.agent.model.api.CommandStatus;
+import com.github.dinuta.estuary.agent.utils.CommandStatusThread;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -48,7 +49,7 @@ public class CommandRunner {
     private static final float DENOMINATOR = 1000F;
 
     @Autowired
-    private EnvironmentUtils environment;
+    private VirtualEnvironment environment;
 
     /**
      * Runs a single system command

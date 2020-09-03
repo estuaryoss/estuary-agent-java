@@ -1,12 +1,12 @@
 package com.github.dinuta.estuary.agent.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
-import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class PingApiController implements PingApi {
     private final HttpServletRequest request;
 
     @Autowired
-    private RequestUtil requestUtil;
+    private ClientRequest clientRequest;
 
     @Autowired
     public PingApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -48,7 +48,7 @@ public class PingApiController implements PingApi {
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(requestUtil.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri()), HttpStatus.OK);
     }
 
 }

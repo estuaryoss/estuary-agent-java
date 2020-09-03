@@ -1,14 +1,14 @@
-package com.github.dinuta.estuary.agent.utils;
+package com.github.dinuta.estuary.agent.component;
 
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Component
-public class RequestUtil {
+public class ClientRequest {
     private final HttpServletRequest httpServletRequest;
 
-    public RequestUtil(HttpServletRequest httpServletRequest) {
+    public ClientRequest(HttpServletRequest httpServletRequest) {
         this.httpServletRequest = httpServletRequest;
     }
 

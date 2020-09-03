@@ -1,12 +1,12 @@
 package com.github.dinuta.estuary.agent.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
-import com.github.dinuta.estuary.agent.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -39,7 +39,7 @@ public class FileApiController implements FileApi {
     private final HttpServletRequest request;
 
     @Autowired
-    private RequestUtil requestUtil;
+    private ClientRequest clientRequest;
 
     @Autowired
     public FileApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -61,7 +61,7 @@ public class FileApiController implements FileApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
+                    .path(clientRequest.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -75,7 +75,7 @@ public class FileApiController implements FileApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
+                    .path(clientRequest.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         return ResponseEntity.ok()
@@ -96,7 +96,7 @@ public class FileApiController implements FileApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
+                    .path(clientRequest.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         if (content == null) {
@@ -107,7 +107,7 @@ public class FileApiController implements FileApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
+                    .path(clientRequest.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         try {
@@ -121,7 +121,7 @@ public class FileApiController implements FileApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(requestUtil.getRequestUri()), HttpStatus.NOT_FOUND);
+                    .path(clientRequest.getRequestUri()), HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(new ApiResponse()
@@ -131,7 +131,7 @@ public class FileApiController implements FileApi {
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(requestUtil.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri()), HttpStatus.OK);
     }
 
 }

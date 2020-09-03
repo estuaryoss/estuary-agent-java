@@ -1,4 +1,4 @@
-package com.github.dinuta.estuary.agent.utils;
+package com.github.dinuta.estuary.agent.component;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -16,14 +16,14 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Component
-public class EnvironmentUtils {
-    private static final Logger log = LoggerFactory.getLogger(EnvironmentUtils.class);
+public class VirtualEnvironment {
+    private static final Logger log = LoggerFactory.getLogger(VirtualEnvironment.class);
 
     private static final String EXT_ENV_VAR_PATH = "environment.properties";
     private final ImmutableMap<String, String> environment = ImmutableMap.copyOf(System.getenv());
     private final Map<String, String> virtualEnvironment = new LinkedHashMap<>();
 
-    public EnvironmentUtils() {
+    public VirtualEnvironment() {
         this.setExtraEnvVarsFromFile();
     }
 

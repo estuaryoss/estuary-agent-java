@@ -1,8 +1,8 @@
 package com.github.dinuta.estuary.agent;
 
+import com.github.dinuta.estuary.agent.component.VirtualEnvironment;
 import com.github.dinuta.estuary.agent.constants.FluentdServiceConstants;
 import com.github.dinuta.estuary.agent.service.FluentdService;
-import com.github.dinuta.estuary.agent.utils.EnvironmentUtils;
 import com.github.dinuta.estuary.agent.utils.MessageDumper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -21,7 +21,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ComponentScan(basePackages = {
         "com.github.dinuta.estuary.agent",
         "com.github.dinuta.estuary.agent.api",
-        "com.github.dinuta.estuary.agent.utils",
+        "com.github.dinuta.estuary.agent.component",
         "com.github.dinuta.estuary.agent.config",
         "com.github.dinuta.estuary.agent.configuration"
 })
@@ -30,7 +30,7 @@ public class TestAgentSpringBoot implements CommandLineRunner {
     private FluentdService fluentdService;
 
     @Autowired
-    private EnvironmentUtils environment;
+    private VirtualEnvironment environment;
 
     public static void main(String[] args) {
         new SpringApplication(TestAgentSpringBoot.class).run(args);

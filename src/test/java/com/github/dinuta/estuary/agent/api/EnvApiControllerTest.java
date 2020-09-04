@@ -79,6 +79,45 @@ public class EnvApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
+    @Test
+    public void whenSettingExternalEnvVarsWithInvalidBodyWithRestAPIThenError() {
+        String envVars = "{whatever_invalid_json}";
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/env",
+                        HttpMethod.POST,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(envVars, new HashMap<>()),
+                        ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SET_ENV_VAR_FAILURE);
+        assertThat(body.getMessage()).isEqualTo(
+                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SET_ENV_VAR_FAILURE), envVars), envVars);
+        assertThat(body.getDescription()).isInstanceOf(String.class);
+        assertThat(body.getDescription().toString()).contains("Exception");
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenGettingNotExistentEnvVarThenValueIsNull() {
+        String envVar = "whatever";
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getDescription()).isEqualTo(null);
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
     @ParameterizedTest
     @ValueSource(
             strings = {
@@ -132,6 +171,7 @@ public class EnvApiControllerTest {
                     "FOO3;BAR3"
             }
     )
+    @Order(3)
     public void whenSettingExternalEnvVarsWithRestAPIThenInformationIsRetrivedOk(String envVars) {
         String envVarName = envVars.split(";")[0];
         String expectedEnvVarValue = envVars.split(";")[1];
@@ -160,6 +200,8 @@ public class EnvApiControllerTest {
         assertThat(((Map) body.getDescription()).get(envVarName)).isEqualTo(expectedEnvVarValue);
     }
 
+
+
     @ParameterizedTest
     @ValueSource(
             strings = {
@@ -167,6 +209,7 @@ public class EnvApiControllerTest {
                     "FOO3;BAR3"
             }
     )
+    @Order(4)
     public void whenSettingExternalEnvVarsWithRestAPIThenSystemEnvVarsAreNotOverwritten(String envVars) {
         String envVarName = envVars.split(";")[0];
         String expectedEnvVarValue = envVars.split(";")[1];
@@ -201,41 +244,24 @@ public class EnvApiControllerTest {
     }
 
     @Test
-    public void whenSettingExternalEnvVarsWithInvalidBodyWithRestAPIThenError() {
-        String envVars = "{whatever_invalid_json}";
-        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
-                .exchange(SERVER_PREFIX + port + "/env",
-                        HttpMethod.POST,
-                        httpRequestUtils.getRequestEntityContentTypeAppJson(envVars, new HashMap<>()),
-                        ApiResponse.class);
+    @Order(9)
+    public void whenSettingVirtualEnvVarsThenAHardLimitIsReached() {
+        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = 50;
 
-        ApiResponse body = responseEntity.getBody();
+        for (int i = 0; i < 2 * VIRTUAL_ENV_VARS_LIMIT_SIZE; i++) {
+            String envVarsJson = String.format("{\"%s\":\"%s\"}", i, i);
+            this.restTemplate
+                    .exchange(SERVER_PREFIX + port + "/env",
+                            HttpMethod.POST,
+                            httpRequestUtils.getRequestEntityContentTypeAppJson(envVarsJson, new HashMap<>()),
+                            ApiResponse.class);
+        }
 
-        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SET_ENV_VAR_FAILURE);
-        assertThat(body.getMessage()).isEqualTo(
-                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SET_ENV_VAR_FAILURE), envVars), envVars);
-        assertThat(body.getDescription()).isInstanceOf(String.class);
-        assertThat(body.getDescription().toString()).contains("Exception");
-        assertThat(body.getName()).isEqualTo(About.getAppName());
-        assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
-    }
+        ResponseEntity responseEntity =
+                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+        ApiResponse body = (ApiResponse) responseEntity.getBody();
 
-    @Test
-    public void whenGettingNotExistentEnvVarThenValueIsNull() {
-        String envVar = "whatever";
-        ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
-
-        ApiResponse body = responseEntity.getBody();
-
-        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
-        assertThat(body.getDescription()).isEqualTo(null);
-        assertThat(body.getName()).isEqualTo(About.getAppName());
-        assertThat(body.getVersion()).isEqualTo(About.getVersion());
-        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(((Map<String, String>) body.getDescription()).get(String.valueOf(VIRTUAL_ENV_VARS_LIMIT_SIZE))).isEqualTo(null);
     }
 }

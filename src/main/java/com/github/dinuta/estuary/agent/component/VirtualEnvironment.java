@@ -18,10 +18,11 @@ import java.util.stream.Collectors;
 @Component
 public class VirtualEnvironment {
     private static final Logger log = LoggerFactory.getLogger(VirtualEnvironment.class);
-
     private static final String EXT_ENV_VAR_PATH = "environment.properties";
     private final ImmutableMap<String, String> environment = ImmutableMap.copyOf(System.getenv());
     private final Map<String, String> virtualEnvironment = new LinkedHashMap<>();
+
+    private final int VIRTUAL_ENVIRONMENT_MAX_SIZE = 50;
 
     public VirtualEnvironment() {
         this.setExtraEnvVarsFromFile();
@@ -45,12 +46,14 @@ public class VirtualEnvironment {
     }
 
     public void setExternalEnvVar(String key, String value) {
-        if (!environment.containsKey(key)) virtualEnvironment.put(key, value);
+        if (!environment.containsKey(key) && virtualEnvironment.size() <= VIRTUAL_ENVIRONMENT_MAX_SIZE)
+            virtualEnvironment.put(key, value);
     }
 
     public void setExternalEnvVars(Map<String, String> envVars) {
         envVars.forEach((key, value) -> {
-            if (!environment.containsKey(key)) virtualEnvironment.put(key, value);
+            if (!environment.containsKey(key) && virtualEnvironment.size() <= VIRTUAL_ENVIRONMENT_MAX_SIZE)
+                virtualEnvironment.put(key, value);
         });
     }
 

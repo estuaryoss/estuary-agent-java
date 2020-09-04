@@ -3,7 +3,7 @@ package com.github.dinuta.estuary.agent.constants;
 import java.util.HashMap;
 
 public class ApiResponseMessage {
-    private static HashMap<Integer, String> message = new HashMap<>();
+    private static final HashMap<Integer, String> message = new HashMap<>();
 
     static {
         message.put(ApiResponseConstants.SUCCESS, "Success");

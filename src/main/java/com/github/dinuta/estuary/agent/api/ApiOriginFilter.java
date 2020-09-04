@@ -1,9 +1,11 @@
 package com.github.dinuta.estuary.agent.api;
 
+import com.github.dinuta.estuary.agent.component.VirtualEnvironment;
 import com.github.dinuta.estuary.agent.constants.HeaderConstants;
 import org.apache.catalina.connector.RequestFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -22,6 +24,9 @@ import static com.github.dinuta.estuary.agent.constants.EnvConstants.HTTP_AUTH_T
 @Component
 public class ApiOriginFilter extends GenericFilterBean {
     private static final Logger log = LoggerFactory.getLogger(ApiOriginFilter.class);
+
+    @Autowired
+    private VirtualEnvironment environment;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
@@ -44,7 +49,7 @@ public class ApiOriginFilter extends GenericFilterBean {
         log.debug(HeaderConstants.X_REQUEST_ID + " : " + xRequestId);
 
         if (!(String.valueOf(tokenHeader)
-                .equals(String.valueOf(System.getenv(HTTP_AUTH_TOKEN))))) {
+                .equals(String.valueOf(environment.getEnvironmentAndVirtualEnvironment().get(HTTP_AUTH_TOKEN))))) {
             httpResponse.sendError(HttpStatus.UNAUTHORIZED.value());
             return;
         }

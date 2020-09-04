@@ -49,7 +49,11 @@ public class CommandRunner {
     private static final float DENOMINATOR = 1000F;
 
     @Autowired
-    private VirtualEnvironment environment;
+    private final VirtualEnvironment environment;
+
+    public CommandRunner(VirtualEnvironment environment) {
+        this.environment = environment;
+    }
 
     /**
      * Runs a single system command
@@ -186,15 +190,14 @@ public class CommandRunner {
 
         //start threads that reads the stdout, stderr, pid and others
         for (int i = 0; i < processStates.size(); i++) {
-            threads.add(new Thread(
-                    new CommandStatusThread(new CommandParallel()
-                            .commandDescription(commandDescription)
-                            .commandStatuses(commandStatuses)
-                            .commandsStatus(commandsStatus)
-                            .command(commands[i])
-                            .process(processStates.get(i))
-                            .threadId(i)
-                    )));
+            CommandStatusThread cmdStatusThread = new CommandStatusThread(this, new CommandParallel()
+                    .commandDescription(commandDescription)
+                    .commandStatuses(commandStatuses)
+                    .commandsStatus(commandsStatus)
+                    .command(commands[i])
+                    .process(processStates.get(i))
+                    .threadId(i));
+            threads.add(new Thread(cmdStatusThread));
             threads.get(i).start();
         }
 
@@ -218,8 +221,8 @@ public class CommandRunner {
     public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessState processState) {
         CommandDetails commandDetails = new CommandDetails();
         InputStream inputStream = null;
-        int timeout = System.getenv(COMMAND_TIMEOUT) != null ?
-                Integer.parseInt(System.getenv(COMMAND_TIMEOUT)) : COMMAND_TIMEOUT_DEFAULT;
+        int timeout = environment.getEnvironmentAndVirtualEnvironment().get(COMMAND_TIMEOUT) != null ?
+                Integer.parseInt(environment.getEnvironmentAndVirtualEnvironment().get(COMMAND_TIMEOUT)) : COMMAND_TIMEOUT_DEFAULT;
 
         try {
             ProcessResult processResult = processState.getProcessResult().get(timeout, TimeUnit.SECONDS);

@@ -11,11 +11,13 @@ import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTER
 
 public class CommandStatusThread implements Runnable {
     private static final float DENOMINATOR = 1000F;
-    private final CommandRunner commandRunner = new CommandRunner();
-    private final CommandParallel pCmd;
 
-    public CommandStatusThread(CommandParallel commandParallel) {
-        this.pCmd = commandParallel;
+    private final CommandParallel pCmd;
+    private final CommandRunner commandRunner;
+
+    public CommandStatusThread(CommandRunner commandRunner, CommandParallel pCmd) {
+        this.commandRunner = commandRunner;
+        this.pCmd = pCmd;
     }
 
     @Override

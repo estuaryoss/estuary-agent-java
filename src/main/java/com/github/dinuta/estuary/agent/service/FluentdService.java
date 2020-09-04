@@ -2,8 +2,8 @@ package com.github.dinuta.estuary.agent.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dinuta.estuary.agent.component.VirtualEnvironment;
 import com.github.dinuta.estuary.agent.constants.About;
-import com.github.dinuta.estuary.agent.constants.EnvConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.logging.EnrichedMessage;
 import com.github.dinuta.estuary.agent.model.logging.ParentMessage;
@@ -20,22 +20,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import static com.github.dinuta.estuary.agent.constants.EnvConstants.FLUENTD_IP_PORT;
+
 @Service
 public class FluentdService {
     private static final Logger log = LoggerFactory.getLogger(FluentdService.class);
+    private final VirtualEnvironment virtualEnvironment = new VirtualEnvironment();
+    private FluentLogger fluentLogger;
+    private EnrichedMessage enrichedMsgCopy;
 
     @Autowired
     private Environment environment;
 
-    private FluentLogger fluentLogger;
-    private EnrichedMessage enrichedMsgCopy;
-
-
     public FluentdService() {
-        if (System.getenv(EnvConstants.FLUENTD_IP_PORT) != null)
-            this.fluentLogger = FluentLogger.getLogger(About.getAppName(),
-                    System.getenv(EnvConstants.FLUENTD_IP_PORT).split(":")[0],
-                    Integer.parseInt(System.getenv(EnvConstants.FLUENTD_IP_PORT).split(":")[1]));
+        this.setFluentdLogger();
     }
 
     /**
@@ -75,7 +73,6 @@ public class FluentdService {
         enrichedMessage.setMsg(parrentMessage);
         enrichedMessage.setTimestamp(LocalDateTime.now().format(customFormatter));
 
-
         return enrichedMessage;
     }
 
@@ -101,9 +98,9 @@ public class FluentdService {
             enrichedMsgCopy.setMsg(parentMessage);
         }
 
-        if (System.getenv(EnvConstants.FLUENTD_IP_PORT) == null) {
+        if (virtualEnvironment.getEnvironmentAndVirtualEnvironment().get(FLUENTD_IP_PORT) == null) {
             return String.format("Fluentd logging not enabled",
-                    EnvConstants.FLUENTD_IP_PORT);
+                    FLUENTD_IP_PORT);
         }
 
         return String.valueOf(this.fluentLogger.log(loggingLevel, objectMapper.convertValue(enrichedMsgCopy, LinkedHashMap.class)));
@@ -122,5 +119,12 @@ public class FluentdService {
         public String getField() {
             return this.field;
         }
+    }
+
+    private void setFluentdLogger() {
+        if (virtualEnvironment.getEnvironmentAndVirtualEnvironment().get(FLUENTD_IP_PORT) != null)
+            this.fluentLogger = FluentLogger.getLogger(About.getAppName(),
+                    virtualEnvironment.getEnvironmentAndVirtualEnvironment().get(FLUENTD_IP_PORT).split(":")[0],
+                    Integer.parseInt(virtualEnvironment.getEnvironmentAndVirtualEnvironment().get(FLUENTD_IP_PORT).split(":")[1]));
     }
 }

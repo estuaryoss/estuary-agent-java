@@ -47,6 +47,8 @@ There are two ways to inject user defined environment variables.
 -   call POST on **/env** endpoint. The body will contain the env vars in JSON format. E.g. {"FOO1":"BAR1"}  
 -   create an **environment.properties** file with the extra env vars needed and place it in the same path as the JAR. Example in this repo.  
 
+*! All environment variables described above can also be set using **environment.properties**. However, the vars set through **application.yml** can't be set: PORT, APP_IP, EUREKA_SERVER.*
+
 ## More information
 This service acts with small differences as the original [python implementation](https://github.com/dinuta/estuary-agent).  
 All the documentation should be matched, minus some differences in terms how this service registers to eureka.

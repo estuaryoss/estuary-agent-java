@@ -21,9 +21,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ComponentScan(basePackages = {
         "com.github.dinuta.estuary.agent",
         "com.github.dinuta.estuary.agent.api",
-        "com.github.dinuta.estuary.agent.component",
         "com.github.dinuta.estuary.agent.config",
-        "com.github.dinuta.estuary.agent.configuration"
+        "com.github.dinuta.estuary.agent.configuration",
+        "com.github.dinuta.estuary.agent.component"
 })
 public class TestAgentSpringBoot implements CommandLineRunner {
     @Autowired
@@ -38,10 +38,10 @@ public class TestAgentSpringBoot implements CommandLineRunner {
 
     @Override
     public void run(String... arg0) {
-        fluentdService.emit(FluentdServiceConstants.STARTUP, MessageDumper.dumpMessage(environment.getEnvironmentAndVirtualEnvironment().toString()));
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }
+        fluentdService.emit(FluentdServiceConstants.STARTUP, MessageDumper.dumpMessage(environment.getEnvironmentAndVirtualEnvironment().toString()));
     }
 
     class ExitException extends RuntimeException implements ExitCodeGenerator {

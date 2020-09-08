@@ -111,8 +111,8 @@ Get this dependency:
 ```xml
 <dependency>
     <groupId>com.github.dinuta.estuary</groupId>
-    <artifactId>testrunner</artifactId>
-    <version>4.0.6</version>
+    <artifactId>agent</artifactId>
+    <version>4.0.8</version>
 </dependency>
 ```
 ## Maven devendency snapshot

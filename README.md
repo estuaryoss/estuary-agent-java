@@ -8,7 +8,7 @@ Agent written in Java (SpringBoot) as part of **estuary** stack.
 The advantage of this implementation is that java libraries can be integrated within, rather than executing the logic through cli commands pointing to a main class in a jar, as per the original python implementation.
 
 ## Artifact
-![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/com.github.dinuta.estuary/testrunner/4.0.6)
+![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/com.github.dinuta.estuary/agent/4.0.8)
 ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.github.dinuta.estuary/testrunner?server=https%3A%2F%2Foss.sonatype.org)
 
 ## Build status

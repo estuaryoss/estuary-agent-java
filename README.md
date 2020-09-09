@@ -29,7 +29,7 @@ export APP_IP=192.168.0.4
 export PORT=8081
 java -jar \
 -Deureka.client.serviceUrl.defaultZone=http://192.168.0.100:8080/eureka/v2 \
--Deureka.client.enabled=true agent-4.0.8-SNAPSHOT-exec.jar 
+-Deureka.client.enabled=true agent-4.0.9-SNAPSHOT-exec.jar 
 ```
 
 ## Fluentd logging

@@ -9,7 +9,7 @@ The advantage of this implementation is that java libraries can be integrated wi
 
 ## Artifact
 ![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/com.github.dinuta.estuary/agent/4.0.8)
-![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.github.dinuta.estuary/testrunner?server=https%3A%2F%2Foss.sonatype.org)
+![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.github.dinuta.estuary/agent?server=https%3A%2F%2Foss.sonatype.org)
 
 ## Build status
 [![CircleCI](https://circleci.com/gh/dinuta/estuary-agent-java.svg?style=svg&circle-token=2036f4d0e07fadce8101e00e790970fcfb43e03f)](https://circleci.com/gh/dinuta/estuary-agent-java)

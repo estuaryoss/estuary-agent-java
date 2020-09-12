@@ -122,7 +122,7 @@ Get this dependency:
     <version>4.0.9-SNAPSHOT</version>
 </dependency>
 ```
-For using a snapshot version, set the oss.sonatype.org repo in settings.xml:
+To use a snapshot version, set the oss.sonatype.org repo in settings.xml:
 ```xml
 <repository>
     <id>snaphosts4</id>

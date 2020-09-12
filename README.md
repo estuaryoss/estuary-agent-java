@@ -119,7 +119,7 @@ Get this dependency:
 <dependency>
     <groupId>com.github.dinuta.estuary</groupId>
     <artifactId>agent</artifactId>
-    <version>4.0.8-SNAPSHOT</version>
+    <version>4.0.9-SNAPSHOT</version>
 </dependency>
 ```
 For using a snapshot version, set the oss.sonatype.org repo in settings.xml:

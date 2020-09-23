@@ -9,5 +9,6 @@ RUN mkdir $APP_DIR
 WORKDIR $APP_DIR
 
 COPY target/agent-4.0.9-SNAPSHOT-exec.jar $APP_DIR
+COPY https $APP_DIR/https
 
-CMD ["java", "-jar", "/app/agent-4.0.9-SNAPSHOT-exec.jar"]
+ENTRYPOINT ["java", "-jar", "/app/agent-4.0.9-SNAPSHOT-exec.jar"]

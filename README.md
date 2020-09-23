@@ -15,8 +15,9 @@ The advantage of this implementation is that java libraries can be integrated wi
 [![CircleCI](https://circleci.com/gh/estuaryoss/estuary-agent-java.svg?style=svg&circle-token=2036f4d0e07fadce8101e00e790970fcfb43e03f)](https://circleci.com/gh/dinuta/estuary-agent-java)
 
 ## Code quality
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/20bec8d5bf1b4197b6447b9f926c32ad)](https://www.codacy.com/gh/estuaryoss/estuary-agent-java?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=estuaryoss/estuary-agent-java&amp;utm_campaign=Badge_Grade)
-[![Maintainability](https://api.codeclimate.com/v1/badges/5600efff46a8f385a221/maintainability)](https://codeclimate.com/github/estuaryoss/estuary-agent-java/maintainability)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/20bec8d5bf1b4197b6447b9f926c32ad)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=estuaryoss/estuary-agent-java&amp;utm_campaign=Badge_Grade)
+[![Maintainability](https://api.codeclimate.com/v1/badges/cb9958e3b834d93cb082/maintainability)](https://codeclimate.com/repos/5f6783d35aa6290178006578/maintainability)
+
 ## Eureka client registration
 Set the following env vars:  
 -   APP_IP -> the ip which this service binds to
@@ -39,6 +40,13 @@ java -jar \
 
 ## Command timeout
 -   COMMAND_TIMEOUT -> This env var sets the command timeout for the system commands. Default is **1800** seconds.  
+
+## Enable HTTPS
+Set **HTTPS_ENABLE** env var option to *true* or *false*.    
+Set the certificate path (is relative!) with **HTTPS_CERT** and **HTTPS_KEYSTORE_PASSWORD** env variables. E.g. HTTPS_CERT=file:https/cert.p12  
+If you do not set cert and keystore password env vars, it uses the ones from default *application.properties* in the resource folder.
+
+! Please also change the app port by setting the env var called **PORT** to *8443*. Default is 8080.   
 
 ## Environment variables injection
 User defined environment variables will be stored in a 'virtual' environment. The extra env vars will be used by the process that executes system commands.  

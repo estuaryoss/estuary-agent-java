@@ -136,7 +136,7 @@ public class CommandRunner {
         }
 
         if (isWindows) {
-            fullCmd.add(String.format("%s/%s", Paths.get("").toAbsolutePath().toString(), pythonExec));
+            fullCmd.add(String.format("%s\\%s", Paths.get("").toAbsolutePath().toString(), pythonExec));
             fullCmd.add(this.doQuoteCmd(command.get(0)) + " " +
                     this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";")));
         } else {
@@ -283,7 +283,7 @@ public class CommandRunner {
 
         return new ProcessExecutor()
                 .command(command)
-                .environment(environment.getVirtualEnvironment())
+                .environment(environment.getEnvironmentAndVirtualEnvironment())
                 .destroyOnExit()
                 .readOutput(true);
     }

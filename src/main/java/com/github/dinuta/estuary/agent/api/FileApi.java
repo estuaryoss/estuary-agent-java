@@ -21,7 +21,7 @@ public interface FileApi {
     @ApiOperation(value = "Gets the content of the file", nickname = "fileGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the file in plain text, success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Failure, the file content could not be read", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the file content could not be read", response = ApiResponse.class)})
     @RequestMapping(value = "/file",
             produces = {"application/json"},
             consumes = {"application/json", "application/octet-stream", "text/plain"},
@@ -34,7 +34,7 @@ public interface FileApi {
     @ApiOperation(value = "Uploads a file no mater the format. Binary or raw", nickname = "filePut", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the file was uploaded successfully", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Failure, the file content could not be uploaded", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the file content could not be uploaded", response = ApiResponse.class)})
     @RequestMapping(value = "/file",
             produces = {"application/json", "text/plain"},
             consumes = {"application/json", "application/x-www-form-urlencoded", "application/octet-stream", "text/plain"},

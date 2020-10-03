@@ -18,7 +18,7 @@ public interface FolderApi {
     @ApiOperation(value = "Gets the folder as zip archive. Useful to get test results folder", nickname = "folderGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the folder as zip archive", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "The content of the folder could not be obtained", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "The content of the folder could not be obtained", response = ApiResponse.class)})
     @RequestMapping(value = "/folder",
             produces = {"application/zip", "application/json"},
             method = RequestMethod.GET)

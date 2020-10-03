@@ -18,7 +18,7 @@ public interface EnvApi {
     @ApiOperation(value = "Gets the environment variable value from the environment", nickname = "envEnvNameGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Get env var success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Get env var failure", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Get env var failure", response = ApiResponse.class)})
     @RequestMapping(value = "/env/{env_name}",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -41,7 +41,7 @@ public interface EnvApi {
     @ApiOperation(value = "Set environment variables", nickname = "envPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Set environment variables success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Set environment variables failure", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Set environment variables failure", response = ApiResponse.class)})
     @RequestMapping(value = "/env",
             produces = {"application/json"},
             method = RequestMethod.POST)

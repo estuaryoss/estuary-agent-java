@@ -18,7 +18,7 @@ public interface CommandDetachedApi {
     @ApiOperation(value = "Stops all commands that were previously started in detached mode", nickname = "commandDetachedDelete", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "command detached stop success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "command detached stop failure", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "command detached stop failure", response = ApiResponse.class)})
     @RequestMapping(value = "/commanddetached",
             produces = {"application/json"},
             method = RequestMethod.DELETE)
@@ -30,7 +30,7 @@ public interface CommandDetachedApi {
     @ApiOperation(value = "Gets information about the last command started in detached mode", nickname = "commandDetachedGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Get command detached info success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "Get command detached info failure", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Get command detached info failure", response = ApiResponse.class)})
     @RequestMapping(value = "/commanddetached",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -41,7 +41,7 @@ public interface CommandDetachedApi {
     @ApiOperation(value = "Starts the shell commands in detached mode and sequentially", nickname = "commandDetachedIdPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "commands start success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "commands start failure", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "commands start failure", response = ApiResponse.class)})
     @RequestMapping(value = "/commanddetached/{id}",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},

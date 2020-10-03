@@ -20,4 +20,5 @@ public class ApiResponseConstants {
     public static final int SET_ENV_VAR_FAILURE = 1017;
     public static final int INVALID_JSON_PAYLOAD = 1018;
     public static final int NOT_IMPLEMENTED = 1019;
+    public static final int INVALID_YAML_CONFIG = 1020;
 }

@@ -1,5 +1,6 @@
 package com.github.dinuta.estuary.agent.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.component.CommandRunner;
@@ -7,8 +8,10 @@ import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
+import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
+import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -51,6 +55,9 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     @Autowired
     private ClientRequest clientRequest;
+
+    @Autowired
+    private EnvApiController envApiController;
 
     @Autowired
     public CommandDetachedApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -127,9 +134,9 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
         try {
             writeContentInFile(testInfo, commandDescription);
-            String commandsStripped = commandContent.replace("\r\n", "\n").stripLeading().stripTrailing();
+            String commandsStripped = commandContent.replace("\r\n", "\n").strip();
             List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
-                    .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());
+                    .stream().map(elem -> elem.strip()).collect(Collectors.toList());
             log.debug("Executing commands: " + commandsList.toString());
 
             List<String> startPyArgumentsList = new ArrayList<>();
@@ -157,6 +164,83 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                 .path(clientRequest.getRequestUri()), HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse> commandDetachedIdPostYaml(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other in yaml format.", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+        String accept = request.getHeader("Accept");
+        String testInfoFilename = new File(".").getAbsolutePath() + "/command_detached_info.json";
+        File testInfo = new File(testInfoFilename);
+        List<String> commandsList = new ArrayList<>();
+        CommandDescription commandDescription = new CommandDescription()
+                .started(true)
+                .finished(false)
+                .id(id);
+
+        if (commandContent == null) {
+            return new ResponseEntity<>(new ApiResponse()
+                    .code(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)
+                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
+                    .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        String commandsStripped = commandContent.replace("\r\n", "\n").strip();
+        try {
+            YamlConfig yamlConfig = new Yaml().loadAs(commandsStripped, YamlConfig.class);
+            envApiController.envPost(this.getConfigEnvVars(yamlConfig), token);
+            commandsList = YamlConfigParser.getCommandsList(yamlConfig).stream()
+                    .map(elem -> elem.strip()).collect(Collectors.toList());
+        } catch (Exception e) {
+            log.debug(ExceptionUtils.getStackTrace(e));
+            return new ResponseEntity<>(new ApiResponse()
+                    .code(ApiResponseConstants.INVALID_YAML_CONFIG)
+                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.INVALID_YAML_CONFIG))
+                    .description(ExceptionUtils.getStackTrace(e))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        try {
+            writeContentInFile(testInfo, commandDescription);
+            log.debug("Executing commands: " + commandsList.toString());
+            List<String> startPyArgumentsList = new ArrayList<>();
+            startPyArgumentsList.add(id);
+            startPyArgumentsList.add(String.join(";", commandsList.toArray(new String[0])));
+
+            log.debug("Sending args: " + startPyArgumentsList.toString());
+            commandRunner.runStartCommandDetached(startPyArgumentsList);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse()
+                    .code(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE)
+                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE)))
+                    .description(ExceptionUtils.getStackTrace(e))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(new ApiResponse()
+                .code(ApiResponseConstants.SUCCESS)
+                .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)))
+                .description(id)
+                .name(About.getAppName())
+                .version(About.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+    }
+
+    private String getConfigEnvVars(YamlConfig yamlConfig) throws JsonProcessingException {
+        if (yamlConfig.getEnv() == null)
+            return "{}";
+        if (yamlConfig.getEnv().size() == 0)
+            return "{}";
+        return objectMapper.writeValueAsString(yamlConfig.getEnv());
     }
 
     private void writeContentInFile(File testInfo, CommandDescription commandDescription) throws IOException {

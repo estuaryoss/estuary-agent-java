@@ -40,13 +40,25 @@ public interface CommandDetachedApi {
 
     @ApiOperation(value = "Starts the shell commands in detached mode and sequentially", nickname = "commandDetachedIdPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "commands start success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "commands start failure", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Commands start success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Commands start failure", response = ApiResponse.class)})
     @RequestMapping(value = "/commanddetached/{id}",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},
             method = RequestMethod.POST)
     default ResponseEntity<ApiResponse> commandDetachedIdPost(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ApiOperation(value = "Starts the commands in detached mode and sequentially. The commands are described by yaml.", nickname = "commandDetachedIdPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Commands start success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Commands start failure", response = ApiResponse.class)})
+    @RequestMapping(value = "/commanddetachedyaml/{id}",
+            produces = {"application/json"},
+            consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},
+            method = RequestMethod.POST)
+    default ResponseEntity<ApiResponse> commandDetachedIdPostYaml(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other described as yaml", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

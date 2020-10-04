@@ -58,5 +58,4 @@ public class HomeControllerTest {
         assertThat(body.get("swagger")).isEqualTo("2.0");
         assertThat(((Map) body.get("paths")).size()).isEqualTo(12);
     }
-
 }

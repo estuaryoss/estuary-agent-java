@@ -11,17 +11,14 @@ public class YamlConfigParser {
 
     public static List<String> getCommandsList(YamlConfig yamlConfig) throws YamlConfigException {
         checkConfig(yamlConfig);
-        commandsList.addAll(yamlConfig.getBefore_script());
+        commandsList.addAll(yamlConfig.getBeforeScript());
         commandsList.addAll(yamlConfig.getScript());
-        commandsList.addAll(yamlConfig.getAfter_script());
+        commandsList.addAll(yamlConfig.getAfterScript());
 
         return commandsList;
     }
 
     private static void checkConfig(YamlConfig yamlConfig) throws YamlConfigException {
-        if (yamlConfig.getScript() == null)
-            throw new YamlConfigException("Mandatory section 'script' was not found or it was empty.");
-
         if (yamlConfig.getScript().size() == 0)
             throw new YamlConfigException("Mandatory section 'script' was not found or it was empty.");
     }

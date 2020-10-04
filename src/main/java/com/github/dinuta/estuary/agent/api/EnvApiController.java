@@ -53,7 +53,7 @@ public class EnvApiController implements EnvApi {
         return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(environment.getEnvironmentAndVirtualEnvironment().get(envName))
+                .description(environment.getEnvAndVirtualEnv().get(envName))
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -66,7 +66,7 @@ public class EnvApiController implements EnvApi {
         return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(environment.getEnvironmentAndVirtualEnvironment())
+                .description(environment.getEnvAndVirtualEnv())
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -94,7 +94,7 @@ public class EnvApiController implements EnvApi {
         }
 
         envVarsToBeAdded.forEach((key, value) -> {
-            if (environment.getVirtualEnvironment().containsKey(key)) virtualEnvVarsAdded.put(key, value);
+            if (environment.getVirtualEnv().containsKey(key)) virtualEnvVarsAdded.put(key, value);
         });
 
         return new ResponseEntity<>(new ApiResponse()

@@ -1,7 +1,7 @@
 package com.github.dinuta.estuary.agent.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.component.CommandRunner;
 import com.github.dinuta.estuary.agent.constants.About;
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.yaml.snakeyaml.Yaml;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -171,6 +170,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         String testInfoFilename = new File(".").getAbsolutePath() + "/command_detached_info.json";
         File testInfo = new File(testInfoFilename);
         List<String> commandsList = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
         CommandDescription commandDescription = new CommandDescription()
                 .started(true)
                 .finished(false)
@@ -189,8 +189,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
         String commandsStripped = commandContent.replace("\r\n", "\n").strip();
         try {
-            YamlConfig yamlConfig = new Yaml().loadAs(commandsStripped, YamlConfig.class);
-            envApiController.envPost(this.getConfigEnvVars(yamlConfig), token);
+            YamlConfig yamlConfig = mapper.readValue(commandsStripped, YamlConfig.class);
+            envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()), token);
             commandsList = YamlConfigParser.getCommandsList(yamlConfig).stream()
                     .map(elem -> elem.strip()).collect(Collectors.toList());
         } catch (Exception e) {
@@ -233,14 +233,6 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                 .path(clientRequest.getRequestUri()), HttpStatus.OK);
-    }
-
-    private String getConfigEnvVars(YamlConfig yamlConfig) throws JsonProcessingException {
-        if (yamlConfig.getEnv() == null)
-            return "{}";
-        if (yamlConfig.getEnv().size() == 0)
-            return "{}";
-        return objectMapper.writeValueAsString(yamlConfig.getEnv());
     }
 
     private void writeContentInFile(File testInfo, CommandDescription commandDescription) throws IOException {

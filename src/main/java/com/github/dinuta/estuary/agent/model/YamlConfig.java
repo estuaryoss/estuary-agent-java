@@ -1,22 +1,46 @@
 package com.github.dinuta.estuary.agent.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class YamlConfig {
+
+    @JsonProperty("env")
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private Map<String, String> env = new LinkedHashMap<>();
-    private List<String> before_script;
-    private List<String> script;
-    private List<String> after_script;
 
+    @JsonProperty("before_script")
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> beforeScript = new ArrayList<>();
 
-    public List<String> getBefore_script() {
-        return before_script;
+    @JsonProperty("script")
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> script = new ArrayList<>();
+
+    @JsonProperty("after_script")
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> afterScript = new ArrayList<>();
+
+    public List<String> getAfterScript() {
+        return afterScript;
     }
 
-    public void setBefore_script(List<String> before_script) {
-        this.before_script = before_script;
+    public void setAfterScript(List<String> afterScript) {
+        this.afterScript = afterScript;
+    }
+
+    public List<String> getBeforeScript() {
+        return beforeScript;
+    }
+
+    public void setBeforeScript(List<String> beforeScript) {
+        this.beforeScript = beforeScript;
     }
 
     public List<String> getScript() {
@@ -25,14 +49,6 @@ public class YamlConfig {
 
     public void setScript(List<String> script) {
         this.script = script;
-    }
-
-    public List<String> getAfter_script() {
-        return after_script;
-    }
-
-    public void setAfter_script(List<String> after_script) {
-        this.after_script = after_script;
     }
 
     public Map<String, String> getEnv() {

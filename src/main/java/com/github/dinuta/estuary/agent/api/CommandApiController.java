@@ -8,6 +8,7 @@ import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
+import com.github.dinuta.estuary.agent.model.ConfigDescriptor;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
@@ -29,9 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Api(tags = {"estuary-agent"})
@@ -79,13 +80,17 @@ public class CommandApiController implements CommandApi {
     public HttpEntity<? extends Object> commandPostYaml(@ApiParam(value = "Commands to run in yaml format", required = true) @Valid @RequestBody String commands, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) throws IOException {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.strip();
-        List<String> commandsList = new ArrayList<String>();
+        List<String> commandsList;
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
+        ResponseEntity<ApiResponse> apiResponse;
+        ConfigDescriptor configDescriptor = new ConfigDescriptor();
+        YamlConfig yamlConfig;
 
         try {
-            YamlConfig yamlConfig = mapper.readValue(commandsStripped, YamlConfig.class);
-            envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()), token);
-            commandsList = YamlConfigParser.getCommandsList(yamlConfig).stream()
+            yamlConfig = mapper.readValue(commandsStripped, YamlConfig.class);
+            apiResponse = envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()), token);
+            yamlConfig.setEnv((Map<String, String>) apiResponse.getBody().getDescription());
+            commandsList = new YamlConfigParser().getCommandsList(yamlConfig).stream()
                     .map(elem -> elem.strip()).collect(Collectors.toList());
         } catch (Exception e) {
             log.debug(ExceptionUtils.getStackTrace(e));
@@ -100,10 +105,12 @@ public class CommandApiController implements CommandApi {
         }
 
         log.debug("Executing commands: " + commandsList.toString());
-        return new ResponseEntity<>(new ApiResponseCommandDescription()
+        configDescriptor.setYamlConfig(yamlConfig);
+        configDescriptor.setDescription(commandRunner.runCommands(commandsList.toArray(new String[0])));
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(commandRunner.runCommands(commandsList.toArray(new String[0])))
+                .description(configDescriptor)
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

@@ -2,7 +2,7 @@ package com.github.dinuta.estuary.agent.model;
 
 import java.util.Objects;
 
-public class Filecontent {
+public class FileContent {
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -23,7 +23,7 @@ public class Filecontent {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Filecontent {\n");
+    sb.append("class FileContent {\n");
 
     sb.append("}");
     return sb.toString();

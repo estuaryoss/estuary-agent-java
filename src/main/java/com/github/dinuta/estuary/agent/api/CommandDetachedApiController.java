@@ -8,6 +8,7 @@ import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
+import com.github.dinuta.estuary.agent.model.ConfigDescriptor;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
@@ -37,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Api(tags = {"estuary-agent"})
@@ -171,10 +173,10 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         File testInfo = new File(testInfoFilename);
         List<String> commandsList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
-        CommandDescription commandDescription = new CommandDescription()
-                .started(true)
-                .finished(false)
-                .id(id);
+        CommandDescription commandDescription = new CommandDescription().started(true).finished(false).id(id);
+        ResponseEntity<ApiResponse> apiResponse;
+        ConfigDescriptor configDescriptor = new ConfigDescriptor();
+        YamlConfig yamlConfig;
 
         if (commandContent == null) {
             return new ResponseEntity<>(new ApiResponse()
@@ -189,9 +191,10 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
         String commandsStripped = commandContent.replace("\r\n", "\n").strip();
         try {
-            YamlConfig yamlConfig = mapper.readValue(commandsStripped, YamlConfig.class);
-            envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()), token);
-            commandsList = YamlConfigParser.getCommandsList(yamlConfig).stream()
+            yamlConfig = mapper.readValue(commandsStripped, YamlConfig.class);
+            apiResponse = envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()), token);
+            yamlConfig.setEnv((Map<String, String>) apiResponse.getBody().getDescription());
+            commandsList = new YamlConfigParser().getCommandsList(yamlConfig).stream()
                     .map(elem -> elem.strip()).collect(Collectors.toList());
         } catch (Exception e) {
             log.debug(ExceptionUtils.getStackTrace(e));
@@ -225,10 +228,12 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                     .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        configDescriptor.setYamlConfig(yamlConfig);
+        configDescriptor.setDescription(id);
         return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)))
-                .description(id)
+                .description(configDescriptor)
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

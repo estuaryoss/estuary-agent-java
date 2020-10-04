@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class YamlConfigParser {
-    private static List<String> commandsList = new ArrayList<>();
+    private List<String> commandsList = new ArrayList<>();
 
-    public static List<String> getCommandsList(YamlConfig yamlConfig) throws YamlConfigException {
+    public List<String> getCommandsList(YamlConfig yamlConfig) throws YamlConfigException {
         checkConfig(yamlConfig);
         commandsList.addAll(yamlConfig.getBeforeScript());
         commandsList.addAll(yamlConfig.getScript());

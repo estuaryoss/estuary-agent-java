@@ -162,7 +162,10 @@ public class CommandDetachedApiControllerTest {
         ApiResponseConfigDescriptor body = responseEntity.getBody();
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getConfigDescriptor().getDescription().toString()).isEqualTo(testId);
-        assertThat(body.getConfigDescriptor().getYamlConfig()).isEqualTo(yamlConfig);
+        assertThat(body.getConfigDescriptor().getYamlConfig().getEnv()).isEqualTo(yamlConfig.getEnv());
+        assertThat(body.getConfigDescriptor().getYamlConfig().getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
+        assertThat(body.getConfigDescriptor().getYamlConfig().getScript()).isEqualTo(yamlConfig.getScript());
+        assertThat(body.getConfigDescriptor().getYamlConfig().getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
 
         await().atMost(2, SECONDS).until(isCommandFinished(list.get(0)));
         ResponseEntity<ApiResponseCommandDescription> responseEntityCmdDescription =

@@ -1,12 +1,21 @@
 package com.github.dinuta.estuary.agent.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
+import com.github.dinuta.estuary.agent.exception.YamlConfigException;
+import com.github.dinuta.estuary.agent.model.YamlConfig;
+import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
+import com.github.dinuta.estuary.agent.model.api.ApiResponseConfigDescriptor;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
+import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
+import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,8 +29,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
@@ -31,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 public class CommandApiControllerTest {
     private final static String SERVER_PREFIX = "http://localhost:";
+    private final static String YAML_CONFIG = "config.yaml";
 
     @LocalServerPort
     private int port;
@@ -185,6 +198,64 @@ public class CommandApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
+    @Test
+    public void whenSendingTheCommandsConfigYamlApiReturnsTheCorrectDetailsForEachOne() throws IOException, YamlConfigException {
+        String yamlConfigString = IOUtils.toString(this.getClass().getResourceAsStream(YAML_CONFIG), "UTF-8");
+        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
+        ObjectMapper objectMapperJson = new ObjectMapper();
+        YamlConfig yamlConfig = objectMapper.readValue(yamlConfigString, YamlConfig.class);
+        List<String> list = new YamlConfigParser().getCommandsList(yamlConfig);
+
+        ResponseEntity<ApiResponseConfigDescriptor> responseEntity =
+                getApiResponseConfigDescriptorResponseEntity(yamlConfigString);
+
+        ApiResponseConfigDescriptor body = responseEntity.getBody();
+        CommandDescription commandDescription = objectMapperJson.readValue(
+                new JSONObject((Map) body.getConfigDescriptor().getDescription()).toJSONString(),
+                CommandDescription.class);
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+
+        assertThat(body.getConfigDescriptor().getYamlConfig().getEnv()).isEqualTo(yamlConfig.getEnv());
+        assertThat(body.getConfigDescriptor().getYamlConfig().getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
+        assertThat(body.getConfigDescriptor().getYamlConfig().getScript()).isEqualTo(yamlConfig.getScript());
+        assertThat(body.getConfigDescriptor().getYamlConfig().getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
+        assertThat(commandDescription.getCommands().get(list.get(0)).getDetails().getCode()).isEqualTo(0L);
+        assertThat(commandDescription.getCommands().get(list.get(1)).getDetails().getCode()).isEqualTo(0L);
+        assertThat(commandDescription.getCommands().get(list.get(2)).getDetails().getCode()).isEqualTo(0L);
+        assertThat(commandDescription.getCommands().get(list.get(0)).getDetails().getOut()).contains("before_script");
+        assertThat(commandDescription.getCommands().get(list.get(1)).getDetails().getOut()).contains("script");
+        assertThat(commandDescription.getCommands().get(list.get(2)).getDetails().getOut()).contains("after_script");
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenSendingTheCommandsConfigYamlWithoutScriptSectionThenException() throws IOException, YamlConfigException {
+        String yamlConfigString = IOUtils.toString(this.getClass().getResourceAsStream(YAML_CONFIG), "UTF-8");
+        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
+        YamlConfig yamlConfig = objectMapper.readValue(yamlConfigString, YamlConfig.class);
+        yamlConfig.setScript(new ArrayList<>());
+
+        ResponseEntity<ApiResponse> responseEntity =
+                getApiResponseResponseEntity(objectMapper.writeValueAsString(yamlConfigString));
+
+        ApiResponse body = responseEntity.getBody();
+        String description = body.getDescription().toString();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.INVALID_YAML_CONFIG);
+
+        assertThat(body.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.INVALID_YAML_CONFIG)));
+        assertThat(description).contains("Exception");
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
     @ParameterizedTest
     @ValueSource(
             strings = {
@@ -219,6 +290,26 @@ public class CommandApiControllerTest {
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
                         ApiResponseCommandDescription.class);
+    }
+
+    private ResponseEntity<ApiResponseConfigDescriptor> getApiResponseConfigDescriptorResponseEntity(String yamlConfig) {
+        Map<String, String> headers = new HashMap<>();
+
+        return this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/commandyaml",
+                        HttpMethod.POST,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(yamlConfig, headers),
+                        ApiResponseConfigDescriptor.class);
+    }
+
+    private ResponseEntity<ApiResponse> getApiResponseResponseEntity(String yamlConfig) {
+        Map<String, String> headers = new HashMap<>();
+
+        return this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/commandyaml",
+                        HttpMethod.POST,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(yamlConfig, headers),
+                        ApiResponse.class);
     }
 
     private void assertSuccessCommandDescriptionFields(String commandInfo, CommandDescription body) {

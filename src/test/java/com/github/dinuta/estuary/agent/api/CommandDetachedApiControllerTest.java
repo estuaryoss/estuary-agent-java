@@ -1,12 +1,18 @@
 package com.github.dinuta.estuary.agent.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
+import com.github.dinuta.estuary.agent.exception.YamlConfigException;
+import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
+import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,8 +27,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -36,6 +44,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 @ExtendWith(SpringExtension.class)
 public class CommandDetachedApiControllerTest {
     private final static String SERVER_PREFIX = "http://localhost:";
+    private final static String YAML_CONFIG = "config.yaml";
 
     @LocalServerPort
     private int port;
@@ -133,6 +142,43 @@ public class CommandDetachedApiControllerTest {
         assertThat(body1.getPath()).isEqualTo("/commanddetached?");
         assertThat(body1.getVersion()).isEqualTo(About.getVersion());
         assertThat(LocalDateTime.parse(body1.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenSendingTheCommandsConfigYamlApiReturnsTheCorrectDetailsForEachOne() throws IOException, YamlConfigException {
+        String testId = "testIdYaml";
+        String yamlConfigString = IOUtils.toString(this.getClass().getResourceAsStream(YAML_CONFIG), "UTF-8");
+        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
+        ObjectMapper objectMapperJson = new ObjectMapper();
+        YamlConfig yamlConfig = objectMapper.readValue(yamlConfigString, YamlConfig.class);
+        List<String> list = new YamlConfigParser().getCommandsList(yamlConfig);
+
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/commanddetachedyaml/" + testId,
+                        HttpMethod.POST,
+                        httpRequestUtils.getRequestEntityJsonContentTypeAppText(yamlConfigString, new HashMap<>()),
+                        ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getDescription().toString()).isEqualTo(testId);
+
+        ResponseEntity<ApiResponseCommandDescription> responseEntityCmdDescription =
+                getApiResponseCommandDescriptionResponseEntity();
+        ApiResponseCommandDescription bodyCmdDescription = responseEntityCmdDescription.getBody();
+
+        assertThat(responseEntityCmdDescription.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(bodyCmdDescription.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(bodyCmdDescription.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+        assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(0)).getDetails().getCode()).isEqualTo(0L);
+        assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(1)).getDetails().getCode()).isEqualTo(0L);
+        assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(2)).getDetails().getCode()).isEqualTo(0L);
+        assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(0)).getDetails().getOut()).contains("before_script");
+        assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(1)).getDetails().getOut()).contains("script");
+        assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(2)).getDetails().getOut()).contains("after_script");
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     public Callable<Boolean> isCommandFinished(String command) {

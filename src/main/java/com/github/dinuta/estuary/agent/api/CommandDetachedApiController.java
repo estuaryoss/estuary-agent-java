@@ -172,7 +172,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         String testInfoFilename = new File(".").getAbsolutePath() + "/command_detached_info.json";
         File testInfo = new File(testInfoFilename);
         List<String> commandsList;
-        ObjectMapper mapper = new YAMLMapper();
+        YAMLMapper mapper = new YAMLMapper();
         CommandDescription commandDescription = new CommandDescription().started(true).finished(false).id(id);
         ResponseEntity<ApiResponse> apiResponse;
         ConfigDescriptor configDescriptor = new ConfigDescriptor();

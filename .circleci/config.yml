@@ -5,15 +5,15 @@ jobs: # a collection of steps
     working_directory: ~/estuary-agent # directory where steps will run
 
     docker: # run the steps with Docker
-      - image: circleci/openjdk:11-jdk-stretch # ...with this image as the primary container; this is where all `steps` will run
+      - image: circleci/openjdk:11.0.3-jdk-stretch
 
     steps: # a collection of executable commands
 
       - checkout # check out source code to working directory
 
-      #      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
-      #          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-      #          key: estuary-agent-{{ checksum "pom.xml" }}
+      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: estuary-agent-{{ checksum "pom.xml" }}
 
       - run: mvn dependency:go-offline # gets the project dependencies
 

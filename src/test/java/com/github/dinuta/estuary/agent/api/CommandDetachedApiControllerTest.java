@@ -11,6 +11,7 @@ import com.github.dinuta.estuary.agent.exception.YamlConfigException;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
+import com.github.dinuta.estuary.agent.model.api.ApiResponseConfigDescriptor;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -149,20 +150,21 @@ public class CommandDetachedApiControllerTest {
         String testId = "testIdYaml";
         String yamlConfigString = IOUtils.toString(this.getClass().getResourceAsStream(YAML_CONFIG), "UTF-8");
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
-        ObjectMapper objectMapperJson = new ObjectMapper();
         YamlConfig yamlConfig = objectMapper.readValue(yamlConfigString, YamlConfig.class);
         List<String> list = new YamlConfigParser().getCommandsList(yamlConfig);
 
-        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+        ResponseEntity<ApiResponseConfigDescriptor> responseEntity = this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commanddetachedyaml/" + testId,
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityJsonContentTypeAppText(yamlConfigString, new HashMap<>()),
-                        ApiResponse.class);
+                        ApiResponseConfigDescriptor.class);
 
-        ApiResponse body = responseEntity.getBody();
+        ApiResponseConfigDescriptor body = responseEntity.getBody();
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getDescription().toString()).isEqualTo(testId);
+        assertThat(body.getConfigDescriptor().getDescription().toString()).isEqualTo(testId);
+        assertThat(body.getConfigDescriptor().getYamlConfig()).isEqualTo(yamlConfig);
 
+        await().atMost(2, SECONDS).until(isCommandFinished(list.get(0)));
         ResponseEntity<ApiResponseCommandDescription> responseEntityCmdDescription =
                 getApiResponseCommandDescriptionResponseEntity();
         ApiResponseCommandDescription bodyCmdDescription = responseEntityCmdDescription.getBody();

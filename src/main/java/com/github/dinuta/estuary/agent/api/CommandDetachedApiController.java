@@ -1,7 +1,7 @@
 package com.github.dinuta.estuary.agent.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.component.CommandRunner;
 import com.github.dinuta.estuary.agent.constants.About;
@@ -171,8 +171,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         String accept = request.getHeader("Accept");
         String testInfoFilename = new File(".").getAbsolutePath() + "/command_detached_info.json";
         File testInfo = new File(testInfoFilename);
-        List<String> commandsList = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
+        List<String> commandsList;
+        ObjectMapper mapper = new YAMLMapper();
         CommandDescription commandDescription = new CommandDescription().started(true).finished(false).id(id);
         ResponseEntity<ApiResponse> apiResponse;
         ConfigDescriptor configDescriptor = new ConfigDescriptor();

@@ -28,4 +28,26 @@ public class ConfigDescriptor {
     public void setDescription(Object description) {
         this.description = description;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+
+        sb.append("    config: ").append(toIndentedString(yamlConfig));
+        sb.append("    description: ").append(toIndentedString(description));
+        sb.append("\n}");
+        return sb.toString();
+    }
+
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(java.lang.Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
+    }
 }

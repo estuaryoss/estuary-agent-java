@@ -1,7 +1,7 @@
 package com.github.dinuta.estuary.agent.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.component.CommandRunner;
 import com.github.dinuta.estuary.agent.constants.About;
@@ -81,13 +81,13 @@ public class CommandApiController implements CommandApi {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.strip();
         List<String> commandsList;
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
+        ObjectMapper yamlMapper = new YAMLMapper();
         ResponseEntity<ApiResponse> apiResponse;
         ConfigDescriptor configDescriptor = new ConfigDescriptor();
         YamlConfig yamlConfig;
 
         try {
-            yamlConfig = mapper.readValue(commandsStripped, YamlConfig.class);
+            yamlConfig = yamlMapper.readValue(commandsStripped, YamlConfig.class);
             apiResponse = envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()), token);
             yamlConfig.setEnv((Map<String, String>) apiResponse.getBody().getDescription());
             commandsList = new YamlConfigParser().getCommandsList(yamlConfig).stream()

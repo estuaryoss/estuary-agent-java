@@ -58,4 +58,28 @@ public class YamlConfig {
     public void setEnv(Map<String, String> env) {
         this.env = env;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+
+        sb.append("    env: ").append(toIndentedString(env));
+        sb.append("    before_script: ").append(toIndentedString(beforeScript));
+        sb.append("    script: ").append(toIndentedString(script));
+        sb.append("    after_script: ").append(toIndentedString(afterScript));
+        sb.append("\n}");
+        return sb.toString();
+    }
+
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(java.lang.Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
+    }
 }

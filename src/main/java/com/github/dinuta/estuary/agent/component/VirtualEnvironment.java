@@ -62,7 +62,7 @@ public class VirtualEnvironment {
      *
      * @return Map containing initial immutable env vars plus virtual env vars set by the user
      */
-    public Map<String, String> getEnvironmentAndVirtualEnvironment() {
+    public Map<String, String> getEnvAndVirtualEnv() {
         Map<String, String> systemAndExternalEnvVars = new LinkedHashMap<>();
         systemAndExternalEnvVars.putAll(environment);
 
@@ -78,7 +78,7 @@ public class VirtualEnvironment {
      *
      * @return Map containing initial immutable env vars
      */
-    public Map<String, String> getEnvironment() {
+    public Map<String, String> getEnv() {
         return environment;
     }
 
@@ -87,7 +87,7 @@ public class VirtualEnvironment {
      *
      * @return Map containing mutable env vars set by the user
      */
-    public Map<String, String> getVirtualEnvironment() {
+    public Map<String, String> getVirtualEnv() {
         return virtualEnvironment;
     }
 }

@@ -24,6 +24,7 @@ public class ApiResponseMessage {
         message.put(ApiResponseConstants.SET_ENV_VAR_FAILURE, "Failed to set env vars \"%s\"");
         message.put(ApiResponseConstants.INVALID_JSON_PAYLOAD, "Invalid json body \"%s\"");
         message.put(ApiResponseConstants.NOT_IMPLEMENTED, "Not implemented");
+        message.put(ApiResponseConstants.INVALID_YAML_CONFIG, "Invalid yaml config");
     }
 
     public static String getMessage(int apiResponseCode) {

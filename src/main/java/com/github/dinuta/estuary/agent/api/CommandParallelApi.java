@@ -23,7 +23,7 @@ public interface CommandParallelApi {
     @ApiOperation(value = "Starts multiple commands in blocking mode parallel. Set the client timeout at needed value.", nickname = "commandPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "commands start success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 404, message = "commands start failure", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 500, message = "commands start failure", response = ApiResponse.class)})
     @RequestMapping(value = "/commandparallel",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},

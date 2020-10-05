@@ -90,7 +90,7 @@ public class EnvApiControllerTest {
 
         ApiResponse body = responseEntity.getBody();
 
-        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SET_ENV_VAR_FAILURE);
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SET_ENV_VAR_FAILURE), envVars), envVars);
@@ -147,7 +147,7 @@ public class EnvApiControllerTest {
     @Test
     @Order(2)
     public void whenSettingExternalEnvVarsFromFileAndItsASystemOneThenItDoesntGetOverwritten() {
-        String envVar = "PATH";
+        String envVar = "TMP";
         String notExpectedValue = "this_value_wont_be_injected_because_its_an_existing_system_env_var";
         ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);

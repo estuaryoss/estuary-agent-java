@@ -61,7 +61,7 @@ public class FolderApiController implements FolderApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.NOT_FOUND);
+                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         File file;
@@ -79,7 +79,7 @@ public class FolderApiController implements FolderApi {
                     .name(About.getAppName())
                     .version(About.getVersion())
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.NOT_FOUND);
+                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return ResponseEntity.ok()

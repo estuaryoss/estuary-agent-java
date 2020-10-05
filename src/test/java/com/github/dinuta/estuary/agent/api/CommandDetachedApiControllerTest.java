@@ -160,7 +160,7 @@ public class CommandDetachedApiControllerTest {
                         ApiResponse.class);
 
         ApiResponse body = responseEntity.getBody();
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getDescription().toString()).isEqualTo(testId);
 
         ResponseEntity<ApiResponseCommandDescription> responseEntityCmdDescription =

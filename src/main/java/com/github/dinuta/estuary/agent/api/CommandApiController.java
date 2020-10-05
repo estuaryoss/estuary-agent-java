@@ -81,7 +81,7 @@ public class CommandApiController implements CommandApi {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.strip();
         List<String> commandsList;
-        ObjectMapper yamlMapper = new YAMLMapper();
+        YAMLMapper yamlMapper = new YAMLMapper();
         ResponseEntity<ApiResponse> apiResponse;
         ConfigDescriptor configDescriptor = new ConfigDescriptor();
         YamlConfig yamlConfig;

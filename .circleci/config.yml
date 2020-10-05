@@ -5,7 +5,7 @@ jobs: # a collection of steps
     working_directory: ~/estuary-agent # directory where steps will run
 
     docker: # run the steps with Docker
-      - image: circleci/openjdk:11-jdk-stretch # ...with this image as the primary container; this is where all `steps` will run
+      - image: circleci/openjdk:11.0.3-jdk-stretch
 
     steps: # a collection of executable commands
 

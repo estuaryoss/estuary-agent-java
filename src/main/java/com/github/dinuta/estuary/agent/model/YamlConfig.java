@@ -27,6 +27,12 @@ public class YamlConfig {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> afterScript = new ArrayList<>();
 
+    public YamlConfig() {
+    }
+
+    public YamlConfig(String config) {
+    }
+
     public List<String> getAfterScript() {
         return afterScript;
     }

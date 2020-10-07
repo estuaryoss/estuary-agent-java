@@ -11,7 +11,6 @@ import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.ConfigDescriptor;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
-import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -67,7 +66,7 @@ public class CommandApiController implements CommandApi {
                 .stream().map(elem -> elem.strip()).collect(Collectors.toList());
 
         log.debug("Executing commands: " + commandsList.toString());
-        return new ResponseEntity<>(new ApiResponseCommandDescription()
+        return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
                 .description(commandRunner.runCommands(commandsList.toArray(new String[0])))

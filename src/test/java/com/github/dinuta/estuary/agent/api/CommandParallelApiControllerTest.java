@@ -1,12 +1,15 @@
 package com.github.dinuta.estuary.agent.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
-import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
+import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,17 +52,19 @@ public class CommandParallelApiControllerTest {
                     "echo 1 && echo 2;1\n2",
             }
     )
-    public void whenSendingCorrectCommandsThenApiReturnsZeroExitCode(String commandInfo) {
-        ResponseEntity<ApiResponseCommandDescription> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo.split(";")[0]);
+    public void whenSendingCorrectCommandsThenApiReturnsZeroExitCode(String commandInfo) throws JsonProcessingException {
+        ResponseEntity<ApiResponse> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo.split(";")[0]);
 
-        ApiResponseCommandDescription body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
 
-        this.assertSuccessCommandDescriptionFields(commandInfo, body.getDescription());
+        CommandDescription commandDescription = new ObjectMapper().readValue(
+                new JSONObject((Map) body.getDescription()).toJSONString(), CommandDescription.class);
+        this.assertSuccessCommandDescriptionFields(commandInfo, commandDescription);
 
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getPath()).isEqualTo("/commandparallel?");
@@ -68,7 +73,7 @@ public class CommandParallelApiControllerTest {
     }
 
     @Test
-    public void whenSendingTwoCommandsAndOneOfTheCommandsTakesLongerThanTheGlobalTimeoutThenCommandTimeouts() {
+    public void whenSendingTwoCommandsAndOneOfTheCommandsTakesLongerThanTheGlobalTimeoutThenCommandTimeouts() throws JsonProcessingException {
         float sleep1 = 2f;
         float sleep2 = 4f;
         float timeout = 3f;
@@ -76,26 +81,28 @@ public class CommandParallelApiControllerTest {
         String command1 = "sleep " + sleep1;
         String command2 = "sleep " + sleep2;
         String command = command1 + "\n" + command2;
-        ResponseEntity<ApiResponseCommandDescription> responseEntity =
+        ResponseEntity<ApiResponse> responseEntity =
                 getApiResponseCommandDescriptionResponseEntity(command);
 
-        ApiResponseCommandDescription body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
+        CommandDescription commandDescription = new ObjectMapper().readValue(
+                new JSONObject((Map) body.getDescription()).toJSONString(), CommandDescription.class);
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
-        assertThat(Math.round(body.getDescription().getDuration())).isEqualTo(Math.round(timeout));
-        assertThat(body.getDescription().getDuration()).isInstanceOf(Float.class);
+        assertThat(Math.round(commandDescription.getDuration())).isEqualTo(Math.round(timeout));
+        assertThat(commandDescription.getDuration()).isInstanceOf(Float.class);
 
-        assertThat(Math.round(body.getDescription().getCommands().get(command1).getDuration())).isEqualTo(Math.round(sleep1));
-        assertThat(body.getDescription().getCommands().get(command1).getDuration()).isInstanceOf(Float.class);
+        assertThat(Math.round(commandDescription.getCommands().get(command1).getDuration())).isEqualTo(Math.round(sleep1));
+        assertThat(commandDescription.getCommands().get(command1).getDuration()).isInstanceOf(Float.class);
 
-        assertThat(Math.round(body.getDescription().getCommands().get(command2).getDuration())).isEqualTo(Math.round(timeout));
-        assertThat(body.getDescription().getCommands().get(command2).getDetails().getErr()).containsIgnoringCase("TimeoutException");
-        assertThat(body.getDescription().getCommands().get(command2).getDetails().getOut()).isEqualTo("");
-        assertThat(body.getDescription().getCommands().get(command2).getDetails().getCode()).isEqualTo(-1);
-        assertThat(body.getDescription().getCommands().get(command2).getDuration()).isInstanceOf(Float.class);
+        assertThat(Math.round(commandDescription.getCommands().get(command2).getDuration())).isEqualTo(Math.round(timeout));
+        assertThat(commandDescription.getCommands().get(command2).getDetails().getErr()).containsIgnoringCase("TimeoutException");
+        assertThat(commandDescription.getCommands().get(command2).getDetails().getOut()).isEqualTo("");
+        assertThat(commandDescription.getCommands().get(command2).getDetails().getCode()).isEqualTo(-1);
+        assertThat(commandDescription.getCommands().get(command2).getDuration()).isInstanceOf(Float.class);
 
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
@@ -103,55 +110,59 @@ public class CommandParallelApiControllerTest {
     }
 
     @Test
-    public void whenSendingTwoCommandsThenApiReturnsMaxOfExecutionTimeInSeconds() {
+    public void whenSendingTwoCommandsThenApiReturnsMaxOfExecutionTimeInSeconds() throws JsonProcessingException {
         float sleep1 = 1f;
         float sleep2 = 2f;
         String command1 = "sleep " + sleep1;
         String command2 = "sleep " + sleep2;
         String command = command1 + "\n" + command2;
-        ResponseEntity<ApiResponseCommandDescription> responseEntity =
+        ResponseEntity<ApiResponse> responseEntity =
                 getApiResponseCommandDescriptionResponseEntity(command);
 
-        ApiResponseCommandDescription body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
+        CommandDescription commandDescription = new ObjectMapper().readValue(
+                new JSONObject((Map) body.getDescription()).toJSONString(), CommandDescription.class);
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
-        assertThat(Math.round(body.getDescription().getDuration())).isEqualTo(Math.round(sleep2));
-        assertThat(body.getDescription().getDuration()).isInstanceOf(Float.class);
+        assertThat(Math.round(commandDescription.getDuration())).isEqualTo(Math.round(sleep2));
+        assertThat(commandDescription.getDuration()).isInstanceOf(Float.class);
 
-        assertThat(Math.round(body.getDescription().getCommands().get(command1).getDuration())).isEqualTo(Math.round(sleep1));
-        assertThat(body.getDescription().getCommands().get(command1).getDuration()).isInstanceOf(Float.class);
-        assertThat(Math.round(body.getDescription().getCommands().get(command2).getDuration())).isEqualTo(Math.round(sleep2));
-        assertThat(body.getDescription().getCommands().get(command2).getDuration()).isInstanceOf(Float.class);
+        assertThat(Math.round(commandDescription.getCommands().get(command1).getDuration())).isEqualTo(Math.round(sleep1));
+        assertThat(commandDescription.getCommands().get(command1).getDuration()).isInstanceOf(Float.class);
+        assertThat(Math.round(commandDescription.getCommands().get(command2).getDuration())).isEqualTo(Math.round(sleep2));
+        assertThat(commandDescription.getCommands().get(command2).getDuration()).isInstanceOf(Float.class);
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     @Test
-    public void whenSendingTwoCommandsOneSuccessOneFailureThenApiReturnsTheCorrectDetailsForEachOne() {
+    public void whenSendingTwoCommandsOneSuccessOneFailureThenApiReturnsTheCorrectDetailsForEachOne() throws JsonProcessingException {
         String command1 = "ls -lrt";
         String command2 = "whatever";
         String command = command1 + "\n" + command2;
-        ResponseEntity<ApiResponseCommandDescription> responseEntity =
+        ResponseEntity<ApiResponse> responseEntity =
                 getApiResponseCommandDescriptionResponseEntity(command);
 
-        ApiResponseCommandDescription body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
+        CommandDescription commandDescription = new ObjectMapper().readValue(
+                new JSONObject((Map) body.getDescription()).toJSONString(), CommandDescription.class);
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
-        assertThat(body.getDescription().getDuration()).isInstanceOf(Float.class);
+        assertThat(commandDescription.getDuration()).isInstanceOf(Float.class);
 
-        assertThat(body.getDescription().getCommands().get(command1).getDetails().getCode()).isEqualTo(0L);
-        assertThat(body.getDescription().getCommands().get(command2).getDetails().getCode()).isNotEqualTo(0L);
-        assertThat(body.getDescription().getCommands().get(command1).getDetails().getOut()).isNotEqualTo("");
-        assertThat(body.getDescription().getCommands().get(command2).getDetails().getOut()).isEqualTo("");
-        assertThat(body.getDescription().getCommands().get(command1).getDetails().getErr()).isEqualTo("");
-        assertThat(body.getDescription().getCommands().get(command2).getDetails().getErr()).isNotEqualTo("");
+        assertThat(commandDescription.getCommands().get(command1).getDetails().getCode()).isEqualTo(0L);
+        assertThat(commandDescription.getCommands().get(command2).getDetails().getCode()).isNotEqualTo(0L);
+        assertThat(commandDescription.getCommands().get(command1).getDetails().getOut()).isNotEqualTo("");
+        assertThat(commandDescription.getCommands().get(command2).getDetails().getOut()).isEqualTo("");
+        assertThat(commandDescription.getCommands().get(command1).getDetails().getErr()).isEqualTo("");
+        assertThat(commandDescription.getCommands().get(command2).getDetails().getErr()).isNotEqualTo("");
 
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
@@ -166,31 +177,33 @@ public class CommandParallelApiControllerTest {
                     "cat whenever;No such file or directory",
             }
     )
-    public void whenSendingIncorrectCommandsThenApiReturnsNonZeroExitCode(String commandInfo) {
-        ResponseEntity<ApiResponseCommandDescription> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo.split(";")[0]);
+    public void whenSendingIncorrectCommandsThenApiReturnsNonZeroExitCode(String commandInfo) throws JsonProcessingException {
+        ResponseEntity<ApiResponse> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo.split(";")[0]);
 
-        ApiResponseCommandDescription body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
+        CommandDescription commandDescription = new ObjectMapper().readValue(
+                new JSONObject((Map) body.getDescription()).toJSONString(), CommandDescription.class);
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
 
-        this.assertFailureCommandDescriptionFields(commandInfo, body.getDescription());
+        this.assertFailureCommandDescriptionFields(commandInfo, commandDescription);
 
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
-    private ResponseEntity<ApiResponseCommandDescription> getApiResponseCommandDescriptionResponseEntity(String command) {
+    private ResponseEntity<ApiResponse> getApiResponseCommandDescriptionResponseEntity(String command) {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commandparallel",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
-                        ApiResponseCommandDescription.class);
+                        ApiResponse.class);
     }
 
     private void assertSuccessCommandDescriptionFields(String commandInfo, CommandDescription body) {

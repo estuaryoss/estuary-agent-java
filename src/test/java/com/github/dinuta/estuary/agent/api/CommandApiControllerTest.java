@@ -222,7 +222,7 @@ public class CommandApiControllerTest {
         ConfigDescriptor configDescriptor = new ObjectMapper().readValue(
                 new JSONObject((Map) body.getDescription()).toJSONString(), ConfigDescriptor.class);
         CommandDescription commandDescription = new ObjectMapper().readValue(
-                new JSONObject((Map) body.getDescription()).toJSONString(), CommandDescription.class);
+                new JSONObject((Map) configDescriptor).toJSONString(), CommandDescription.class);
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
@@ -254,8 +254,10 @@ public class CommandApiControllerTest {
                 getApiResponseResponseEntity(objectMapper.writeValueAsString(yamlConfigString));
 
         ApiResponse body = responseEntity.getBody();
+        ConfigDescriptor configDescriptor = new ObjectMapper().readValue(
+                new JSONObject((Map) body.getDescription()).toJSONString(), ConfigDescriptor.class);
         CommandDescription commandDescription = new ObjectMapper().readValue(
-                new JSONObject((Map) body.getDescription()).toJSONString(), CommandDescription.class);
+                new JSONObject((Map) configDescriptor).toJSONString(), CommandDescription.class);
 
         String description = commandDescription.toString();
 

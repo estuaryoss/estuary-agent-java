@@ -202,7 +202,7 @@ public class CommandDetachedApiControllerTest {
             ResponseEntity<ApiResponse> responseEntity = getApiResponseCommandDescriptionResponseEntity();
             ApiResponse body = responseEntity.getBody();
             CommandDescription commandDescription = new ObjectMapper().readValue(
-                    new JSONObject((Map) body).toJSONString(), CommandDescription.class);
+                    new JSONObject((Map) body.getDescription()).toJSONString(), CommandDescription.class);
 
 
             if (commandDescription.getCommands().get(command) == null)

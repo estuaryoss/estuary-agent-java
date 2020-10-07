@@ -161,11 +161,11 @@ public class CommandDetachedApiControllerTest {
 
         ApiResponseConfigDescriptor body = responseEntity.getBody();
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getConfigDescriptor().getDescription().toString()).isEqualTo(testId);
-        assertThat(body.getConfigDescriptor().getYamlConfig().getEnv()).isEqualTo(yamlConfig.getEnv());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getScript()).isEqualTo(yamlConfig.getScript());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
+        assertThat(body.getDescription().getDescription().toString()).isEqualTo(testId);
+        assertThat(body.getDescription().getYamlConfig().getEnv()).isEqualTo(yamlConfig.getEnv());
+        assertThat(body.getDescription().getYamlConfig().getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
+        assertThat(body.getDescription().getYamlConfig().getScript()).isEqualTo(yamlConfig.getScript());
+        assertThat(body.getDescription().getYamlConfig().getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
 
         await().atMost(2, SECONDS).until(isCommandFinished(list.get(0)));
         ResponseEntity<ApiResponseCommandDescription> responseEntityCmdDescription =

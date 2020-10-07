@@ -211,17 +211,17 @@ public class CommandApiControllerTest {
 
         ApiResponseConfigDescriptor body = responseEntity.getBody();
         CommandDescription commandDescription = objectMapperJson.readValue(
-                new JSONObject((Map) body.getConfigDescriptor().getDescription()).toJSONString(),
+                new JSONObject((Map) body.getDescription().getDescription()).toJSONString(),
                 CommandDescription.class);
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
 
-        assertThat(body.getConfigDescriptor().getYamlConfig().getEnv()).isEqualTo(yamlConfig.getEnv());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getScript()).isEqualTo(yamlConfig.getScript());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
+        assertThat(body.getDescription().getYamlConfig().getEnv()).isEqualTo(yamlConfig.getEnv());
+        assertThat(body.getDescription().getYamlConfig().getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
+        assertThat(body.getDescription().getYamlConfig().getScript()).isEqualTo(yamlConfig.getScript());
+        assertThat(body.getDescription().getYamlConfig().getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
         assertThat(commandDescription.getCommands().get(list.get(0)).getDetails().getCode()).isEqualTo(0L);
         assertThat(commandDescription.getCommands().get(list.get(1)).getDetails().getCode()).isEqualTo(0L);
         assertThat(commandDescription.getCommands().get(list.get(2)).getDetails().getCode()).isEqualTo(0L);

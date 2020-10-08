@@ -11,9 +11,9 @@ import com.github.dinuta.estuary.agent.exception.YamlConfigException;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
-import com.github.dinuta.estuary.agent.model.api.ApiResponseConfigDescriptor;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
 import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -150,22 +150,28 @@ public class CommandDetachedApiControllerTest {
         String testId = "testIdYaml";
         String yamlConfigString = IOUtils.toString(this.getClass().getResourceAsStream(YAML_CONFIG), "UTF-8");
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
+        ObjectMapper objectMapperJson = new ObjectMapper();
         YamlConfig yamlConfig = objectMapper.readValue(yamlConfigString, YamlConfig.class);
         List<String> list = new YamlConfigParser().getCommandsList(yamlConfig);
 
-        ResponseEntity<ApiResponseConfigDescriptor> responseEntity = this.restTemplate
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commanddetachedyaml/" + testId,
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityJsonContentTypeAppText(yamlConfigString, new HashMap<>()),
-                        ApiResponseConfigDescriptor.class);
+                        ApiResponse.class);
 
-        ApiResponseConfigDescriptor body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
+        String commandDescription = ((Map) body.getDescription()).get("description").toString();
+        YamlConfig yamlConfigResponse = objectMapperJson.readValue(
+                new JSONObject((Map) ((Map) body.getDescription()).get("config")).toJSONString(),
+                YamlConfig.class);
+
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getConfigDescriptor().getDescription().toString()).isEqualTo(testId);
-        assertThat(body.getConfigDescriptor().getYamlConfig().getEnv()).isEqualTo(yamlConfig.getEnv());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getScript()).isEqualTo(yamlConfig.getScript());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
+        assertThat(commandDescription).isEqualTo(testId);
+        assertThat(yamlConfigResponse.getEnv()).isEqualTo(yamlConfig.getEnv());
+        assertThat(yamlConfigResponse.getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
+        assertThat(yamlConfigResponse.getScript()).isEqualTo(yamlConfig.getScript());
+        assertThat(yamlConfigResponse.getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
 
         await().atMost(2, SECONDS).until(isCommandFinished(list.get(0)));
         ResponseEntity<ApiResponseCommandDescription> responseEntityCmdDescription =

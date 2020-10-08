@@ -11,7 +11,6 @@ import com.github.dinuta.estuary.agent.exception.YamlConfigException;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
-import com.github.dinuta.estuary.agent.model.api.ApiResponseConfigDescriptor;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
 import org.apache.commons.io.IOUtils;
@@ -206,22 +205,25 @@ public class CommandApiControllerTest {
         YamlConfig yamlConfig = objectMapper.readValue(yamlConfigString, YamlConfig.class);
         List<String> list = new YamlConfigParser().getCommandsList(yamlConfig);
 
-        ResponseEntity<ApiResponseConfigDescriptor> responseEntity =
+        ResponseEntity<ApiResponse> responseEntity =
                 getApiResponseConfigDescriptorResponseEntity(yamlConfigString);
 
-        ApiResponseConfigDescriptor body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
         CommandDescription commandDescription = objectMapperJson.readValue(
-                new JSONObject((Map) body.getConfigDescriptor().getDescription()).toJSONString(),
+                new JSONObject((Map) ((Map) body.getDescription()).get("description")).toJSONString(),
                 CommandDescription.class);
+        YamlConfig yamlConfigResponse = objectMapperJson.readValue(
+                new JSONObject((Map) ((Map) body.getDescription()).get("config")).toJSONString(),
+                YamlConfig.class);
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
 
-        assertThat(body.getConfigDescriptor().getYamlConfig().getEnv()).isEqualTo(yamlConfig.getEnv());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getScript()).isEqualTo(yamlConfig.getScript());
-        assertThat(body.getConfigDescriptor().getYamlConfig().getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
+        assertThat(yamlConfigResponse.getEnv()).isEqualTo(yamlConfig.getEnv());
+        assertThat(yamlConfigResponse.getBeforeScript()).isEqualTo(yamlConfig.getBeforeScript());
+        assertThat(yamlConfigResponse.getScript()).isEqualTo(yamlConfig.getScript());
+        assertThat(yamlConfigResponse.getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
         assertThat(commandDescription.getCommands().get(list.get(0)).getDetails().getCode()).isEqualTo(0L);
         assertThat(commandDescription.getCommands().get(list.get(1)).getDetails().getCode()).isEqualTo(0L);
         assertThat(commandDescription.getCommands().get(list.get(2)).getDetails().getCode()).isEqualTo(0L);
@@ -292,14 +294,14 @@ public class CommandApiControllerTest {
                         ApiResponseCommandDescription.class);
     }
 
-    private ResponseEntity<ApiResponseConfigDescriptor> getApiResponseConfigDescriptorResponseEntity(String yamlConfig) {
+    private ResponseEntity<ApiResponse> getApiResponseConfigDescriptorResponseEntity(String yamlConfig) {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commandyaml",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(yamlConfig, headers),
-                        ApiResponseConfigDescriptor.class);
+                        ApiResponse.class);
     }
 
     private ResponseEntity<ApiResponse> getApiResponseResponseEntity(String yamlConfig) {

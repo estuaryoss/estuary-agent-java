@@ -137,8 +137,8 @@ public class CommandRunner {
 
         if (isWindows) {
             fullCmd.add(String.format("%s\\%s", Paths.get("").toAbsolutePath().toString(), pythonExec));
-            fullCmd.add(this.doQuoteCmd(command.get(0)) + " " +
-                    this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";")));
+            fullCmd.add(this.doQuoteCmd(command.get(0)));
+            fullCmd.add(this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";")));
         } else {
             fullCmd.add(
                     this.doQuoteCmd(String.format("%s/%s", Paths.get("").toAbsolutePath().toString(), pythonExec)) + " " +

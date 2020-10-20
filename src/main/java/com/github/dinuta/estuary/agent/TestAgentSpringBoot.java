@@ -1,6 +1,7 @@
 package com.github.dinuta.estuary.agent;
 
 import com.github.dinuta.estuary.agent.component.VirtualEnvironment;
+import com.github.dinuta.estuary.agent.constants.DefaultConstants;
 import com.github.dinuta.estuary.agent.constants.FluentdServiceConstants;
 import com.github.dinuta.estuary.agent.service.FluentdService;
 import com.github.dinuta.estuary.agent.utils.MessageDumper;
@@ -13,6 +14,9 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.io.File;
+import java.io.IOException;
 
 @SpringBootApplication
 @EnableEurekaClient
@@ -37,10 +41,13 @@ public class TestAgentSpringBoot implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... arg0) {
+    public void run(String... arg0) throws IOException {
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }
+        File file = new File(DefaultConstants.CMD_DETACHED_FOLDER);
+        if (!file.exists()) file.mkdirs();
+
         fluentdService.emit(FluentdServiceConstants.STARTUP, MessageDumper.dumpMessage(environment.getEnvAndVirtualEnv().toString()));
     }
 

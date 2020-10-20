@@ -29,7 +29,7 @@ export APP_IP=192.168.0.4
 export PORT=8081
 java -jar \
 -Deureka.client.serviceUrl.defaultZone=http://192.168.0.100:8080/eureka/v2 \
--Deureka.client.enabled=true agent-4.1.0-SNAPSHOT-exec.jar 
+-Deureka.client.enabled=true agent-4.2.0-SNAPSHOT-exec.jar 
 ```
 
 ## Fluentd logging
@@ -127,7 +127,7 @@ Get this dependency:
 <dependency>
     <groupId>com.github.dinuta.estuary</groupId>
     <artifactId>agent</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
 </dependency>
 ```
 To use a snapshot version, set the oss.sonatype.org repo in settings.xml:

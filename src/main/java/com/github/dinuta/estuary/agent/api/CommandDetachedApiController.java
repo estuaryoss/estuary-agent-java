@@ -9,6 +9,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.ConfigDescriptor;
+import com.github.dinuta.estuary.agent.model.StateHolder;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
@@ -61,6 +62,9 @@ public class CommandDetachedApiController implements CommandDetachedApi {
     private EnvApiController envApiController;
 
     @Autowired
+    private StateHolder stateHolder;
+
+    @Autowired
     public CommandDetachedApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -80,9 +84,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        String testInfoName = "command_detached_info.json";
-        String testInfoFilename = new File(".").getAbsolutePath() + "/" + testInfoName;
-        log.debug(testInfoName + " Path: " + testInfoFilename);
+        String testInfoFilename = stateHolder.getLastCommand();
+        log.debug("Reading content from file: " + testInfoFilename);
 
         File testInfo = new File(testInfoFilename);
         CommandDescription commandDescription = new CommandDescription();
@@ -94,8 +97,39 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.GET_TEST_INFO_FAILURE)
-                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_TEST_INFO_FAILURE))
+                    .code(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE)
+                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE))
+                    .description(ExceptionUtils.getStackTrace(e))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(clientRequest.getRequestUri()), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new ApiResponse()
+                .code(ApiResponseConstants.SUCCESS)
+                .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .description(commandDescription)
+                .name(About.getAppName())
+                .version(About.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse> commandDetachedIdGet(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+        String accept = request.getHeader("Accept");
+        String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
+        log.debug("Reading content from file: " + testInfoFilename);
+
+        CommandDescription commandDescription;
+        try {
+            Path path = Paths.get(testInfoFilename);
+            String fileContent = String.join("\n", Files.readAllLines(path));
+            commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse()
+                    .code(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE)
+                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE))
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
@@ -115,8 +149,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedIdPost(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        String testInfoFilename = new File(".").getAbsolutePath() + "/command_detached_info.json";
-        File testInfo = new File(testInfoFilename);
+        stateHolder.setLastCommand(id);
+        File testInfo = new File(stateHolder.getLastCommand());
         CommandDescription commandDescription = new CommandDescription()
                 .started(true)
                 .finished(false)
@@ -169,7 +203,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedIdPostYaml(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other in yaml format.", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        String testInfoFilename = new File(".").getAbsolutePath() + "/command_detached_info.json";
+        stateHolder.setLastCommand(id);
+        String testInfoFilename = stateHolder.getLastCommand();
         File testInfo = new File(testInfoFilename);
         List<String> commandsList;
         YAMLMapper mapper = new YAMLMapper();

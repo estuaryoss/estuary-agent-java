@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.io.File;
-import java.io.IOException;
 
 @SpringBootApplication
 @EnableEurekaClient
@@ -41,7 +40,7 @@ public class TestAgentSpringBoot implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... arg0) throws IOException {
+    public void run(String... arg0) {
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }

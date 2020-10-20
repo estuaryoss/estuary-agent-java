@@ -9,9 +9,9 @@ public class ApiResponseConstants {
     public static final int GET_FILE_FAILURE_IS_DIR = 1006;
     public static final int GET_ENV_VAR_FAILURE = 1007;
     public static final int MISSING_PARAMETER_POST = 1008;
-    public static final int GET_TEST_INFO_FAILURE = 1009;
+    public static final int GET_COMMAND_DETACHED_INFO_FAILURE = 1009;
     public static final int EMPTY_REQUEST_BODY_PROVIDED = 1010;
-    public static final int TEST_STOP_FAILURE = 1011;
+    public static final int COMMAND_DETACHED_STOP_FAILURE = 1011;
     public static final int UPLOAD_FILE_FAILURE = 1012;
     public static final int HTTP_HEADER_NOT_PROVIDED = 1013;
     public static final int COMMAND_EXEC_FAILURE = 1014;

@@ -13,6 +13,7 @@ import com.github.dinuta.estuary.agent.model.StateHolder;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
+import com.github.dinuta.estuary.agent.utils.ProcessUtils;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -26,6 +27,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.zeroturnaround.process.PidProcess;
+import org.zeroturnaround.process.ProcessUtil;
+import org.zeroturnaround.process.Processes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -40,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Api(tags = {"estuary-agent"})
@@ -95,6 +100,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             Path path = Paths.get(testInfoFilename);
             String fileContent = String.join("\n", Files.readAllLines(path));
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
+            commandDescription.processes(ProcessUtils.getProcesses());
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE)
@@ -126,10 +132,48 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             Path path = Paths.get(testInfoFilename);
             String fileContent = String.join("\n", Files.readAllLines(path));
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
+            commandDescription.processes(ProcessUtils.getProcesses());
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE)
                     .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE))
+                    .description(ExceptionUtils.getStackTrace(e))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(clientRequest.getRequestUri()), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new ApiResponse()
+                .code(ApiResponseConstants.SUCCESS)
+                .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .description(commandDescription)
+                .name(About.getAppName())
+                .version(About.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+        String accept = request.getHeader("Accept");
+        String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
+        log.debug("Reading content from file: " + testInfoFilename);
+
+        CommandDescription commandDescription;
+        try {
+            Path path = Paths.get(testInfoFilename);
+            String fileContent = String.join("\n", Files.readAllLines(path));
+            commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
+            int pid = (int) commandDescription.getPid();
+            PidProcess process = Processes.newPidProcess(pid);
+            log.debug("PID " + pid + " is alive: " + process.isAlive());
+            if (process.isAlive())
+                ProcessUtil.destroyGracefullyOrForcefullyAndWait(process, 5, TimeUnit.SECONDS, 10, TimeUnit.SECONDS);
+            log.debug("PID " + pid + " is alive: " + process.isAlive());
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse()
+                    .code(ApiResponseConstants.COMMAND_DETACHED_STOP_FAILURE)
+                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.COMMAND_DETACHED_STOP_FAILURE))
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())

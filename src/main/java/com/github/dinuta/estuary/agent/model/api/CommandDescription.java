@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CommandDescription {
     @JsonProperty("finished")
@@ -30,6 +33,17 @@ public class CommandDescription {
 
     @JsonProperty("commands")
     private LinkedHashMap<String, CommandStatus> commands = new LinkedHashMap<>();
+
+    @JsonProperty("processes")
+    private List<Map<String, Object>> processes = new ArrayList<>();
+
+    public List<Map<String, Object>> getProcesses() {
+        return processes;
+    }
+
+    public void setProcesses(List<Map<String, Object>> processes) {
+        this.processes = processes;
+    }
 
     public boolean getFinished() {
         return finished;
@@ -125,6 +139,11 @@ public class CommandDescription {
 
     public CommandDescription commands(LinkedHashMap<String, CommandStatus> commands) {
         this.commands = commands;
+        return this;
+    }
+
+    public CommandDescription processes(List<Map<String, Object>> processes) {
+        this.processes = processes;
         return this;
     }
 

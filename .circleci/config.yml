@@ -31,7 +31,7 @@ jobs: # a collection of steps
           command: chmod +x start.py
           name: "chmod +x start.py"
       - run:
-          command: set
+          command: printenv
           name: "print env vars"
       - run:
           command: mvn clean package # run the actual tests

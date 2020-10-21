@@ -227,7 +227,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE)
-                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE)))
+                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE), id))
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())
@@ -299,7 +299,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE)
-                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE)))
+                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE), id))
                     .description(ExceptionUtils.getStackTrace(e))
                     .name(About.getAppName())
                     .version(About.getVersion())

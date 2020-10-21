@@ -25,7 +25,7 @@ public class VirtualEnvironmentTest {
     public void whenSettingAlreadyExistingSystemEnvVarThenIsNotSet() {
         Map<String, String> envVarsToBeSet = new LinkedHashMap<>();
         envVarsToBeSet.put("FOO1", "BAR1");
-        envVarsToBeSet.put("TMP", "BAR2"); // <- system one
+        envVarsToBeSet.put("OS", "BAR2"); // <- system one
 
         Map<String, String> environment = new VirtualEnvironment().setExternalEnvVars(envVarsToBeSet);
 

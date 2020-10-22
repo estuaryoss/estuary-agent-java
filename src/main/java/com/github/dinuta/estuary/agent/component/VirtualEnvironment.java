@@ -50,11 +50,26 @@ public class VirtualEnvironment {
             virtualEnvironment.put(key, value);
     }
 
-    public void setExternalEnvVars(Map<String, String> envVars) {
-        envVars.forEach((key, value) -> {
-            if (!environment.containsKey(key) && virtualEnvironment.size() <= VIRTUAL_ENVIRONMENT_MAX_SIZE)
+    public Map<String, String> setExternalEnvVars(Map<String, String> envVars) {
+        Map<String, String> addedEnvVars = new LinkedHashMap<>();
+
+        for (Map.Entry<String, String> entry : envVars.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if (environment.containsKey(key)) continue;
+
+            if (virtualEnvironment.containsKey(key)) {
+                virtualEnvironment.put(key, value); //can override
+                addedEnvVars.put(key, value);
+                continue;
+            }
+            if (virtualEnvironment.size() <= VIRTUAL_ENVIRONMENT_MAX_SIZE) {
                 virtualEnvironment.put(key, value);
-        });
+                addedEnvVars.put(key, value);
+            }
+
+        }
+        return addedEnvVars;
     }
 
     /**

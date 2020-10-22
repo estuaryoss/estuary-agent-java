@@ -61,7 +61,7 @@ public interface CommandDetachedApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Starts the commands in detached mode and sequentially. The commands are described by yaml.", nickname = "commandDetachedIdPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiOperation(value = "Starts the commands in detached mode and sequentially. The commands are described by yaml.", nickname = "commandDetachedIdPostYaml", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Commands start success", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "Commands start failure", response = ApiResponse.class)})
@@ -73,4 +73,14 @@ public interface CommandDetachedApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @ApiOperation(value = "Deletes the associated processes of the shell commands in detached mode", nickname = "commandDetachedIdDelete", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Command delete success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Command delete failure", response = ApiResponse.class)})
+    @RequestMapping(value = "/commanddetached/{id}",
+            produces = {"application/json"},
+            method = RequestMethod.DELETE)
+    default ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
 }

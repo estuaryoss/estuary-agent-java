@@ -79,7 +79,7 @@ public class EnvApiController implements EnvApi {
 
         try {
             envVarsToBeAdded = objectMapper.readValue(envVars, LinkedHashMap.class);
-            environment.setExternalEnvVars(envVarsToBeAdded);
+            virtualEnvVarsAdded = environment.setExternalEnvVars(envVarsToBeAdded);
         } catch (Exception e) {
             log.debug(ExceptionUtils.getStackTrace(e));
             return new ResponseEntity<>(new ApiResponse()
@@ -92,10 +92,6 @@ public class EnvApiController implements EnvApi {
                     .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                     .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        envVarsToBeAdded.forEach((key, value) -> {
-            if (environment.getVirtualEnv().containsKey(key)) virtualEnvVarsAdded.put(key, value);
-        });
 
         return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)

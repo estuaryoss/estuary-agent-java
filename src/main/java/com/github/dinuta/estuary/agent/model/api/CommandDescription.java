@@ -1,10 +1,13 @@
 package com.github.dinuta.estuary.agent.model.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.dinuta.estuary.agent.model.ProcessInfo;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class CommandDescription {
     @JsonProperty("finished")
@@ -30,6 +33,17 @@ public class CommandDescription {
 
     @JsonProperty("commands")
     private LinkedHashMap<String, CommandStatus> commands = new LinkedHashMap<>();
+
+    @JsonProperty("processes")
+    private List<ProcessInfo> processes = new ArrayList<>();
+
+    public List<ProcessInfo> getProcesses() {
+        return processes;
+    }
+
+    public void setProcesses(List<ProcessInfo> processes) {
+        this.processes = processes;
+    }
 
     public boolean getFinished() {
         return finished;
@@ -125,6 +139,11 @@ public class CommandDescription {
 
     public CommandDescription commands(LinkedHashMap<String, CommandStatus> commands) {
         this.commands = commands;
+        return this;
+    }
+
+    public CommandDescription processes(List<ProcessInfo> processes) {
+        this.processes = processes;
         return this;
     }
 

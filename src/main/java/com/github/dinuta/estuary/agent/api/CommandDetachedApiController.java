@@ -9,6 +9,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.ConfigDescriptor;
+import com.github.dinuta.estuary.agent.model.ProcessInfo;
 import com.github.dinuta.estuary.agent.model.StateHolder;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
@@ -27,9 +28,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.zeroturnaround.process.PidProcess;
-import org.zeroturnaround.process.ProcessUtil;
-import org.zeroturnaround.process.Processes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -44,8 +42,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.github.dinuta.estuary.agent.utils.ProcessUtils.getParentProcessForDetachedCmd;
 
 @Api(tags = {"estuary-agent"})
 @Controller
@@ -164,12 +163,9 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             Path path = Paths.get(testInfoFilename);
             String fileContent = String.join("\n", Files.readAllLines(path));
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
-            int pid = (int) commandDescription.getPid();
-            PidProcess process = Processes.newPidProcess(pid);
-            log.debug("PID " + pid + " is alive: " + process.isAlive());
-            if (process.isAlive())
-                ProcessUtil.destroyGracefullyOrForcefullyAndWait(process, 5, TimeUnit.SECONDS, 10, TimeUnit.SECONDS);
-            log.debug("PID " + pid + " is alive: " + process.isAlive());
+            ProcessInfo parentProcessInfo = getParentProcessForDetachedCmd(id);
+            ProcessUtils.killChildrenProcesses(parentProcessInfo.getChildren());
+            ProcessUtils.killProcess(parentProcessInfo);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.COMMAND_DETACHED_STOP_FAILURE)
@@ -184,7 +180,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(commandDescription)
+                .description(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

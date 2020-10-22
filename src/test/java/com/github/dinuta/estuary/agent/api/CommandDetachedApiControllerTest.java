@@ -203,7 +203,7 @@ public class CommandDetachedApiControllerTest {
 
     @Test
     public void whenDeletingANonExistentIdThenException() {
-        String id = "this_is_does_not_exist";
+        String id = "this_is_does_not_exist_";
         ResponseEntity<ApiResponse> response = deleteApiResponseEntityForId(id);
 
         ApiResponse body = response.getBody();
@@ -255,8 +255,6 @@ public class CommandDetachedApiControllerTest {
 
         assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
         assertThat(LocalDateTime.parse(body1.getDescription().getStartedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
-        assertThat(body1.getDescription().getStarted()).isEqualTo(true);
-        assertThat(body1.getDescription().getFinished()).isEqualTo(false);
         assertThat(body1.getDescription().getId()).isEqualTo(testId);
         assertThat(new Gson().toJson(body1.getDescription().getProcesses())).doesNotContain(String.valueOf(pid));
     }

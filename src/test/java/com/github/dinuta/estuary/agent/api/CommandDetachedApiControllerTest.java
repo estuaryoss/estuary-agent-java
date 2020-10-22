@@ -12,6 +12,7 @@ import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
+import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -169,7 +170,7 @@ public class CommandDetachedApiControllerTest {
         assertThat(body.getDescription()).isEqualTo(testId);
 
 
-        await().atMost(sleep1 + 1, SECONDS).until(isCommandFinished(command1));
+        await().atMost(sleep1 + 2, SECONDS).until(isCommandFinished(command1));
         ApiResponseCommandDescription body1 =
                 getApiResponseCommandDescriptionEntity().getBody();
 
@@ -180,7 +181,7 @@ public class CommandDetachedApiControllerTest {
         assertThat(body1.getDescription().getCommands().get(command1).getStatus()).isEqualTo("finished");
         assertThat(body1.getDescription().getCommands().get(command2).getStatus()).isEqualTo("in progress");
 
-        await().atMost(sleep2 + 1, SECONDS).until(isCommandFinished(command2));
+        await().atMost(sleep2 + 2, SECONDS).until(isCommandFinished(command2));
         body1 = getApiResponseCommandDescriptionEntity().getBody();
 
         assertThat(Math.round(body1.getDescription().getDuration())).isEqualTo(Math.round(sleep1 + sleep2));
@@ -198,6 +199,66 @@ public class CommandDetachedApiControllerTest {
         assertThat(body1.getPath()).isEqualTo("/commanddetached?");
         assertThat(body1.getVersion()).isEqualTo(About.getVersion());
         assertThat(LocalDateTime.parse(body1.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenDeletingANonExistentIdThenException() {
+        String id = "this_is_does_not_exist";
+        ResponseEntity<ApiResponse> response = deleteApiResponseEntityForId(id);
+
+        ApiResponse body = response.getBody();
+        assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.COMMAND_DETACHED_STOP_FAILURE);
+        assertThat(body.getDescription().toString()).contains("Exception");
+    }
+
+    @Test
+    public void whenDeletingAnExistentIdThenProcessesAreDeleted() throws InterruptedException {
+        String testId = "myInventedId";
+        String command = "sleep 400 && echo 400";
+        Map<String, String> headers = new HashMap<>();
+
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/commanddetached/" + testId,
+                        HttpMethod.POST,
+                        httpRequestUtils.getRequestEntityJsonContentTypeAppText(command, headers),
+                        ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(
+                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+        assertThat(body.getDescription()).isEqualTo(testId);
+        Thread.sleep(1000);
+        ApiResponseCommandDescription body1 =
+                getApiResponseCommandDescriptionEntity().getBody();
+        int pid = (int) body1.getDescription().getPid();
+
+        assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body1.getDescription().getStartedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(body1.getDescription().getStarted()).isEqualTo(true);
+        assertThat(body1.getDescription().getFinished()).isEqualTo(false);
+        assertThat(body1.getDescription().getId()).isEqualTo(testId);
+        assertThat(new Gson().toJson(body1.getDescription().getProcesses())).contains(String.valueOf(pid));
+
+        ResponseEntity<ApiResponse> response = deleteApiResponseEntityForId(testId);
+
+        body = response.getBody();
+        assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getDescription()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+
+        body1 = getApiResponseCommandDescriptionEntity().getBody();
+
+        assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body1.getDescription().getStartedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(body1.getDescription().getStarted()).isEqualTo(true);
+        assertThat(body1.getDescription().getFinished()).isEqualTo(false);
+        assertThat(body1.getDescription().getId()).isEqualTo(testId);
+        assertThat(new Gson().toJson(body1.getDescription().getProcesses())).doesNotContain(String.valueOf(pid));
     }
 
     @Test
@@ -252,10 +313,14 @@ public class CommandDetachedApiControllerTest {
             ResponseEntity<ApiResponseCommandDescription> responseEntity = getApiResponseCommandDescriptionEntity();
             ApiResponseCommandDescription body = responseEntity.getBody();
 
-            if (body.getDescription().getCommands().get(command) == null)
-                return Boolean.FALSE;
+            try {
+                if (body.getDescription().getCommands().get(command) == null)
+                    return Boolean.FALSE;
 
-            return Boolean.valueOf(body.getDescription().getCommands().get(command).getDuration() > 0F);
+                return Boolean.valueOf(body.getDescription().getCommands().get(command).getStatus().equals("finished"));
+            } catch (Exception e) {
+                return false;
+            }
         };
     }
 
@@ -286,6 +351,16 @@ public class CommandDetachedApiControllerTest {
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.GET,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
+                        ApiResponse.class);
+    }
+
+    private ResponseEntity<ApiResponse> deleteApiResponseEntityForId(String id) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(CONTENT_TYPE, MediaType.TEXT_PLAIN.toString());
+        return this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
+                        HttpMethod.DELETE,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
                         ApiResponse.class);
     }

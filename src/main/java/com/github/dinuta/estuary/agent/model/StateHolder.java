@@ -7,13 +7,19 @@ import java.io.File;
 public class StateHolder {
     private final String LAST_COMMAND_FORMAT = new File(DefaultConstants.CMD_DETACHED_FOLDER).getAbsolutePath() + "/cmd_info_%s.json";
     private String lastCommand = String.format(LAST_COMMAND_FORMAT, "_");
+    private String lastCommandId = "_";
 
     public void setLastCommand(String id) {
         this.lastCommand = String.format(LAST_COMMAND_FORMAT, id);
+        this.lastCommandId = id;
     }
 
     public String getLastCommand() {
         return lastCommand;
+    }
+
+    public String getLastCommandId() {
+        return lastCommandId;
     }
 
     public StateHolder lastCommand(String lastCommand) {

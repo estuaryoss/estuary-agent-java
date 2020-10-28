@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -67,11 +68,9 @@ public class FileApiController implements FileApi {
                     .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        File file;
         ByteArrayResource resource;
-        try {
-            file = new File(filePath);
-            resource = new ByteArrayResource(IOUtils.toByteArray(new FileInputStream(file)));
+        try (InputStream in = new FileInputStream(new File(filePath))) {
+            resource = new ByteArrayResource(IOUtils.toByteArray(in));
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.GET_FILE_FAILURE)

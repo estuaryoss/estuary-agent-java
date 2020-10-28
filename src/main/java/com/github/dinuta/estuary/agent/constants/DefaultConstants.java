@@ -5,4 +5,5 @@ public class DefaultConstants {
     public static final int PROCESS_EXCEPTION_GENERAL = 1;
     public static final int PROCESS_EXCEPTION_TIMEOUT = -1;
     public static final String CMD_DETACHED_FOLDER = "cmds";
+    public static final String STREAMS_DETACHED_FOLDER = "streams";
 }

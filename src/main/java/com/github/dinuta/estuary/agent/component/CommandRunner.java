@@ -237,19 +237,19 @@ public class CommandRunner {
                     .err(err)
                     .code(code)
                     .pid(processState.getProcess().pid())
-                    .args(command);
+                    .args(String.join(" ", command));
         } catch (TimeoutException e) {
             log.debug(ExceptionUtils.getStackTrace(e));
             commandDetails
                     .err(ExceptionUtils.getStackTrace(e))
                     .code(PROCESS_EXCEPTION_TIMEOUT)
-                    .args(command);
+                    .args(String.join(" ", command));
         } catch (Exception e) {
             log.debug(ExceptionUtils.getStackTrace(e));
             commandDetails
                     .err(ExceptionUtils.getStackTrace(e))
                     .code(PROCESS_EXCEPTION_GENERAL)
-                    .args(command);
+                    .args(String.join(" ", command));
         } finally {
             try {
                 processState.closeErrOutputStream();

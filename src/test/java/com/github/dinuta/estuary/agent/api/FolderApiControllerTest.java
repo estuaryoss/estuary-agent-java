@@ -56,7 +56,7 @@ public class FolderApiControllerTest {
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body).isNotEmpty();
         //check also it appeared on disk
-        assertThat(new File("results.zip").exists()).isTrue();
+        assertThat(new File("archive.zip").exists()).isTrue();
     }
 
     @Test

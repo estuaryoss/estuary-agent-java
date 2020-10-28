@@ -16,7 +16,7 @@ public class CommandDetails {
     private long pid = 0;
 
     @JsonProperty("args")
-    private String[] args = null;
+    private String args = null;
 
     public String getOut() {
         return out;
@@ -50,11 +50,11 @@ public class CommandDetails {
         this.pid = pid;
     }
 
-    public String[] getArgs() {
+    public String getArgs() {
         return args;
     }
 
-    public void setArgs(String[] args) {
+    public void setArgs(String args) {
         this.args = args;
     }
 
@@ -78,7 +78,7 @@ public class CommandDetails {
         return this;
     }
 
-    public CommandDetails args(String[] args) {
+    public CommandDetails args(String args) {
         this.args = args;
         return this;
     }

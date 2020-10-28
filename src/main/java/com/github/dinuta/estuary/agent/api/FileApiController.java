@@ -9,12 +9,13 @@ import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -64,9 +67,11 @@ public class FileApiController implements FileApi {
                     .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        File file;
+        ByteArrayResource resource;
         try {
-            Path path = Paths.get(filePath);
-            fileContent = Files.readAllLines(path);
+            file = new File(filePath);
+            resource = new ByteArrayResource(IOUtils.toByteArray(new FileInputStream(file)));
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.GET_FILE_FAILURE)
@@ -79,8 +84,7 @@ public class FileApiController implements FileApi {
         }
 
         return ResponseEntity.ok()
-                .contentType(MediaType.valueOf("text/plain"))
-                .body(String.join("\n", fileContent));
+                .body(resource);
     }
 
     public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file", required = true) @Valid @RequestBody byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {

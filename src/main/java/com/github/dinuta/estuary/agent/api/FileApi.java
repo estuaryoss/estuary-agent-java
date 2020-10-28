@@ -23,7 +23,7 @@ public interface FileApi {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the file in plain text, success", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the file content could not be read", response = ApiResponse.class)})
     @RequestMapping(value = "/file",
-            produces = {"application/json"},
+            produces = {"application/json", "application/zip"},
             consumes = {"application/json", "application/octet-stream", "text/plain"},
             method = RequestMethod.GET)
     default ResponseEntity<? extends Object> fileGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token, @ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {

@@ -90,12 +90,23 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
         File testInfo = new File(testInfoFilename);
         CommandDescription commandDescription = new CommandDescription();
+
         try {
             if (!testInfo.exists())
                 writeContentInFile(testInfo, commandDescription);
-            Path path = Paths.get(testInfoFilename);
-            String fileContent = String.join("\n", Files.readAllLines(path));
-            commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
+        } catch (IOException e) {
+            return new ResponseEntity<>(new ApiResponse()
+                    .code(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE)
+                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE))
+                    .description(ExceptionUtils.getStackTrace(e))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        try (InputStream in = new FileInputStream(testInfo)) {
+            commandDescription = objectMapper.readValue(IOUtils.toString(in, "UTF-8"), CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
             commandDescription.processes(ProcessUtils.getProcesses());
         } catch (Exception e) {

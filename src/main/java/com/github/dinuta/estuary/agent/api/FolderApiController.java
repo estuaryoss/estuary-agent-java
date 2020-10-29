@@ -26,6 +26,7 @@ import org.zeroturnaround.zip.ZipUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 
 @Api(tags = {"estuary-agent"})
@@ -49,7 +50,7 @@ public class FolderApiController implements FolderApi {
 
     public ResponseEntity<? extends Object> folderGet(@ApiParam(value = "Target folder path to get as zip", required = false) @RequestHeader(value = "Folder-Path", required = false) String folderPath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        String archiveNamePath = "results.zip";
+        String archiveNamePath = "archive.zip";
         String headerName = "Folder-Path";
 
         log.debug(headerName + " Header: " + folderPath);
@@ -65,12 +66,23 @@ public class FolderApiController implements FolderApi {
         }
 
         File file;
-        ByteArrayResource resource;
         try {
             file = new File(archiveNamePath);
             ZipUtil.pack(new File(folderPath), file, name -> name);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse()
+                    .code(ApiResponseConstants.FOLDER_ZIP_FAILURE)
+                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.FOLDER_ZIP_FAILURE), folderPath))
+                    .description(ExceptionUtils.getStackTrace(e))
+                    .name(About.getAppName())
+                    .version(About.getVersion())
+                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-            resource = new ByteArrayResource(IOUtils.toByteArray(new FileInputStream(archiveNamePath)));
+        ByteArrayResource resource;
+        try (InputStream in = new FileInputStream(archiveNamePath)) {
+            resource = new ByteArrayResource(IOUtils.toByteArray(in));
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.FOLDER_ZIP_FAILURE)

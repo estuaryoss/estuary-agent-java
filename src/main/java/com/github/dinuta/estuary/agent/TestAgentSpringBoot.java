@@ -44,8 +44,10 @@ public class TestAgentSpringBoot implements CommandLineRunner {
         if (arg0.length > 0 && arg0[0].equals("exitcode")) {
             throw new ExitException();
         }
-        File file = new File(DefaultConstants.CMD_DETACHED_FOLDER);
-        if (!file.exists()) file.mkdirs();
+        File file_cmds = new File(DefaultConstants.CMD_DETACHED_FOLDER);
+        File file_streams = new File(DefaultConstants.STREAMS_DETACHED_FOLDER);
+        if (!file_cmds.exists()) file_cmds.mkdirs();
+        if (!file_streams.exists()) file_streams.mkdirs();
 
         fluentdService.emit(FluentdServiceConstants.STARTUP, MessageDumper.dumpMessage(environment.getEnvAndVirtualEnv().toString()));
     }

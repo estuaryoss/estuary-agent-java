@@ -119,6 +119,36 @@ public class CommandDetachedApiControllerTest {
     }
 
     @Test
+    public void whenSendingDetachedCommandAndThenStreamingOutputhenTheOutputIsIncremental() throws InterruptedException {
+        String id = "myId101";
+        String command = "echo 1 && sleep 1 && echo 2 && sleep 1 && echo 3 && sleep 1";
+
+        ResponseEntity<ApiResponse> responseEntity = postApiResponseCommandDescriptionEntity(command, id);
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getMessage()).isEqualTo(
+                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getDescription()).isEqualTo(id);
+        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+
+        Thread.sleep(1000);
+        ApiResponseCommandDescription body1 = getApiResponseCommandDescriptionEntityForId(id).getBody();
+        Thread.sleep(2000);
+        ApiResponseCommandDescription body2 = getApiResponseCommandDescriptionEntityForId(id).getBody();
+
+        assertThat(body1.getDescription().getId()).isEqualTo(id);
+        assertThat(body2.getDescription().getId()).isEqualTo(id);
+        assertThat(body2.getDescription().getCommands().get(command).getDetails().getOut().length())
+                .isGreaterThan(body1.getDescription().getCommands().get(command).getDetails().getOut().length());
+        assertThat(body1.getDescription().getCommands().get(command).getDetails().getErr()).isEqualTo("");
+        assertThat(body2.getDescription().getCommands().get(command).getDetails().getErr()).isEqualTo("");
+    }
+
+    @Test
     public void whenAskingForNonExistentDetachedCommandIdThenItIsNotFound() throws InterruptedException {
         String id = "myId11";
         String command = "ls -lart";

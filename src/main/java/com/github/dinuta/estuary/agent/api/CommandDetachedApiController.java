@@ -34,9 +34,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -193,11 +190,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
         log.debug("Reading content from file: " + testInfoFilename);
 
-        CommandDescription commandDescription;
         try {
-            Path path = Paths.get(testInfoFilename);
-            String fileContent = String.join("\n", Files.readAllLines(path));
-            commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
             ProcessInfo parentProcessInfo = getParentProcessForDetachedCmd(id);
             ProcessUtils.killChildrenProcesses(parentProcessInfo.getChildren());
             ProcessUtils.killProcess(parentProcessInfo);

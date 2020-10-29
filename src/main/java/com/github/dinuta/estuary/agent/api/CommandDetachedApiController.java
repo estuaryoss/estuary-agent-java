@@ -123,23 +123,23 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         CommandDescription finalCommandDescription = commandDescription;
         Base64FilePath base64FilePath = new Base64FilePath();
         Set<String> commandKeys = commandDescription.getCommands().keySet();
-        commandKeys.forEach(elem -> {
+        commandKeys.forEach(cmd -> {
             String output = "";
             String error = "";
-            try {
-                InputStream isOut = new FileInputStream(
-                        base64FilePath.getEncodedFileNameInBase64(elem, stateHolder.getLastCommandId(), ".out"));
+            try (
+                    InputStream isOut = new FileInputStream(
+                            base64FilePath.getEncodedFileNameInBase64(cmd, stateHolder.getLastCommandId(), ".out"));
+                    InputStream isErr = new FileInputStream(
+                            base64FilePath.getEncodedFileNameInBase64(cmd, stateHolder.getLastCommandId(), ".err"))
+            ) {
                 output = IOUtils.toString(isOut, "UTF-8");
-
-                InputStream isErr = new FileInputStream(
-                        base64FilePath.getEncodedFileNameInBase64(elem, stateHolder.getLastCommandId(), ".err"));
                 error = IOUtils.toString(isErr, "UTF-8");
             } catch (Exception e) {
                 log.debug(ExceptionUtils.getStackTrace(e));
             }
 
-            finalCommandDescription.getCommands().get(elem).getDetails().setOut(output);
-            finalCommandDescription.getCommands().get(elem).getDetails().setErr(error);
+            finalCommandDescription.getCommands().get(cmd).getDetails().setOut(output);
+            finalCommandDescription.getCommands().get(cmd).getDetails().setErr(error);
         });
 
         return finalCommandDescription;

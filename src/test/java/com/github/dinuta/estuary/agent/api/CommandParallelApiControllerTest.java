@@ -230,6 +230,6 @@ public class CommandParallelApiControllerTest {
         assertThat(body.getCommands().get(command).getStatus()).isEqualTo("finished");
 
         assertThat(body.getCommands().get(command).getDetails().getPid()).isGreaterThanOrEqualTo(0);
-        assertThat(body.getCommands().get(command).getDetails().getArgs()).isEqualTo(command);
+        assertThat(body.getCommands().get(command).getDetails().getArgs()).contains(command);
     }
 }

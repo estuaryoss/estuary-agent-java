@@ -118,6 +118,7 @@ public class CommandDetachedApiControllerTest {
         assertThat(body1.getDescription().getCommands().get(commandInfo.split(";")[0]).getDetails().getOut()).contains(expected);
     }
 
+    @Test
     public void whenAskingForNonExistentDetachedCommandIdThenItIsNotFound() throws InterruptedException {
         String id = "myId11";
         String command = "ls -lart";

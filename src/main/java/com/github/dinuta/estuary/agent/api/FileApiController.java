@@ -23,12 +23,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -113,9 +108,8 @@ public class FileApiController implements FileApi {
                     .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        try {
-            Path path = Paths.get(filePath);
-            Files.write(path, content);
+        try (OutputStream outputStream = new FileOutputStream(new File(filePath))) {
+            org.apache.commons.io.IOUtils.write(content, outputStream);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.UPLOAD_FILE_FAILURE)

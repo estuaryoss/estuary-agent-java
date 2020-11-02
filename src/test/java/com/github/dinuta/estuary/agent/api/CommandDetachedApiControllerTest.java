@@ -282,6 +282,7 @@ public class CommandDetachedApiControllerTest {
         assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
         assertThat(body.getDescription()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
 
+        Thread.sleep(1000);
         body1 = getApiResponseCommandDescriptionEntity().getBody();
 
         assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());

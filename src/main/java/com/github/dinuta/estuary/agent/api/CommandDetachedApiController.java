@@ -192,8 +192,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
         try {
             ProcessInfo parentProcessInfo = getParentProcessForDetachedCmd(id);
-            ProcessUtils.killChildrenProcesses(parentProcessInfo.getChildren());
             ProcessUtils.killProcess(parentProcessInfo);
+            ProcessUtils.killChildrenProcesses(parentProcessInfo.getChildren());
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.COMMAND_DETACHED_STOP_FAILURE)

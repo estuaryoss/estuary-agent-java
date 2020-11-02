@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Api(tags = {"estuary-agent"})
 @Controller
@@ -49,7 +48,6 @@ public class FileApiController implements FileApi {
     public ResponseEntity<? extends Object> fileGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token, @ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
         String headerName = "File-Path";
-        List<String> fileContent;
 
         log.debug(headerName + " Header: " + filePath);
         if (filePath == null) {

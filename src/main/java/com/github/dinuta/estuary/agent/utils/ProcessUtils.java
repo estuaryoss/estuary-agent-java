@@ -100,7 +100,7 @@ public class ProcessUtils {
     }
 
     /**
-     * @param childrenProcesses
+     * @param childrenProcesses A list of children
      * @throws IOException
      * @throws InterruptedException
      * @throws TimeoutException
@@ -114,7 +114,7 @@ public class ProcessUtils {
         }
     }
 
-    public static void killProcess(@NotNull ProcessInfo processInfo) throws IOException, InterruptedException, TimeoutException {
+    public static void killProcess(ProcessInfo processInfo) throws IOException, InterruptedException, TimeoutException {
         PidProcess process = Processes.newPidProcess((int) processInfo.getPid());
 
         log.debug("Process PID " + (int) processInfo.getPid() + " is alive: " + process.isAlive());

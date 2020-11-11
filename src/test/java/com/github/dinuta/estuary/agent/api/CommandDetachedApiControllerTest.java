@@ -277,6 +277,7 @@ public class CommandDetachedApiControllerTest {
         ResponseEntity<ApiResponse> response = deleteApiResponseEntityForId(testId);
 
         body = response.getBody();
+        System.out.println("=> Received body: " + body.toString());
         assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));

@@ -238,9 +238,9 @@ public class CommandDetachedApiControllerTest {
         ResponseEntity<ApiResponse> response = deleteApiResponseEntityForId(id);
 
         ApiResponse body = response.getBody();
-        assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.COMMAND_DETACHED_STOP_FAILURE);
-        assertThat(body.getDescription().toString()).contains("Exception");
+        assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getDescription().toString()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
     }
 
     @Test

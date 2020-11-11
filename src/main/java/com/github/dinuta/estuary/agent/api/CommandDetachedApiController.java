@@ -187,8 +187,6 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
-        log.debug("Reading content from file: " + testInfoFilename);
 
         try {
             ProcessInfo parentProcessInfo = getParentProcessForDetachedCmd(id);

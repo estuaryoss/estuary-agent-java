@@ -187,14 +187,12 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
-        log.debug("Reading content from file: " + testInfoFilename);
 
         try {
             ProcessInfo parentProcessInfo = getParentProcessForDetachedCmd(id);
             List<ProcessHandle> children = parentProcessInfo.getChildren();
             ProcessUtils.killProcess(parentProcessInfo);
-            ProcessUtils.killChildrenProcesses(children);
+            if (children != null) ProcessUtils.killChildrenProcesses(children);
         } catch (Exception e) {
             return new ResponseEntity<>(new ApiResponse()
                     .code(ApiResponseConstants.COMMAND_DETACHED_STOP_FAILURE)
@@ -244,8 +242,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             log.debug("Executing commands: " + commandsList.toString());
 
             List<String> startPyArgumentsList = new ArrayList<>();
-            startPyArgumentsList.add(id);
-            startPyArgumentsList.add(String.join(";", commandsList.toArray(new String[0])));
+            startPyArgumentsList.add("--cid=" + id);
+            startPyArgumentsList.add("--args=" + String.join(";;", commandsList.toArray(new String[0])));
 
             log.debug("Sending args: " + startPyArgumentsList.toString());
             commandRunner.runStartCommandDetached(startPyArgumentsList);
@@ -316,8 +314,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             writeContentInFile(testInfo, commandDescription);
             log.debug("Executing commands: " + commandsList.toString());
             List<String> startPyArgumentsList = new ArrayList<>();
-            startPyArgumentsList.add(id);
-            startPyArgumentsList.add(String.join(";", commandsList.toArray(new String[0])));
+            startPyArgumentsList.add("--cid=" + id);
+            startPyArgumentsList.add("--args=" + String.join(";;", commandsList.toArray(new String[0])));
 
             log.debug("Sending args: " + startPyArgumentsList.toString());
             commandRunner.runStartCommandDetached(startPyArgumentsList);

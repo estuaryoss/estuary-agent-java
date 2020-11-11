@@ -7,6 +7,7 @@ import org.zeroturnaround.process.PidProcess;
 import org.zeroturnaround.process.ProcessUtil;
 import org.zeroturnaround.process.Processes;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,7 +99,13 @@ public class ProcessUtils {
         return processInfo;
     }
 
-    public static void killChildrenProcesses(List<ProcessHandle> childrenProcesses) throws IOException, InterruptedException, TimeoutException {
+    /**
+     * @param childrenProcesses A list of children
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws TimeoutException
+     */
+    public static void killChildrenProcesses(@NotNull List<ProcessHandle> childrenProcesses) throws IOException, InterruptedException, TimeoutException {
         for (int i = 0; i < childrenProcesses.size(); i++) {
             if (childrenProcesses.get(i).children().collect(Collectors.toList()).size() > 0)
                 killChildrenProcesses(childrenProcesses.get(i).children().collect(Collectors.toList()));

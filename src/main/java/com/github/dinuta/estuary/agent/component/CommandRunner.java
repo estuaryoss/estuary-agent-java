@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -132,18 +131,18 @@ public class CommandRunner {
         String cmdsSeparatedBySemicolon = "";
 
         for (int i = 1; i < command.size(); i++) {
-            cmdsSeparatedBySemicolon += command.get(i) + ";";
+            cmdsSeparatedBySemicolon += command.get(i) + ";;";
         }
 
         if (isWindows) {
-            fullCmd.add(String.format("%s\\%s", Paths.get("").toAbsolutePath().toString(), pythonExec));
+            fullCmd.add(String.format("%s", pythonExec));
             fullCmd.add(this.doQuoteCmd(command.get(0)));
-            fullCmd.add(this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";")));
+            fullCmd.add(this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";;")));
         } else {
             fullCmd.add(
-                    this.doQuoteCmd(String.format("%s/%s", Paths.get("").toAbsolutePath().toString(), pythonExec)) + " " +
+                    this.doQuoteCmd(String.format("%s", pythonExec)) + " " +
                             this.doQuoteCmd(command.get(0)) + " " +
-                            this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";")));
+                            this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";;")));
         }
 
         return this.runStartCmdDetached(fullCmd.toArray(new String[0])).start().getFuture();

@@ -244,8 +244,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             log.debug("Executing commands: " + commandsList.toString());
 
             List<String> startPyArgumentsList = new ArrayList<>();
-            startPyArgumentsList.add(id);
-            startPyArgumentsList.add(String.join(";", commandsList.toArray(new String[0])));
+            startPyArgumentsList.add("--cid=" + id);
+            startPyArgumentsList.add("--args=" + String.join(";;", commandsList.toArray(new String[0])));
 
             log.debug("Sending args: " + startPyArgumentsList.toString());
             commandRunner.runStartCommandDetached(startPyArgumentsList);
@@ -316,8 +316,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             writeContentInFile(testInfo, commandDescription);
             log.debug("Executing commands: " + commandsList.toString());
             List<String> startPyArgumentsList = new ArrayList<>();
-            startPyArgumentsList.add(id);
-            startPyArgumentsList.add(String.join(";", commandsList.toArray(new String[0])));
+            startPyArgumentsList.add("--cid=" + id);
+            startPyArgumentsList.add("--args=" + String.join(";;", commandsList.toArray(new String[0])));
 
             log.debug("Sending args: " + startPyArgumentsList.toString());
             commandRunner.runStartCommandDetached(startPyArgumentsList);

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,12 +41,11 @@ public class AboutApiControllerTest {
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
         assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
-        assertThat(body.getDescription()).isEqualTo(About.getAppName());
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getPath()).isEqualTo("/about?");
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
-
     }
-
 }
+

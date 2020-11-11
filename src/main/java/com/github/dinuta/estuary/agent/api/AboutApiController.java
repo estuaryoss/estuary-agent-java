@@ -7,6 +7,7 @@ import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
+import com.github.dinuta.estuary.agent.utils.SystemInformation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class AboutApiController implements AboutApi {
         return new ResponseEntity<>(new ApiResponse()
                 .code(ApiResponseConstants.SUCCESS)
                 .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(About.getAppName())
+                .description(SystemInformation.getSystemInfo())
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

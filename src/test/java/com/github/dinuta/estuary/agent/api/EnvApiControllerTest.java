@@ -1,8 +1,9 @@
 package com.github.dinuta.estuary.agent.api;
 
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
+import com.github.dinuta.estuary.agent.component.VirtualEnvironment;
 import com.github.dinuta.estuary.agent.constants.About;
-import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
+import com.github.dinuta.estuary.agent.constants.ApiResponseCode;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import org.junit.jupiter.api.MethodOrderer;
@@ -51,8 +52,8 @@ public class EnvApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
         assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(((Map) body.getDescription()).get("PATH")).isNotEqualTo("");
         assertThat(body.getName()).isEqualTo(About.getAppName());
@@ -70,8 +71,8 @@ public class EnvApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
         assertThat(body.getDescription()).isInstanceOf(String.class);
         assertThat(body.getDescription()).isNotEqualTo("");
         assertThat(body.getName()).isEqualTo(About.getAppName());
@@ -91,9 +92,9 @@ public class EnvApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SET_ENV_VAR_FAILURE);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SET_ENV_VAR_FAILURE.getCode());
         assertThat(body.getMessage()).isEqualTo(
-                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SET_ENV_VAR_FAILURE), envVars), envVars);
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.SET_ENV_VAR_FAILURE.getCode()), envVars), envVars);
         assertThat(body.getDescription()).isInstanceOf(String.class);
         assertThat(body.getDescription().toString()).contains("Exception");
         assertThat(body.getName()).isEqualTo(About.getAppName());
@@ -110,8 +111,8 @@ public class EnvApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
         assertThat(body.getDescription()).isEqualTo(null);
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
@@ -135,8 +136,8 @@ public class EnvApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
         assertThat(body.getDescription()).isInstanceOf(String.class);
         assertThat(body.getDescription()).isEqualTo(expectedValue);
         assertThat(body.getName()).isEqualTo(About.getAppName());
@@ -155,8 +156,8 @@ public class EnvApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
         assertThat(body.getDescription()).isInstanceOf(String.class);
         assertThat(body.getDescription()).isNotEqualTo(notExpectedValue);
         assertThat(body.getName()).isEqualTo(About.getAppName());
@@ -185,8 +186,8 @@ public class EnvApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
         assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
@@ -226,8 +227,8 @@ public class EnvApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
         assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(((Map) body.getDescription()).size()).isEqualTo(1);
         assertThat(body.getName()).isEqualTo(About.getAppName());
@@ -246,7 +247,7 @@ public class EnvApiControllerTest {
     @Test
     @Order(9)
     public void whenSettingVirtualEnvVarsThenAHardLimitIsReached() {
-        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = 50;
+        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = VirtualEnvironment.VIRTUAL_ENVIRONMENT_MAX_SIZE;
 
         for (int i = 0; i < 2 * VIRTUAL_ENV_VARS_LIMIT_SIZE; i++) {
             String envVarsJson = String.format("{\"%s\":\"%s\"}", i, i);

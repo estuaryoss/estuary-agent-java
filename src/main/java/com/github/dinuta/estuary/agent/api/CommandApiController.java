@@ -5,9 +5,10 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.component.CommandRunner;
 import com.github.dinuta.estuary.agent.constants.About;
-import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
+import com.github.dinuta.estuary.agent.constants.ApiResponseCode;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
+import com.github.dinuta.estuary.agent.exception.ApiException;
 import com.github.dinuta.estuary.agent.model.ConfigDescriptor;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
@@ -15,7 +16,6 @@ import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,8 +68,8 @@ public class CommandApiController implements CommandApi {
 
         log.debug("Executing commands: " + commandsList.toString());
         return new ResponseEntity<>(new ApiResponseCommandDescription()
-                .code(ApiResponseConstants.SUCCESS)
-                .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(commandRunner.runCommands(commandsList.toArray(new String[0])))
                 .name(About.getAppName())
                 .version(About.getVersion())
@@ -93,23 +93,16 @@ public class CommandApiController implements CommandApi {
             commandsList = new YamlConfigParser().getCommandsList(yamlConfig).stream()
                     .map(elem -> elem.strip()).collect(Collectors.toList());
         } catch (Exception e) {
-            log.debug(ExceptionUtils.getStackTrace(e));
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.INVALID_YAML_CONFIG)
-                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.INVALID_YAML_CONFIG))
-                    .description(ExceptionUtils.getStackTrace(e))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException(ApiResponseCode.INVALID_YAML_CONFIG.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.INVALID_YAML_CONFIG.getCode()));
         }
 
         log.debug("Executing commands: " + commandsList.toString());
         configDescriptor.setYamlConfig(yamlConfig);
         configDescriptor.setDescription(commandRunner.runCommands(commandsList.toArray(new String[0])));
         return new ResponseEntity<>(new ApiResponse()
-                .code(ApiResponseConstants.SUCCESS)
-                .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(configDescriptor)
                 .name(About.getAppName())
                 .version(About.getVersion())

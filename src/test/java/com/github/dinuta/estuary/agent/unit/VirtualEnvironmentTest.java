@@ -58,7 +58,7 @@ public class VirtualEnvironmentTest {
 
     @Test
     public void whenSettingVirtualEnvVarsThenAHardLimitIsReached() {
-        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = 50;
+        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = VirtualEnvironment.VIRTUAL_ENVIRONMENT_MAX_SIZE;
         Map<String, String> envVarsToBeSet = new LinkedHashMap<>();
 
         for (int i = 0; i < 2 * VIRTUAL_ENV_VARS_LIMIT_SIZE; i++) {

@@ -55,7 +55,7 @@ public class XRequestIdTest {
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(responseEntity.getHeaders().get(HeaderConstants.X_REQUEST_ID).get(0)).isEqualTo(xReqId); // <--
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
         assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(body.getName()).isEqualTo(About.getAppName());
@@ -79,7 +79,7 @@ public class XRequestIdTest {
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(responseEntity.getHeaders().get(HeaderConstants.X_REQUEST_ID).get(0)).isInstanceOf(String.class); // <--
         assertThat(responseEntity.getHeaders().get(HeaderConstants.X_REQUEST_ID).get(0).length()).isEqualTo(36); // <--
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
         assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(body.getName()).isEqualTo(About.getAppName());

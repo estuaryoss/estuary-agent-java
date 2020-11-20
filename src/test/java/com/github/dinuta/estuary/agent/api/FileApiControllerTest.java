@@ -70,7 +70,7 @@ public class FileApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), HeaderConstants.FILE_PATH));
         assertThat(body.getDescription()).isEqualTo(
@@ -96,7 +96,7 @@ public class FileApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.GET_FILE_FAILURE);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.GET_FILE_FAILURE.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode())));
         assertThat(body.getDescription().toString()).contains("Exception");
@@ -120,7 +120,7 @@ public class FileApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.UPLOAD_FILE_FAILURE);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.UPLOAD_FILE_FAILURE.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.UPLOAD_FILE_FAILURE.getCode())));
         assertThat(body.getDescription().toString()).contains("Exception");

@@ -73,7 +73,7 @@ public class FolderApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), HeaderConstants.FOLDER_PATH));
         assertThat(body.getDescription()).isEqualTo(
@@ -100,7 +100,7 @@ public class FolderApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.FOLDER_ZIP_FAILURE);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(String.format(ApiResponseMessage.getMessage(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode()), folderName)));
         assertThat(body.getDescription().toString()).contains("Exception");

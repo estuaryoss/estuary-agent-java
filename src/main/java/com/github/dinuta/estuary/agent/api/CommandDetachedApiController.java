@@ -156,7 +156,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
             commandDescription.processes(ProcessUtils.getProcesses());
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
         }

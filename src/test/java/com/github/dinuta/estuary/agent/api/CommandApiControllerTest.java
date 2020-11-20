@@ -249,7 +249,7 @@ public class CommandApiControllerTest {
         String description = body.getDescription().toString();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.INVALID_YAML_CONFIG);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.INVALID_YAML_CONFIG.getCode());
 
         assertThat(body.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseCode.INVALID_YAML_CONFIG.getCode())));
         assertThat(description).contains("Exception");

@@ -1,13 +1,16 @@
 package com.github.dinuta.estuary.agent.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.component.CommandRunner;
 import com.github.dinuta.estuary.agent.constants.About;
-import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
+import com.github.dinuta.estuary.agent.constants.ApiResponseCode;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
+import com.github.dinuta.estuary.agent.exception.ApiException;
+import com.github.dinuta.estuary.agent.exception.YamlConfigException;
 import com.github.dinuta.estuary.agent.model.ConfigDescriptor;
 import com.github.dinuta.estuary.agent.model.ProcessInfo;
 import com.github.dinuta.estuary.agent.model.StateHolder;
@@ -36,6 +39,7 @@ import javax.validation.Valid;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static com.github.dinuta.estuary.agent.utils.ProcessUtils.getParentProcessForDetachedCmd;
@@ -71,9 +75,9 @@ public class CommandDetachedApiController implements CommandDetachedApi {
     public ResponseEntity<ApiResponse> commandDetachedDelete(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<>(new ApiResponse()
-                .code(ApiResponseConstants.NOT_IMPLEMENTED)
-                .message(ApiResponseMessage.getMessage(ApiResponseConstants.NOT_IMPLEMENTED))
-                .description(ApiResponseMessage.getMessage(ApiResponseConstants.NOT_IMPLEMENTED))
+                .code(ApiResponseCode.NOT_IMPLEMENTED.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.NOT_IMPLEMENTED.getCode()))
+                .description(ApiResponseMessage.getMessage(ApiResponseCode.NOT_IMPLEMENTED.getCode()))
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -92,34 +96,22 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             if (!testInfo.exists())
                 writeContentInFile(testInfo, commandDescription);
         } catch (IOException e) {
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE)
-                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE))
-                    .description(ExceptionUtils.getStackTrace(e))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
         }
 
         try (InputStream in = new FileInputStream(testInfo)) {
             commandDescription = objectMapper.readValue(IOUtils.toString(in, "UTF-8"), CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
             commandDescription.processes(ProcessUtils.getProcesses());
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE)
-                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE))
-                    .description(ExceptionUtils.getStackTrace(e))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
         }
 
         return new ResponseEntity<>(new ApiResponse()
-                .code(ApiResponseConstants.SUCCESS)
-                .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(commandDescription)
                 .name(About.getAppName())
                 .version(About.getVersion())
@@ -165,19 +157,13 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             commandDescription = streamOutAndErr(commandDescription);
             commandDescription.processes(ProcessUtils.getProcesses());
         } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE)
-                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE))
-                    .description(ExceptionUtils.getStackTrace(e))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
         }
 
         return new ResponseEntity<>(new ApiResponse()
-                .code(ApiResponseConstants.SUCCESS)
-                .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(commandDescription)
                 .name(About.getAppName())
                 .version(About.getVersion())
@@ -193,21 +179,21 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             List<ProcessHandle> children = parentProcessInfo.getChildren();
             ProcessUtils.killProcess(parentProcessInfo);
             if (children != null) ProcessUtils.killChildrenProcesses(children);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.COMMAND_DETACHED_STOP_FAILURE)
-                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.COMMAND_DETACHED_STOP_FAILURE))
-                    .description(ExceptionUtils.getStackTrace(e))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode())));
+        } catch (InterruptedException e) {
+            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode())));
+        } catch (TimeoutException e) {
+            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode())));
         }
 
         return new ResponseEntity<>(new ApiResponse()
-                .code(ApiResponseConstants.SUCCESS)
-                .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
-                .description(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -218,20 +204,11 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         String accept = request.getHeader("Accept");
         stateHolder.setLastCommand(id);
         File testInfo = new File(stateHolder.getLastCommand());
-        CommandDescription commandDescription = new CommandDescription()
-                .started(true)
-                .finished(false)
-                .id(id);
+        CommandDescription commandDescription = new CommandDescription().started(true).finished(false).id(id);
 
         if (commandContent == null) {
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)
-                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
-                    .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException(ApiResponseCode.EMPTY_REQUEST_BODY_PROVIDED.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.EMPTY_REQUEST_BODY_PROVIDED.getCode())));
         }
 
         try {
@@ -247,20 +224,14 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
             log.debug("Sending args: " + startPyArgumentsList.toString());
             commandRunner.runStartCommandDetached(startPyArgumentsList);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE)
-                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE), id))
-                    .description(ExceptionUtils.getStackTrace(e))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode()), id));
         }
 
         return new ResponseEntity<>(new ApiResponse()
-                .code(ApiResponseConstants.SUCCESS)
-                .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)))
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())))
                 .description(id)
                 .name(About.getAppName())
                 .version(About.getVersion())
@@ -281,14 +252,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         YamlConfig yamlConfig;
 
         if (commandContent == null) {
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)
-                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
-                    .description(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.EMPTY_REQUEST_BODY_PROVIDED)))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ApiException(ApiResponseCode.EMPTY_REQUEST_BODY_PROVIDED.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.EMPTY_REQUEST_BODY_PROVIDED.getCode()));
         }
 
         String commandsStripped = commandContent.replace("\r\n", "\n").strip();
@@ -298,16 +263,9 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             yamlConfig.setEnv((Map<String, String>) apiResponse.getBody().getDescription());
             commandsList = new YamlConfigParser().getCommandsList(yamlConfig).stream()
                     .map(elem -> elem.strip()).collect(Collectors.toList());
-        } catch (Exception e) {
-            log.debug(ExceptionUtils.getStackTrace(e));
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.INVALID_YAML_CONFIG)
-                    .message(ApiResponseMessage.getMessage(ApiResponseConstants.INVALID_YAML_CONFIG))
-                    .description(ExceptionUtils.getStackTrace(e))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (JsonProcessingException | YamlConfigException e) {
+            throw new ApiException(ApiResponseCode.INVALID_YAML_CONFIG.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.INVALID_YAML_CONFIG.getCode()));
         }
 
         try {
@@ -319,22 +277,16 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
             log.debug("Sending args: " + startPyArgumentsList.toString());
             commandRunner.runStartCommandDetached(startPyArgumentsList);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResponse()
-                    .code(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE)
-                    .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.COMMAND_DETACHED_START_FAILURE), id))
-                    .description(ExceptionUtils.getStackTrace(e))
-                    .name(About.getAppName())
-                    .version(About.getVersion())
-                    .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .path(clientRequest.getRequestUri()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode()), id));
         }
 
         configDescriptor.setYamlConfig(yamlConfig);
         configDescriptor.setDescription(id);
         return new ResponseEntity<>(new ApiResponse()
-                .code(ApiResponseConstants.SUCCESS)
-                .message(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)))
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())))
                 .description(configDescriptor)
                 .name(About.getAppName())
                 .version(About.getVersion())

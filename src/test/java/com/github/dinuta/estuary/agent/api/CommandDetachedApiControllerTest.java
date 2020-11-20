@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.constants.About;
-import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
+import com.github.dinuta.estuary.agent.constants.ApiResponseCode;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.exception.YamlConfigException;
@@ -71,9 +71,9 @@ public class CommandDetachedApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
-                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getDescription()).isEqualTo(id);
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
@@ -101,9 +101,9 @@ public class CommandDetachedApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
-                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getDescription()).isEqualTo(id);
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
@@ -127,9 +127,9 @@ public class CommandDetachedApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
-                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getDescription()).isEqualTo(id);
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
@@ -157,9 +157,9 @@ public class CommandDetachedApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
-                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
         assertThat(body.getName()).isEqualTo(About.getAppName());
         assertThat(body.getDescription()).isEqualTo(id);
         assertThat(body.getVersion()).isEqualTo(About.getVersion());
@@ -169,8 +169,8 @@ public class CommandDetachedApiControllerTest {
         ApiResponse body1 = getApiResponseEntityForId(id + "invalid").getBody();
 
         assertThat(body1.getDescription().toString()).contains("Exception");
-        assertThat(body1.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE));
-        assertThat(body1.getCode()).isEqualTo(ApiResponseConstants.GET_COMMAND_DETACHED_INFO_FAILURE);
+        assertThat(body1.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+        assertThat(body1.getCode()).isEqualTo(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE);
     }
 
     @Test
@@ -195,9 +195,9 @@ public class CommandDetachedApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
-                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
         assertThat(body.getDescription()).isEqualTo(testId);
 
 
@@ -239,8 +239,8 @@ public class CommandDetachedApiControllerTest {
 
         ApiResponse body = response.getBody();
         assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getDescription().toString()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getDescription().toString()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
     }
 
     @Test
@@ -258,9 +258,9 @@ public class CommandDetachedApiControllerTest {
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
-                String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
         assertThat(body.getDescription()).isEqualTo(testId);
         Thread.sleep(1000);
         ApiResponseCommandDescription body1 =
@@ -279,9 +279,9 @@ public class CommandDetachedApiControllerTest {
         body = response.getBody();
         System.out.println("=> Received body: " + body.toString());
         assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
-        assertThat(body.getDescription()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS));
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
+        assertThat(body.getDescription()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
 
         Thread.sleep(1000);
         body1 = getApiResponseCommandDescriptionEntity().getBody();
@@ -326,8 +326,8 @@ public class CommandDetachedApiControllerTest {
         ApiResponseCommandDescription bodyCmdDescription = responseEntityCmdDescription.getBody();
 
         assertThat(responseEntityCmdDescription.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(bodyCmdDescription.getCode()).isEqualTo(ApiResponseConstants.SUCCESS);
-        assertThat(bodyCmdDescription.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS)));
+        assertThat(bodyCmdDescription.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(bodyCmdDescription.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
         assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(0)).getDetails().getCode()).isEqualTo(0L);
         assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(1)).getDetails().getCode()).isEqualTo(0L);
         assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(2)).getDetails().getCode()).isEqualTo(0L);

@@ -22,7 +22,7 @@ public class VirtualEnvironment {
     private final ImmutableMap<String, String> environment = ImmutableMap.copyOf(System.getenv());
     private final Map<String, String> virtualEnvironment = new LinkedHashMap<>();
 
-    private final int VIRTUAL_ENVIRONMENT_MAX_SIZE = 50;
+    private final int VIRTUAL_ENVIRONMENT_MAX_SIZE = 100;
 
     public VirtualEnvironment() {
         this.setExtraEnvVarsFromFile();

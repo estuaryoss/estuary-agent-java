@@ -3,7 +3,7 @@ package com.github.dinuta.estuary.agent.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.constants.About;
-import com.github.dinuta.estuary.agent.constants.ApiResponseConstants;
+import com.github.dinuta.estuary.agent.constants.ApiResponseCode;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
@@ -44,8 +44,8 @@ public class AboutApiController implements AboutApi {
         String accept = request.getHeader("Accept");
 
         return new ResponseEntity<>(new ApiResponse()
-                .code(ApiResponseConstants.SUCCESS)
-                .message(ApiResponseMessage.getMessage(ApiResponseConstants.SUCCESS))
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(SystemInformation.getSystemInfo())
                 .name(About.getAppName())
                 .version(About.getVersion())

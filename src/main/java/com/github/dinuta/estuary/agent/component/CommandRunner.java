@@ -264,18 +264,18 @@ public class CommandRunner {
 
     private ArrayList<String> getPlatformCommand() {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
-        ArrayList<String> fullCommand = new ArrayList<>();
+        ArrayList<String> platformCmd = new ArrayList<>();
 
         if (isWindows) {
-            fullCommand.add(EXEC_WIN);
-            fullCommand.add(ARGS_WIN);
+            platformCmd.add(EXEC_WIN);
+            platformCmd.add(ARGS_WIN);
         } else {
-            fullCommand.add(EXEC_LINUX);
-            fullCommand.add(ARGS_LINUX);
+            platformCmd.add(EXEC_LINUX);
+            platformCmd.add(ARGS_LINUX);
 
         }
 
-        return fullCommand;
+        return platformCmd;
     }
 
     private ProcessExecutor runStartCmdDetached(String[] command) {

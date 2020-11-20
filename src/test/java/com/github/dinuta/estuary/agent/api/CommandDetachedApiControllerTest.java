@@ -170,7 +170,7 @@ public class CommandDetachedApiControllerTest {
 
         assertThat(body1.getDescription().toString()).contains("Exception");
         assertThat(body1.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
-        assertThat(body1.getCode()).isEqualTo(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE);
+        assertThat(body1.getCode()).isEqualTo(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode());
     }
 
     @Test

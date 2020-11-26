@@ -45,30 +45,26 @@ public class VirtualEnvironment {
         log.debug("External env vars read from file '" + EXT_ENV_VAR_PATH + "' are: " + new JSONObject(virtualEnvironment).toString());
     }
 
-    public void setExternalEnvVar(String key, String value) {
-        if (!environment.containsKey(key) && virtualEnvironment.size() <= VIRTUAL_ENVIRONMENT_MAX_SIZE)
+    public boolean setExternalEnvVar(String key, String value) {
+        if (environment.containsKey(key)) {
             virtualEnvironment.put(key, value);
+            return true;
+        }
+        if (virtualEnvironment.size() <= VIRTUAL_ENVIRONMENT_MAX_SIZE) {
+            virtualEnvironment.put(key, value);
+            return true;
+        }
+
+        return false;
     }
 
     public Map<String, String> setExternalEnvVars(Map<String, String> envVars) {
         Map<String, String> addedEnvVars = new LinkedHashMap<>();
 
-        for (Map.Entry<String, String> entry : envVars.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if (environment.containsKey(key)) continue;
+        envVars.forEach((key, value) -> {
+            if (this.setExternalEnvVar(key, value)) addedEnvVars.put(key, value);
+        });
 
-            if (virtualEnvironment.containsKey(key)) {
-                virtualEnvironment.put(key, value); //can override
-                addedEnvVars.put(key, value);
-                continue;
-            }
-            if (virtualEnvironment.size() <= VIRTUAL_ENVIRONMENT_MAX_SIZE) {
-                virtualEnvironment.put(key, value);
-                addedEnvVars.put(key, value);
-            }
-
-        }
         return addedEnvVars;
     }
 

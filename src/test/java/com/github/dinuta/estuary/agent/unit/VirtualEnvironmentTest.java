@@ -1,7 +1,7 @@
 package com.github.dinuta.estuary.agent.unit;
 
 import com.github.dinuta.estuary.agent.component.VirtualEnvironment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

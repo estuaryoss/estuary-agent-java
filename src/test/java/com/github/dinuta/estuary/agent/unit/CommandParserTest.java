@@ -27,7 +27,7 @@ public class CommandParserTest {
         YamlConfig config = objectMapper.readValue(yamlConfigString, YamlConfig.class);
         List<String> commandsList = new YamlConfigParser().getCommandsList(config);
 
-        assertThat(commandsList.size()).isEqualTo(3);
+        assertThat(commandsList.size()).isEqualTo(6);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class CommandParserTest {
 
         List<String> commandsList = new YamlConfigParser().getCommandsList(config);
 
-        assertThat(commandsList.size()).isEqualTo(2);
+        assertThat(commandsList.size()).isEqualTo(5);
     }
 
     @Test
@@ -65,11 +65,11 @@ public class CommandParserTest {
 
         List<String> commandsList = new YamlConfigParser().getCommandsList(config);
 
-        assertThat(commandsList.size()).isEqualTo(2);
+        assertThat(commandsList.size()).isEqualTo(5);
     }
 
     @Test
-    public void whenBeforeAndAfterScriptIsMissingButScriptIsPresentFromConfigThenOK() throws IOException, YamlConfigException {
+    public void whenBeforeAndAfterScriptAreMissingButScriptIsPresentFromConfigThenOK() throws IOException, YamlConfigException {
         String yamlConfigString = IOUtils.toString(this.getClass().getResourceAsStream(YAML_CONFIG), "UTF-8");
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
         YamlConfig config = objectMapper.readValue(yamlConfigString, YamlConfig.class);
@@ -78,7 +78,20 @@ public class CommandParserTest {
 
         List<String> commandsList = new YamlConfigParser().getCommandsList(config);
 
-        assertThat(commandsList.size()).isEqualTo(1);
+        assertThat(commandsList.size()).isEqualTo(4);
+    }
+
+    @Test
+    public void whenBeforeAndAfterInstallAreMissingButScriptIsPresentFromConfigThenOK() throws IOException, YamlConfigException {
+        String yamlConfigString = IOUtils.toString(this.getClass().getResourceAsStream(YAML_CONFIG), "UTF-8");
+        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()).findAndRegisterModules();
+        YamlConfig config = objectMapper.readValue(yamlConfigString, YamlConfig.class);
+        config.setBeforeInstall(new ArrayList<>());
+        config.setAfterInstall(new ArrayList<>());
+
+        List<String> commandsList = new YamlConfigParser().getCommandsList(config);
+
+        assertThat(commandsList.size()).isEqualTo(4);
     }
 
     @Test
@@ -90,6 +103,6 @@ public class CommandParserTest {
 
         List<String> commandsList = new YamlConfigParser().getCommandsList(config);
 
-        assertThat(commandsList.size()).isEqualTo(3);
+        assertThat(commandsList.size()).isEqualTo(6);
     }
 }

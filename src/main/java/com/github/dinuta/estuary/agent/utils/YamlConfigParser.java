@@ -11,6 +11,9 @@ public class YamlConfigParser {
 
     public List<String> getCommandsList(YamlConfig yamlConfig) throws YamlConfigException {
         checkConfig(yamlConfig);
+        commandsList.addAll(yamlConfig.getBeforeInstall());
+        commandsList.addAll(yamlConfig.getInstall());
+        commandsList.addAll(yamlConfig.getAfterInstall());
         commandsList.addAll(yamlConfig.getBeforeScript());
         commandsList.addAll(yamlConfig.getScript());
         commandsList.addAll(yamlConfig.getAfterScript());

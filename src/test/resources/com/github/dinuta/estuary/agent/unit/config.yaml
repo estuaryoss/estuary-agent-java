@@ -1,5 +1,13 @@
 env:
   FOO1: "BAR1"
+ignored_key:
+  - echo ignored_key
+before_install:
+  - echo before_install
+install:
+  - echo install
+after_install:
+  - echo after_install
 before_script:
   - echo before_script
 script:

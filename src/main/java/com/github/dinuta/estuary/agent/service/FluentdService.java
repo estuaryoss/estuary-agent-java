@@ -122,9 +122,9 @@ public class FluentdService {
     }
 
     private void setFluentdLogger() {
-        if (virtualEnvironment.getEnvAndVirtualEnv().get(FLUENTD_IP_PORT) != null)
+        if (virtualEnvironment.getEnv().get(FLUENTD_IP_PORT) != null)
             this.fluentLogger = FluentLogger.getLogger(About.getAppName(),
-                    virtualEnvironment.getEnvAndVirtualEnv().get(FLUENTD_IP_PORT).split(":")[0],
-                    Integer.parseInt(virtualEnvironment.getEnvAndVirtualEnv().get(FLUENTD_IP_PORT).split(":")[1]));
+                    virtualEnvironment.getEnv().get(FLUENTD_IP_PORT).split(":")[0],
+                    Integer.parseInt(virtualEnvironment.getEnv().get(FLUENTD_IP_PORT).split(":")[1]));
     }
 }

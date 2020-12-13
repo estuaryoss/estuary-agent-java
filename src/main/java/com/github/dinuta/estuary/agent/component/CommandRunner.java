@@ -221,8 +221,8 @@ public class CommandRunner {
     public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessState processState) {
         CommandDetails commandDetails = new CommandDetails();
         InputStream inputStream = null;
-        int timeout = environment.getEnvAndVirtualEnv().get(COMMAND_TIMEOUT) != null ?
-                Integer.parseInt(environment.getEnvAndVirtualEnv().get(COMMAND_TIMEOUT)) : COMMAND_TIMEOUT_DEFAULT;
+        int timeout = environment.getEnv().get(COMMAND_TIMEOUT) != null ?
+                Integer.parseInt(environment.getEnv().get(COMMAND_TIMEOUT)) : COMMAND_TIMEOUT_DEFAULT;
 
         try {
             ProcessResult processResult = processState.getProcessResult().get(timeout, TimeUnit.SECONDS);

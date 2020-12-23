@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
-@Api(tags = {"estuary-agent"})
+@Api(tags = {"estuary-agent"}, description = "root")
 @Controller
 public class PingApiController implements PingApi {
 
@@ -41,14 +41,15 @@ public class PingApiController implements PingApi {
 
     public ResponseEntity<ApiResponse> pingGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        return new ResponseEntity<>(new ApiResponse()
+        return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description("pong")
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
     }
 
 }

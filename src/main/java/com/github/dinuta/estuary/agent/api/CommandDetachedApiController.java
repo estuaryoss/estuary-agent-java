@@ -74,14 +74,15 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedDelete(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        return new ResponseEntity<>(new ApiResponse()
+        return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.NOT_IMPLEMENTED.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.NOT_IMPLEMENTED.getCode()))
                 .description(ApiResponseMessage.getMessage(ApiResponseCode.NOT_IMPLEMENTED.getCode()))
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri()), HttpStatus.NOT_IMPLEMENTED);
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<ApiResponse> commandDetachedGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
@@ -103,20 +104,21 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         try (InputStream in = new FileInputStream(testInfo)) {
             commandDescription = objectMapper.readValue(IOUtils.toString(in, "UTF-8"), CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
-            commandDescription.processes(ProcessUtils.getProcesses());
+            commandDescription.setProcesses(ProcessUtils.getProcesses());
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
         }
 
-        return new ResponseEntity<>(new ApiResponse()
+        return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(commandDescription)
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
     }
 
     private CommandDescription streamOutAndErr(CommandDescription commandDescription) {
@@ -155,20 +157,21 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             String fileContent = IOUtils.toString(is, "UTF-8");
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
-            commandDescription.processes(ProcessUtils.getProcesses());
+            commandDescription.setProcesses(ProcessUtils.getProcesses());
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
         }
 
-        return new ResponseEntity<>(new ApiResponse()
+        return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(commandDescription)
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
     }
 
     public ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
@@ -190,21 +193,26 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode())));
         }
 
-        return new ResponseEntity<>(new ApiResponse()
+        return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
     }
 
     public ResponseEntity<ApiResponse> commandDetachedIdPost(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
         stateHolder.setLastCommand(id);
         File testInfo = new File(stateHolder.getLastCommand());
-        CommandDescription commandDescription = new CommandDescription().started(true).finished(false).id(id);
+        CommandDescription commandDescription = CommandDescription.builder()
+                .started(true)
+                .finished(false)
+                .id(id)
+                .build();
 
         if (commandContent == null) {
             throw new ApiException(ApiResponseCode.EMPTY_REQUEST_BODY_PROVIDED.getCode(),
@@ -229,14 +237,15 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode()), id));
         }
 
-        return new ResponseEntity<>(new ApiResponse()
+        return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())))
                 .description(id)
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri()), HttpStatus.ACCEPTED);
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.ACCEPTED);
     }
 
     public ResponseEntity<ApiResponse> commandDetachedIdPostYaml(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other in yaml format.", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
@@ -246,7 +255,11 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         File testInfo = new File(testInfoFilename);
         List<String> commandsList;
         YAMLMapper mapper = new YAMLMapper();
-        CommandDescription commandDescription = new CommandDescription().started(true).finished(false).id(id);
+        CommandDescription commandDescription = CommandDescription.builder()
+                .started(true)
+                .finished(false)
+                .id(id)
+                .build();
         ResponseEntity<ApiResponse> apiResponse;
         ConfigDescriptor configDescriptor = new ConfigDescriptor();
         YamlConfig yamlConfig;
@@ -284,14 +297,15 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
         configDescriptor.setYamlConfig(yamlConfig);
         configDescriptor.setDescription(id);
-        return new ResponseEntity<>(new ApiResponse()
+        return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())))
                 .description(configDescriptor)
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
     }
 
     private void writeContentInFile(File testInfo, CommandDescription commandDescription) throws IOException {

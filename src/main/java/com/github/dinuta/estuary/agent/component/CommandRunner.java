@@ -87,31 +87,32 @@ public class CommandRunner {
      */
     public CommandDescription runCommands(String[] commands) throws IOException {
         LinkedHashMap commandsStatus = new LinkedHashMap<String, CommandStatus>();
-        CommandDescription commandDescription = new CommandDescription();
-
-        commandDescription.startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-        commandDescription.started(true);
-        commandDescription.finished(false);
-        commandDescription.pid(ProcessHandle.current().pid());
+        CommandDescription commandDescription = CommandDescription.builder()
+                .startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .started(true)
+                .finished(false)
+                .pid(ProcessHandle.current().pid())
+                .build();
 
         for (String cmd : commands) {
             CommandStatus commandStatus = new CommandStatus();
-            commandStatus.startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-            commandsStatus.put(cmd, commandStatus.details(this.runCommand(cmd)));
-            commandStatus.finishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-            commandStatus.duration(Duration.between(
+            commandStatus.setStartedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
+            commandStatus.setDetails(this.runCommand(cmd));
+            commandStatus.setFinishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
+            commandStatus.setDuration(Duration.between(
                     LocalDateTime.parse(commandStatus.getStartedat(), DateTimeConstants.PATTERN),
                     LocalDateTime.parse(commandStatus.getFinishedat(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
-            commandStatus.status("finished");
-            commandDescription.commands(commandsStatus);
+            commandStatus.setStatus("finished");
+            commandsStatus.put(cmd, commandStatus);
+            commandDescription.setCommands(commandsStatus);
         }
 
-        commandDescription.finishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-        commandDescription.duration(Duration.between(
+        commandDescription.setFinishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
+        commandDescription.setDuration(Duration.between(
                 LocalDateTime.parse(commandDescription.getStartedat(), DateTimeConstants.PATTERN),
                 LocalDateTime.parse(commandDescription.getFinishedat(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
-        commandDescription.finished(true);
-        commandDescription.started(false);
+        commandDescription.setFinished(true);
+        commandDescription.setStarted(false);
 
         return commandDescription;
     }
@@ -175,28 +176,29 @@ public class CommandRunner {
         ArrayList<Thread> threads = new ArrayList<>();
         ArrayList<CommandStatus> commandStatuses = new ArrayList<>();
         LinkedHashMap<String, CommandStatus> commandsStatus = new LinkedHashMap();
-        CommandDescription commandDescription = new CommandDescription();
-
-        commandDescription.startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-        commandDescription.started(true);
-        commandDescription.finished(false);
-        commandDescription.pid(ProcessHandle.current().pid());
+        CommandDescription commandDescription = CommandDescription.builder()
+                .startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .started(true)
+                .finished(false)
+                .pid(ProcessHandle.current().pid())
+                .build();
 
         for (int i = 0; i < commands.length; i++) {
             commandStatuses.add(new CommandStatus());
-            commandStatuses.get(i).startedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
+            commandStatuses.get(i).setStartedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             processStates.add(this.runCommandDetached(commands[i].split(" ")));
         }
 
         //start threads that reads the stdout, stderr, pid and others
         for (int i = 0; i < processStates.size(); i++) {
-            CommandStatusThread cmdStatusThread = new CommandStatusThread(this, new CommandParallel()
+            CommandStatusThread cmdStatusThread = new CommandStatusThread(this, CommandParallel.builder()
                     .commandDescription(commandDescription)
                     .commandStatuses(commandStatuses)
                     .commandsStatus(commandsStatus)
                     .command(commands[i])
-                    .process(processStates.get(i))
-                    .threadId(i));
+                    .processState(processStates.get(i))
+                    .threadId(i)
+                    .build());
             threads.add(new Thread(cmdStatusThread));
             threads.get(i).start();
         }
@@ -219,7 +221,7 @@ public class CommandRunner {
      * @return The command details of the command executed
      */
     public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessState processState) {
-        CommandDetails commandDetails = new CommandDetails();
+        CommandDetails commandDetails;
         InputStream inputStream = null;
         int timeout = environment.getEnv().get(COMMAND_TIMEOUT) != null ?
                 Integer.parseInt(environment.getEnv().get(COMMAND_TIMEOUT)) : COMMAND_TIMEOUT_DEFAULT;
@@ -232,24 +234,27 @@ public class CommandRunner {
             inputStream = new ByteArrayInputStream(processState.getErrOutputStream().toByteArray());
             String err = IOUtils.toString(inputStream, Charset.defaultCharset());
 
-            commandDetails
+            commandDetails = CommandDetails.builder()
                     .out(out)
                     .err(err)
                     .code(code)
                     .pid(processState.getProcess().pid())
-                    .args(String.join(" ", command));
+                    .args(String.join(" ", command))
+                    .build();
         } catch (TimeoutException e) {
             log.debug(ExceptionUtils.getStackTrace(e));
-            commandDetails
+            commandDetails = CommandDetails.builder()
                     .err(ExceptionUtils.getStackTrace(e))
                     .code(PROCESS_EXCEPTION_TIMEOUT)
-                    .args(String.join(" ", command));
+                    .args(String.join(" ", command))
+                    .build();
         } catch (Exception e) {
             log.debug(ExceptionUtils.getStackTrace(e));
-            commandDetails
+            commandDetails = CommandDetails.builder()
                     .err(ExceptionUtils.getStackTrace(e))
                     .code(PROCESS_EXCEPTION_GENERAL)
-                    .args(String.join(" ", command));
+                    .args(String.join(" ", command))
+                    .build();
         } finally {
             try {
                 processState.closeErrOutputStream();

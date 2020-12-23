@@ -67,14 +67,15 @@ public class CommandApiController implements CommandApi {
                 .stream().map(elem -> elem.strip()).collect(Collectors.toList());
 
         log.debug("Executing commands: " + commandsList.toString());
-        return new ResponseEntity<>(new ApiResponseCommandDescription()
+        return new ResponseEntity<>(ApiResponseCommandDescription.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(commandRunner.runCommands(commandsList.toArray(new String[0])))
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
     }
 
     public HttpEntity<? extends Object> commandPostYaml(@ApiParam(value = "Commands to run in yaml format", required = true) @Valid @RequestBody String commands, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) throws IOException {
@@ -100,13 +101,14 @@ public class CommandApiController implements CommandApi {
         log.debug("Executing commands: " + commandsList.toString());
         configDescriptor.setYamlConfig(yamlConfig);
         configDescriptor.setDescription(commandRunner.runCommands(commandsList.toArray(new String[0])));
-        return new ResponseEntity<>(new ApiResponse()
+        return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(configDescriptor)
                 .name(About.getAppName())
                 .version(About.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri()), HttpStatus.OK);
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
     }
 }

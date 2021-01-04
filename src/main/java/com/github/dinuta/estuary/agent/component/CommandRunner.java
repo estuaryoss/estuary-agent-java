@@ -8,7 +8,6 @@ import com.github.dinuta.estuary.agent.model.api.CommandParallel;
 import com.github.dinuta.estuary.agent.model.api.CommandStatus;
 import com.github.dinuta.estuary.agent.utils.CommandStatusThread;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,25 +125,19 @@ public class CommandRunner {
      * @return A reference to a Future of {@link ProcessResult}
      * @throws IOException if the process could not be started
      */
-    public Future<ProcessResult> runStartCommandDetached(List<String> command) throws IOException {
-        String pythonExec = "start.py";
+    public Future<ProcessResult> runStartCommandInBackground(List<String> command) throws IOException {
+        String exec = "runcmd";
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         ArrayList<String> fullCmd = getPlatformCommand();
-        String cmdsSeparatedBySemicolon = "";
-
-        for (int i = 1; i < command.size(); i++) {
-            cmdsSeparatedBySemicolon += command.get(i) + ";;";
-        }
 
         if (isWindows) {
-            fullCmd.add(String.format("%s\\%s", Paths.get("").toAbsolutePath().toString(), pythonExec));
-            fullCmd.add(this.doQuoteCmd(command.get(0)));
-            fullCmd.add(this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";;")));
+            fullCmd.add(String.format("%s\\%s %s %s %s",
+                    Paths.get("").toAbsolutePath().toString(), exec,
+                    command.get(0), command.get(1), command.get(2)));
         } else {
             fullCmd.add(
-                    this.doQuoteCmd(String.format("%s/%s", Paths.get("").toAbsolutePath().toString(), pythonExec)) + " " +
-                            this.doQuoteCmd(command.get(0)) + " " +
-                            this.doQuoteCmd(StringUtils.stripEnd(cmdsSeparatedBySemicolon, ";;")));
+                    this.doQuoteCmd(String.format("%s/%s", Paths.get("").toAbsolutePath().toString(), exec)) + " " +
+                            command.get(0) + " " + command.get(1) + " " + command.get(2));
         }
 
         return this.runStartCmdDetached(fullCmd.toArray(new String[0])).start().getFuture();
@@ -239,21 +232,21 @@ public class CommandRunner {
                     .err(err)
                     .code(code)
                     .pid(processState.getProcess().pid())
-                    .args(String.join(" ", command))
+                    .args(command)
                     .build();
         } catch (TimeoutException e) {
             log.debug(ExceptionUtils.getStackTrace(e));
             commandDetails = CommandDetails.builder()
                     .err(ExceptionUtils.getStackTrace(e))
                     .code(PROCESS_EXCEPTION_TIMEOUT)
-                    .args(String.join(" ", command))
+                    .args(command)
                     .build();
         } catch (Exception e) {
             log.debug(ExceptionUtils.getStackTrace(e));
             commandDetails = CommandDetails.builder()
                     .err(ExceptionUtils.getStackTrace(e))
                     .code(PROCESS_EXCEPTION_GENERAL)
-                    .args(String.join(" ", command))
+                    .args(command)
                     .build();
         } finally {
             try {

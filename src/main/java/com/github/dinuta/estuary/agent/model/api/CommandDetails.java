@@ -33,7 +33,7 @@ public class CommandDetails {
     @Getter
     @Setter
     @JsonProperty("args")
-    private String args;
+    private String[] args;
 
     @Override
     public String toString() {

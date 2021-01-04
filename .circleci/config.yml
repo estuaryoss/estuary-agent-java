@@ -22,14 +22,14 @@ jobs: # a collection of steps
             - ~/.m2
           key: estuary-agent-{{ checksum "pom.xml" }}
       - run:
-          command: wget https://estuary-agent.s3.eu-central-1.amazonaws.com/4.3.0/start.py-linux
-          name: "download start.py"
+          command: wget https://estuary-agent-go.s3.eu-central-1.amazonaws.com/4.1.0/runcmd-linux
+          name: "download runcmd-linux"
       - run:
-          command: mv start.py-linux start.py
-          name: "rename start.py-linux"
+          command: mv runcmd-linux  runcmd
+          name: "rename runcmd-linux"
       - run:
-          command: chmod +x start.py
-          name: "chmod +x start.py"
+          command: chmod +x runcmd
+          name: "chmod +x runcmd-linux"
       - run:
           command: printenv
           name: "print env vars"

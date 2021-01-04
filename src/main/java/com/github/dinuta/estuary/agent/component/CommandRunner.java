@@ -131,10 +131,9 @@ public class CommandRunner {
         ArrayList<String> fullCmd = getPlatformCommand();
 
         if (isWindows) {
-            fullCmd.add(String.format("%s\\%s", Paths.get("").toAbsolutePath().toString(), exec));
-            fullCmd.add(this.doQuoteCmd(command.get(0)));
-            fullCmd.add(this.doQuoteCmd(command.get(1)));
-            fullCmd.add(this.doQuoteCmd(command.get(2)));
+            fullCmd.add(String.format("%s\\%s %s %s %s",
+                    Paths.get("").toAbsolutePath().toString(), exec,
+                    command.get(0), command.get(1), command.get(2)));
         } else {
             fullCmd.add(
                     this.doQuoteCmd(String.format("%s/%s", Paths.get("").toAbsolutePath().toString(), exec)) + " " +

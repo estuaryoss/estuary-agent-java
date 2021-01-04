@@ -226,12 +226,13 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                     .stream().map(elem -> elem.strip()).collect(Collectors.toList());
             log.debug("Executing commands: " + commandsList.toString());
 
-            List<String> startPyArgumentsList = new ArrayList<>();
-            startPyArgumentsList.add("--cid=" + id);
-            startPyArgumentsList.add("--args=" + String.join(";;", commandsList.toArray(new String[0])));
+            List<String> argumentsList = new ArrayList<>();
+            argumentsList.add("--cid=" + id);
+            argumentsList.add("--enableStreams=true");
+            argumentsList.add("--args=\"" + String.join(";;", commandsList.toArray(new String[0])) + "\"");
 
-            log.debug("Sending args: " + startPyArgumentsList.toString());
-            commandRunner.runStartCommandDetached(startPyArgumentsList);
+            log.debug("Sending args: " + argumentsList.toString());
+            commandRunner.runStartCommandInBackground(argumentsList);
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode(),
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode()), id));
@@ -284,12 +285,13 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         try {
             writeContentInFile(testInfo, commandDescription);
             log.debug("Executing commands: " + commandsList.toString());
-            List<String> startPyArgumentsList = new ArrayList<>();
-            startPyArgumentsList.add("--cid=" + id);
-            startPyArgumentsList.add("--args=" + String.join(";;", commandsList.toArray(new String[0])));
+            List<String> argumentsList = new ArrayList<>();
+            argumentsList.add("--cid=" + id);
+            argumentsList.add("--enableStreams=true");
+            argumentsList.add("--args=\"" + String.join(";;", commandsList.toArray(new String[0])) + "\"");
 
-            log.debug("Sending args: " + startPyArgumentsList.toString());
-            commandRunner.runStartCommandDetached(startPyArgumentsList);
+            log.debug("Sending args: " + argumentsList.toString());
+            commandRunner.runStartCommandInBackground(argumentsList);
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode(),
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode()), id));

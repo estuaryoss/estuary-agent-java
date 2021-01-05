@@ -23,7 +23,7 @@ public enum ApiResponseCode {
     INVALID_YAML_CONFIG(1020),
     GENERAL(1100);
 
-    public final int code;
+    private final int code;
 
     private ApiResponseCode(int code) {
         this.code = code;

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class ProcessUtils {
     private static final Logger log = LoggerFactory.getLogger(ProcessUtils.class);
 
-    private static String EXEC = "start.py";
+    private static String EXEC = "runcmd";
 
     public static List<ProcessInfo> getProcesses() {
         List customProcessInfoList = new ArrayList();

@@ -163,7 +163,7 @@ public class FileApiControllerTest {
         ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate
                         .exchange(SERVER_PREFIX + port + "/file",
-                                HttpMethod.PUT,
+                                HttpMethod.POST,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
                                 ApiResponse.class);
 

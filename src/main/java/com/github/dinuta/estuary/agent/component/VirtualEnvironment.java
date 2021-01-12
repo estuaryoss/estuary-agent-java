@@ -103,4 +103,11 @@ public class VirtualEnvironment {
     public Map<String, String> getVirtualEnv() {
         return virtualEnvironment;
     }
+
+    /**
+     * Deletes all the custom env vars contained in the virtual environment
+     */
+    public void cleanVirtualEnv() {
+        virtualEnvironment.clear();
+    }
 }

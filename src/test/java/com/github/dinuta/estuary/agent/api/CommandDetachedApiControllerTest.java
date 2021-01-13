@@ -322,7 +322,7 @@ public class CommandDetachedApiControllerTest {
         assertThat(yamlConfigResponse.getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
 
         await().atMost(2, SECONDS).until(isCommandFinished(list.get(0)));
-        ResponseEntity<ApiResponse> responseEntityCmdDescription =
+        ResponseEntity<ApiResponse<CommandDescription>> responseEntityCmdDescription =
                 getApiResponseCommandDescriptionEntity();
         ApiResponse<CommandDescription> bodyCmdDescription = responseEntityCmdDescription.getBody();
 
@@ -342,7 +342,7 @@ public class CommandDetachedApiControllerTest {
 
     public Callable<Boolean> isCommandFinished(String command) {
         return () -> {
-            ResponseEntity<ApiResponse> responseEntity = getApiResponseCommandDescriptionEntity();
+            ResponseEntity<ApiResponse<CommandDescription>> responseEntity = getApiResponseCommandDescriptionEntity();
             ApiResponse<CommandDescription> body = responseEntity.getBody();
 
             try {
@@ -357,14 +357,15 @@ public class CommandDetachedApiControllerTest {
     }
 
 
-    private ResponseEntity<ApiResponse> getApiResponseCommandDescriptionEntity() {
+    private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionEntity() {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE, MediaType.TEXT_PLAIN.toString());
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commanddetached",
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                        ApiResponse.class);
+                        new ParameterizedTypeReference<ApiResponse<CommandDescription>>() {
+                        });
     }
 
     private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionEntityForId(String id) {

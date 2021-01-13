@@ -374,7 +374,8 @@ public class CommandDetachedApiControllerTest {
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                        ApiResponse.class);
+                        new ParameterizedTypeReference<ApiResponse>() {
+                        });
     }
 
     private ResponseEntity<ApiResponse> getApiResponseEntityForId(String id) {

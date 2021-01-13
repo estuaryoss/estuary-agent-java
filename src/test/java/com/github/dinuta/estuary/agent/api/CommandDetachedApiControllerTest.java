@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -67,7 +68,7 @@ public class CommandDetachedApiControllerTest {
         String id = "myId1";
         String expected = commandInfo.split(";")[1];
 
-        ResponseEntity<ApiResponse> responseEntity = postApiResponseCommandDescriptionEntity(commandInfo.split(";")[0], id);
+        ResponseEntity<ApiResponse<String>> responseEntity = postApiResponseCommandDescriptionEntity(commandInfo.split(";")[0], id);
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
@@ -97,7 +98,7 @@ public class CommandDetachedApiControllerTest {
         String id = "myId10";
         String expected = commandInfo.split(";")[1];
 
-        ResponseEntity<ApiResponse> responseEntity = postApiResponseCommandDescriptionEntity(commandInfo.split(";")[0], id);
+        ResponseEntity<ApiResponse<String>> responseEntity = postApiResponseCommandDescriptionEntity(commandInfo.split(";")[0], id);
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
@@ -123,8 +124,8 @@ public class CommandDetachedApiControllerTest {
         String id = "myId101";
         String command = "echo 1 && sleep 1 && echo 2 && sleep 1 && echo 3 && sleep 1";
 
-        ResponseEntity<ApiResponse> responseEntity = postApiResponseCommandDescriptionEntity(command, id);
-        ApiResponse body = responseEntity.getBody();
+        ResponseEntity<ApiResponse<String>> responseEntity = postApiResponseCommandDescriptionEntity(command, id);
+        ApiResponse<String> body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
@@ -153,8 +154,8 @@ public class CommandDetachedApiControllerTest {
         String id = "myId11";
         String command = "ls -lart";
 
-        ResponseEntity<ApiResponse> responseEntity = postApiResponseCommandDescriptionEntity(command, id);
-        ApiResponse body = responseEntity.getBody();
+        ResponseEntity<ApiResponse<String>> responseEntity = postApiResponseCommandDescriptionEntity(command, id);
+        ApiResponse<String> body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
@@ -396,13 +397,14 @@ public class CommandDetachedApiControllerTest {
                         ApiResponse.class);
     }
 
-    private ResponseEntity<ApiResponse> postApiResponseCommandDescriptionEntity(String command, String id) {
+    private ResponseEntity<ApiResponse<String>> postApiResponseCommandDescriptionEntity(String command, String id) {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
-                        ApiResponse.class);
+                        new ParameterizedTypeReference<ApiResponse<String>>() {
+                        });
     }
 }

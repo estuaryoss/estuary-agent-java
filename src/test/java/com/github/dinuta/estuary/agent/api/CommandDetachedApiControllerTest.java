@@ -367,14 +367,14 @@ public class CommandDetachedApiControllerTest {
                         ApiResponse.class);
     }
 
-    private ResponseEntity<ApiResponse> getApiResponseCommandDescriptionEntityForId(String id) {
+    private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionEntityForId(String id) {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE, MediaType.TEXT_PLAIN.toString());
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                        new ParameterizedTypeReference<ApiResponse>() {
+                        new ParameterizedTypeReference<ApiResponse<CommandDescription>>() {
                         });
     }
 

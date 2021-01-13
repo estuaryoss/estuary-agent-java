@@ -10,7 +10,7 @@ import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
 import com.github.dinuta.estuary.agent.exception.YamlConfigException;
 import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
-import com.github.dinuta.estuary.agent.model.api.ApiResponseCommandDescription;
+import com.github.dinuta.estuary.agent.model.api.CommandDescription;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
 import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -67,7 +68,7 @@ public class CommandDetachedApiControllerTest {
         String id = "myId1";
         String expected = commandInfo.split(";")[1];
 
-        ResponseEntity<ApiResponse> responseEntity = postApiResponseCommandDescriptionEntity(commandInfo.split(";")[0], id);
+        ResponseEntity<ApiResponse<String>> responseEntity = postApiResponseCommandDescriptionEntity(commandInfo.split(";")[0], id);
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
@@ -80,7 +81,7 @@ public class CommandDetachedApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         Thread.sleep(1000);
-        ApiResponseCommandDescription body1 = getApiResponseCommandDescriptionEntity().getBody();
+        ApiResponse<CommandDescription> body1 = getApiResponseCommandDescriptionEntity().getBody();
 
         assertThat(body1.getDescription().getCommands().get(commandInfo.split(";")[0]).getDetails().getCode()).isEqualTo(0);
         assertThat(body1.getDescription().getCommands().get(commandInfo.split(";")[0]).getDetails().getErr()).isEqualTo("");
@@ -97,7 +98,7 @@ public class CommandDetachedApiControllerTest {
         String id = "myId10";
         String expected = commandInfo.split(";")[1];
 
-        ResponseEntity<ApiResponse> responseEntity = postApiResponseCommandDescriptionEntity(commandInfo.split(";")[0], id);
+        ResponseEntity<ApiResponse<String>> responseEntity = postApiResponseCommandDescriptionEntity(commandInfo.split(";")[0], id);
         ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
@@ -110,7 +111,7 @@ public class CommandDetachedApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         Thread.sleep(1000);
-        ApiResponseCommandDescription body1 = getApiResponseCommandDescriptionEntityForId(id).getBody();
+        ApiResponse<CommandDescription> body1 = getApiResponseCommandDescriptionEntityForId(id).getBody();
 
         assertThat(body1.getDescription().getId()).isEqualTo(id);
         assertThat(body1.getDescription().getCommands().get(commandInfo.split(";")[0]).getDetails().getCode()).isEqualTo(0);
@@ -123,8 +124,8 @@ public class CommandDetachedApiControllerTest {
         String id = "myId101";
         String command = "echo 1 && sleep 1 && echo 2 && sleep 1 && echo 3 && sleep 1";
 
-        ResponseEntity<ApiResponse> responseEntity = postApiResponseCommandDescriptionEntity(command, id);
-        ApiResponse body = responseEntity.getBody();
+        ResponseEntity<ApiResponse<String>> responseEntity = postApiResponseCommandDescriptionEntity(command, id);
+        ApiResponse<String> body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
@@ -136,9 +137,9 @@ public class CommandDetachedApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         Thread.sleep(1000);
-        ApiResponseCommandDescription body1 = getApiResponseCommandDescriptionEntityForId(id).getBody();
+        ApiResponse<CommandDescription> body1 = getApiResponseCommandDescriptionEntityForId(id).getBody();
         Thread.sleep(2000);
-        ApiResponseCommandDescription body2 = getApiResponseCommandDescriptionEntityForId(id).getBody();
+        ApiResponse<CommandDescription> body2 = getApiResponseCommandDescriptionEntityForId(id).getBody();
 
         assertThat(body1.getDescription().getId()).isEqualTo(id);
         assertThat(body2.getDescription().getId()).isEqualTo(id);
@@ -153,8 +154,8 @@ public class CommandDetachedApiControllerTest {
         String id = "myId11";
         String command = "ls -lart";
 
-        ResponseEntity<ApiResponse> responseEntity = postApiResponseCommandDescriptionEntity(command, id);
-        ApiResponse body = responseEntity.getBody();
+        ResponseEntity<ApiResponse<String>> responseEntity = postApiResponseCommandDescriptionEntity(command, id);
+        ApiResponse<String> body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
@@ -202,7 +203,7 @@ public class CommandDetachedApiControllerTest {
 
 
         await().atMost(sleep1 + 2, SECONDS).until(isCommandFinished(command1));
-        ApiResponseCommandDescription body1 =
+        ApiResponse<CommandDescription> body1 =
                 getApiResponseCommandDescriptionEntity().getBody();
 
         assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
@@ -263,7 +264,7 @@ public class CommandDetachedApiControllerTest {
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
         assertThat(body.getDescription()).isEqualTo(testId);
         Thread.sleep(1000);
-        ApiResponseCommandDescription body1 =
+        ApiResponse<CommandDescription> body1 =
                 getApiResponseCommandDescriptionEntity().getBody();
         int pid = (int) body1.getDescription().getPid();
 
@@ -321,9 +322,9 @@ public class CommandDetachedApiControllerTest {
         assertThat(yamlConfigResponse.getAfterScript()).isEqualTo(yamlConfig.getAfterScript());
 
         await().atMost(2, SECONDS).until(isCommandFinished(list.get(0)));
-        ResponseEntity<ApiResponseCommandDescription> responseEntityCmdDescription =
+        ResponseEntity<ApiResponse<CommandDescription>> responseEntityCmdDescription =
                 getApiResponseCommandDescriptionEntity();
-        ApiResponseCommandDescription bodyCmdDescription = responseEntityCmdDescription.getBody();
+        ApiResponse<CommandDescription> bodyCmdDescription = responseEntityCmdDescription.getBody();
 
         assertThat(responseEntityCmdDescription.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(bodyCmdDescription.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
@@ -341,8 +342,8 @@ public class CommandDetachedApiControllerTest {
 
     public Callable<Boolean> isCommandFinished(String command) {
         return () -> {
-            ResponseEntity<ApiResponseCommandDescription> responseEntity = getApiResponseCommandDescriptionEntity();
-            ApiResponseCommandDescription body = responseEntity.getBody();
+            ResponseEntity<ApiResponse<CommandDescription>> responseEntity = getApiResponseCommandDescriptionEntity();
+            ApiResponse<CommandDescription> body = responseEntity.getBody();
 
             try {
                 if (body.getDescription().getCommands().get(command) == null)
@@ -356,24 +357,26 @@ public class CommandDetachedApiControllerTest {
     }
 
 
-    private ResponseEntity<ApiResponseCommandDescription> getApiResponseCommandDescriptionEntity() {
+    private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionEntity() {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE, MediaType.TEXT_PLAIN.toString());
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commanddetached",
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                        ApiResponseCommandDescription.class);
+                        new ParameterizedTypeReference<ApiResponse<CommandDescription>>() {
+                        });
     }
 
-    private ResponseEntity<ApiResponseCommandDescription> getApiResponseCommandDescriptionEntityForId(String id) {
+    private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionEntityForId(String id) {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE, MediaType.TEXT_PLAIN.toString());
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                        ApiResponseCommandDescription.class);
+                        new ParameterizedTypeReference<ApiResponse<CommandDescription>>() {
+                        });
     }
 
     private ResponseEntity<ApiResponse> getApiResponseEntityForId(String id) {
@@ -396,13 +399,14 @@ public class CommandDetachedApiControllerTest {
                         ApiResponse.class);
     }
 
-    private ResponseEntity<ApiResponse> postApiResponseCommandDescriptionEntity(String command, String id) {
+    private ResponseEntity<ApiResponse<String>> postApiResponseCommandDescriptionEntity(String command, String id) {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
-                        ApiResponse.class);
+                        new ParameterizedTypeReference<ApiResponse<String>>() {
+                        });
     }
 }

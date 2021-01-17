@@ -3,7 +3,7 @@ package com.github.dinuta.estuary.agent.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
-import com.github.dinuta.estuary.agent.constants.About;
+import com.github.dinuta.estuary.agent.component.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseCode;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
@@ -58,6 +58,9 @@ public class CommandDetachedApiControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private About about;
+
     @ParameterizedTest
     @ValueSource(
             strings = {
@@ -75,9 +78,9 @@ public class CommandDetachedApiControllerTest {
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
-        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getDescription()).isEqualTo(id);
-        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         Thread.sleep(1000);
@@ -105,9 +108,9 @@ public class CommandDetachedApiControllerTest {
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
-        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getDescription()).isEqualTo(id);
-        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         Thread.sleep(1000);
@@ -131,9 +134,9 @@ public class CommandDetachedApiControllerTest {
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
-        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getDescription()).isEqualTo(id);
-        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         Thread.sleep(1000);
@@ -161,9 +164,9 @@ public class CommandDetachedApiControllerTest {
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
-        assertThat(body.getName()).isEqualTo(About.getAppName());
+        assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getDescription()).isEqualTo(id);
-        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         Thread.sleep(1000);
@@ -227,9 +230,9 @@ public class CommandDetachedApiControllerTest {
         assertThat(body1.getDescription().getCommands().get(command1).getStatus()).isEqualTo("finished");
         assertThat(Math.round(body1.getDescription().getCommands().get(command2).getDuration())).isEqualTo(Math.round(sleep2));
         assertThat(body1.getDescription().getCommands().get(command2).getStatus()).isEqualTo("finished");
-        assertThat(body1.getName()).isEqualTo(About.getAppName());
+        assertThat(body1.getName()).isEqualTo(about.getAppName());
         assertThat(body1.getPath()).isEqualTo("/commanddetached?");
-        assertThat(body1.getVersion()).isEqualTo(About.getVersion());
+        assertThat(body1.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body1.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
@@ -335,8 +338,8 @@ public class CommandDetachedApiControllerTest {
         assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(0)).getDetails().getOut()).contains("before_script");
         assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(1)).getDetails().getOut()).contains("script");
         assertThat(bodyCmdDescription.getDescription().getCommands().get(list.get(2)).getDetails().getOut()).contains("after_script");
-        assertThat(body.getName()).isEqualTo(About.getAppName());
-        assertThat(body.getVersion()).isEqualTo(About.getVersion());
+        assertThat(body.getName()).isEqualTo(about.getAppName());
+        assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 

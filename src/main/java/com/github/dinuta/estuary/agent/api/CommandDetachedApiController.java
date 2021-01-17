@@ -3,9 +3,9 @@ package com.github.dinuta.estuary.agent.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.github.dinuta.estuary.agent.component.About;
 import com.github.dinuta.estuary.agent.component.ClientRequest;
 import com.github.dinuta.estuary.agent.component.CommandRunner;
-import com.github.dinuta.estuary.agent.constants.About;
 import com.github.dinuta.estuary.agent.constants.ApiResponseCode;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
@@ -67,6 +67,9 @@ public class CommandDetachedApiController implements CommandDetachedApi {
     private StateHolder stateHolder;
 
     @Autowired
+    private About about;
+
+    @Autowired
     public CommandDetachedApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -78,8 +81,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .code(ApiResponseCode.NOT_IMPLEMENTED.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.NOT_IMPLEMENTED.getCode()))
                 .description(ApiResponseMessage.getMessage(ApiResponseCode.NOT_IMPLEMENTED.getCode()))
-                .name(About.getAppName())
-                .version(About.getVersion())
+                .name(about.getAppName())
+                .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                 .path(clientRequest.getRequestUri())
                 .build(), HttpStatus.NOT_IMPLEMENTED);
@@ -114,8 +117,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(commandDescription)
-                .name(About.getAppName())
-                .version(About.getVersion())
+                .name(about.getAppName())
+                .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                 .path(clientRequest.getRequestUri())
                 .build(), HttpStatus.OK);
@@ -167,8 +170,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(commandDescription)
-                .name(About.getAppName())
-                .version(About.getVersion())
+                .name(about.getAppName())
+                .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                 .path(clientRequest.getRequestUri())
                 .build(), HttpStatus.OK);
@@ -197,8 +200,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
                 .description(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .name(About.getAppName())
-                .version(About.getVersion())
+                .name(about.getAppName())
+                .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                 .path(clientRequest.getRequestUri())
                 .build(), HttpStatus.OK);
@@ -242,8 +245,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())))
                 .description(id)
-                .name(About.getAppName())
-                .version(About.getVersion())
+                .name(about.getAppName())
+                .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                 .path(clientRequest.getRequestUri())
                 .build(), HttpStatus.ACCEPTED);
@@ -303,8 +306,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())))
                 .description(configDescriptor)
-                .name(About.getAppName())
-                .version(About.getVersion())
+                .name(about.getAppName())
+                .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                 .path(clientRequest.getRequestUri())
                 .build(), HttpStatus.OK);

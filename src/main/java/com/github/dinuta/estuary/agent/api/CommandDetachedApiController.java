@@ -209,8 +209,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedIdPost(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        stateHolder.setLastCommand(id);
-        File testInfo = new File(stateHolder.getLastCommand());
+        File testInfo = new File(String.format(stateHolder.getLastCommandFormat(), id));
         CommandDescription commandDescription = CommandDescription.builder()
                 .started(true)
                 .finished(false)
@@ -236,6 +235,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
             log.debug("Sending args: " + argumentsList.toString());
             commandRunner.runStartCommandInBackground(argumentsList);
+            stateHolder.setLastCommand(id);
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode(),
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode()), id));
@@ -254,10 +254,8 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedIdPostYaml(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other in yaml format.", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
         String accept = request.getHeader("Accept");
-        stateHolder.setLastCommand(id);
-        String testInfoFilename = stateHolder.getLastCommand();
-        File testInfo = new File(testInfoFilename);
         List<String> commandsList;
+        File testInfo = new File(String.format(stateHolder.getLastCommandFormat(), id));
         YAMLMapper mapper = new YAMLMapper();
         CommandDescription commandDescription = CommandDescription.builder()
                 .started(true)
@@ -295,6 +293,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
             log.debug("Sending args: " + argumentsList.toString());
             commandRunner.runStartCommandInBackground(argumentsList);
+            stateHolder.setLastCommand(id);
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode(),
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode()), id));

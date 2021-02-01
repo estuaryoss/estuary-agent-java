@@ -8,10 +8,10 @@ ENV COMMAND_TIMEOUT 1200
 RUN mkdir $APP_DIR
 WORKDIR $APP_DIR
 
-COPY target/agent-4.3.0-SNAPSHOT-exec.jar $APP_DIR/agent-exec.jar
-ADD https://estuary-agent.s3.eu-central-1.amazonaws.com/4.3.0/start.py-linux $APP_DIR/start.py
+COPY target/agent-4.3.1-SNAPSHOT-exec.jar $APP_DIR/agent-exec.jar
+ADD https://estuary-agent-go.s3.eu-central-1.amazonaws.com/4.1.0/runcmd-linux $APP_DIR/runcmd
 COPY https $APP_DIR/https
 
-RUN chmod +x $APP_DIR/start.py
+RUN chmod +x $APP_DIR/runcmd
 
 ENTRYPOINT ["java", "-jar", "/app/agent-exec.jar"]

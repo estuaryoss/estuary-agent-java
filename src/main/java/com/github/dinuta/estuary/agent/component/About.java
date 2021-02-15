@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 public class About {
     @Getter
     private final String appName = "estuary-agent";
+
     @Value("${app.version}")
     @Getter
     private String version;

@@ -31,7 +31,7 @@ import static com.github.dinuta.estuary.agent.constants.DefaultConstants.*;
         "com.github.dinuta.estuary.agent.component",
         "com.github.dinuta.estuary.agent.handler"
 })
-public class TestAgentSpringBoot implements CommandLineRunner {
+public class EstuaryAgent implements CommandLineRunner {
     @Autowired
     private FluentdService fluentdService;
 
@@ -39,7 +39,7 @@ public class TestAgentSpringBoot implements CommandLineRunner {
     private VirtualEnvironment environment;
 
     public static void main(String[] args) {
-        SpringApplication.run(TestAgentSpringBoot.class, args);
+        SpringApplication.run(EstuaryAgent.class, args);
     }
 
     @Value("${app.folder.streams}")

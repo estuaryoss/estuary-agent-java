@@ -15,8 +15,8 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import org.zeroturnaround.zip.ZipUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @Api(tags = {"estuary-agent"})
-@Controller
+@RestController
 public class FolderApiController implements FolderApi {
 
     private static final Logger log = LoggerFactory.getLogger(FolderApiController.class);

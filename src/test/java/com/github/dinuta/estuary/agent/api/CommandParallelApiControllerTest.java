@@ -25,6 +25,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.dinuta.estuary.agent.api.constants.Authentication.PASSWORD;
+import static com.github.dinuta.estuary.agent.api.constants.Authentication.USER;
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -190,7 +192,7 @@ public class CommandParallelApiControllerTest {
     private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionResponseEntity(String command) {
         Map<String, String> headers = new HashMap<>();
 
-        return this.restTemplate
+        return this.restTemplate.withBasicAuth(USER, PASSWORD)
                 .exchange(SERVER_PREFIX + port + "/commandparallel",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),

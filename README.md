@@ -33,20 +33,28 @@ java -jar \
 ```
 
 ## Fluentd logging
--   FLUENTD_IP_PORT  -> This env var sets the fluentd ip:port connection. Example: localhost:24224  
 
-## Token Authentication
--   HTTP_AUTH_TOKEN -> This env var sets the auth token for the service. Will be matched with the header 'Token'
+- FLUENTD_IP_PORT -> This env var sets the fluentd ip:port connection. Example: localhost:24224
+
+## Authentication
+
+- HTTP_AUTH_USER
+- HTTP_AUTH_PASSWORD These env vars will be matched against basic authentication from your HttpClient.  
+  After the authentication the user can get a cookie to communicate further with the agent.
 
 ## Command timeout
--   COMMAND_TIMEOUT -> This env var sets the command timeout for the system commands. Default is **1800** seconds.  
+
+- COMMAND_TIMEOUT -> This env var sets the command timeout for the system commands. Default is **1800** seconds.
 
 ## Enable HTTPS
-Set **HTTPS_ENABLE** env var option to *true* or *false*.    
-Set the certificate path (is relative!) with **HTTPS_CERT** and **HTTPS_KEYSTORE_PASSWORD** env variables. E.g. HTTPS_CERT=file:https/cert.p12  
-If you do not set cert and keystore password env vars, it uses the ones from default *application.properties* in the resource folder.
 
-! Please also change the app port by setting the env var called **PORT** to *8443*. Default is 8080.   
+Set **HTTPS_ENABLE** env var option to *true* or *false*.    
+Set the certificate path (is relative!) with **HTTPS_CERT** and **HTTPS_KEYSTORE_PASSWORD** env variables. E.g.
+HTTPS_CERT=file:https/cert.p12  
+If you do not set cert and keystore password env vars, it uses the ones from default *application.properties* in the
+resource folder.
+
+! Please also change the app port by setting the env var called **PORT** to *8443*. Default is 8080.
 
 ## Environment variables injection
 User defined environment variables will be stored in a 'virtual' environment. The extra env vars will be used by the process that executes system commands.  

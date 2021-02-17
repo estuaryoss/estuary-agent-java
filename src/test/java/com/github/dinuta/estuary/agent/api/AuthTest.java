@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.dinuta.estuary.agent.api.constants.Authentication.PASSWORD;
+import static com.github.dinuta.estuary.agent.api.constants.Authentication.USER;
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,7 +49,7 @@ public class AuthTest {
         headers.put(HeaderConstants.TOKEN, "null");
 
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate
+                this.restTemplate.withBasicAuth(USER, PASSWORD)
                         .exchange(SERVER_PREFIX + port + "/about",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
@@ -70,7 +72,7 @@ public class AuthTest {
         headers.put(HeaderConstants.TOKEN, "whateverinvalid");
 
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate
+                this.restTemplate.withBasicAuth(USER, PASSWORD)
                         .exchange(SERVER_PREFIX + port + "/about",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),

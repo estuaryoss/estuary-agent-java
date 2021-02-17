@@ -27,7 +27,6 @@ import static com.github.dinuta.estuary.agent.constants.DefaultConstants.*;
 @ComponentScan(basePackages = {
         "com.github.dinuta.estuary.agent",
         "com.github.dinuta.estuary.agent.api",
-        "com.github.dinuta.estuary.agent.config",
         "com.github.dinuta.estuary.agent.configuration",
         "com.github.dinuta.estuary.agent.component",
         "com.github.dinuta.estuary.agent.handler"

@@ -95,7 +95,7 @@ public class EnvApiController implements EnvApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> envPost(@ApiParam(value = "List of env vars by key-value pair in JSON format", required = true) @Valid @RequestBody String envVars, @ApiParam(value = "Authentication Token") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> envPost(@ApiParam(value = "List of env vars by key-value pair in JSON format", required = true) @Valid @RequestBody String envVars) {
         Map<String, String> envVarsToBeAdded = new LinkedHashMap<>();
         Map<String, String> virtualEnvVarsAdded = new LinkedHashMap<>();
 

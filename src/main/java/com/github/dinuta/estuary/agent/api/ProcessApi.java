@@ -9,17 +9,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(value = "ping")
+@Api(value = "processes", description = "processes API")
 @RequestMapping(value = "")
-public interface PingApi {
+public interface ProcessApi {
 
-    @ApiOperation(value = "Ping endpoint which replies with pong", nickname = "pingGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiOperation(value = "Gets the process list from the system", nickname = "getProcesses", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Ping endpoint which replies with pong. Useful when checking the alive status of the service", response = ApiResponse.class)})
-    @RequestMapping(value = "/ping",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Get system processes success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Get system processes failure", response = ApiResponse.class)})
+    @RequestMapping(value = "/processes",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    default ResponseEntity<ApiResponse> pingGet() {
+    default ResponseEntity<ApiResponse> getProcesses() {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

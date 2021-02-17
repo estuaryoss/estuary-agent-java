@@ -12,7 +12,6 @@ import com.github.dinuta.estuary.agent.model.YamlConfig;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import com.github.dinuta.estuary.agent.model.api.CommandDescription;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
-import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -278,7 +277,13 @@ public class CommandDetachedApiControllerTest {
         assertThat(body1.getDescription().isStarted()).isEqualTo(true);
         assertThat(body1.getDescription().isFinished()).isEqualTo(false);
         assertThat(body1.getDescription().getId()).isEqualTo(testId);
-        assertThat(new Gson().toJson(body1.getDescription().getProcesses())).contains(String.valueOf(pid));
+
+        ResponseEntity<ApiResponse> responseProcesses = this.restTemplate.withBasicAuth(USER, PASSWORD)
+                .exchange(SERVER_PREFIX + port + "/processes",
+                        HttpMethod.GET,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
+                        ApiResponse.class);
+        assertThat(responseProcesses.getBody().getDescription().toString()).contains(String.valueOf(pid));
 
         ResponseEntity<ApiResponse> response = deleteApiResponseEntityForId(testId);
 
@@ -295,7 +300,13 @@ public class CommandDetachedApiControllerTest {
         assertThat(LocalDateTime.parse(body1.getDescription().getFinishedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
         assertThat(LocalDateTime.parse(body1.getDescription().getStartedat(), DateTimeConstants.PATTERN)).isBefore(LocalDateTime.now());
         assertThat(body1.getDescription().getId()).isEqualTo(testId);
-        assertThat(new Gson().toJson(body1.getDescription().getProcesses())).doesNotContain(String.valueOf(pid));
+
+        responseProcesses = this.restTemplate.withBasicAuth(USER, PASSWORD)
+                .exchange(SERVER_PREFIX + port + "/processes",
+                        HttpMethod.GET,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
+                        ApiResponse.class);
+        assertThat(responseProcesses.getBody().getDescription().toString()).doesNotContain(String.valueOf(pid));
     }
 
     @Test

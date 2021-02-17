@@ -42,7 +42,7 @@ import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import static com.github.dinuta.estuary.agent.utils.ProcessUtils.getParentProcessForDetachedCmd;
+import static com.github.dinuta.estuary.agent.utils.ProcessUtils.getProcessInfoForPid;
 
 @Api(tags = {"estuary-agent"})
 @RestController
@@ -107,7 +107,9 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         try (InputStream in = new FileInputStream(testInfo)) {
             commandDescription = objectMapper.readValue(IOUtils.toString(in, "UTF-8"), CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
-            commandDescription.setProcesses(ProcessUtils.getProcesses());
+            List<ProcessInfo> processInfoList = getProcessInfoForPid(commandDescription.getPid());
+            if (processInfoList.size() == 1)
+                commandDescription.setProcesses(ProcessUtils.getProcessInfoForPid(processInfoList.get(0).getParent()));
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
@@ -177,14 +179,31 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id) {
         String accept = request.getHeader("Accept");
 
+        String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
+        log.debug("Reading content from file: " + testInfoFilename);
+
+        CommandDescription commandDescription;
+        try (InputStream is = new FileInputStream(testInfoFilename)) {
+            String fileContent = IOUtils.toString(is, "UTF-8");
+            commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
+            commandDescription = streamOutAndErr(commandDescription);
+            commandDescription.setProcesses(ProcessUtils.getProcesses());
+        } catch (IOException e) {
+            throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+        }
+
+
         try {
-            ProcessInfo parentProcessInfo = getParentProcessForDetachedCmd(id);
-            List<ProcessHandle> children = parentProcessInfo.getChildren();
-            ProcessUtils.killProcess(parentProcessInfo);
-            if (children != null) ProcessUtils.killChildrenProcesses(children);
+            List<ProcessInfo> processInfoList = getProcessInfoForPid(commandDescription.getPid());
+            if (processInfoList.size() == 1) {
+                List<ProcessHandle> children = processInfoList.get(0).getChildren();
+                ProcessUtils.killProcess(processInfoList.get(0));
+                if (children != null) ProcessUtils.killChildrenProcesses(children);
+            }
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode(),
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode())));
@@ -274,7 +293,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         String commandsStripped = commandContent.replace("\r\n", "\n").strip();
         try {
             yamlConfig = mapper.readValue(commandsStripped, YamlConfig.class);
-            apiResponse = envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()), token);
+            apiResponse = envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()));
             yamlConfig.setEnv((Map<String, String>) apiResponse.getBody().getDescription());
             commandsList = new YamlConfigParser().getCommandsList(yamlConfig).stream()
                     .map(elem -> elem.strip()).collect(Collectors.toList());

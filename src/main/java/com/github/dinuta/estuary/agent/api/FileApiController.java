@@ -17,9 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -27,7 +27,7 @@ import java.io.*;
 import java.time.LocalDateTime;
 
 @Api(tags = {"estuary-agent"})
-@Controller
+@RestController
 public class FileApiController implements FileApi {
 
     private static final Logger log = LoggerFactory.getLogger(FileApiController.class);

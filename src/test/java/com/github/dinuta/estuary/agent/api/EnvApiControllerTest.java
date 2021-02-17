@@ -26,6 +26,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.dinuta.estuary.agent.constants.Authentication.PASSWORD;
+import static com.github.dinuta.estuary.agent.constants.Authentication.USER;
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,7 +52,7 @@ public class EnvApiControllerTest {
     @Test
     public void whenCallingGetThenInformationIsRetrivedOk() {
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
 
         ApiResponse body = responseEntity.getBody();
 
@@ -69,7 +71,7 @@ public class EnvApiControllerTest {
     public void whenGettingExistentEnvVarThenInformationIsRetrivedOk() {
         String envVar = "PATH";
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
+                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
 
         ApiResponse body = responseEntity.getBody();
 
@@ -86,7 +88,7 @@ public class EnvApiControllerTest {
     @Test
     public void whenSettingExternalEnvVarsWithInvalidBodyWithRestAPIThenError() {
         String envVars = "{whatever_invalid_json}";
-        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
                 .exchange(SERVER_PREFIX + port + "/env",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(envVars, new HashMap<>()),
@@ -109,7 +111,7 @@ public class EnvApiControllerTest {
     public void whenGettingNotExistentEnvVarThenValueIsNull() {
         String envVar = "whatever";
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
+                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
 
         ApiResponse body = responseEntity.getBody();
 
@@ -134,7 +136,7 @@ public class EnvApiControllerTest {
         String envVar = envInfo.split(";")[0];
         String expectedValue = envInfo.split(";")[1];
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
+                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
 
         ApiResponse body = responseEntity.getBody();
 
@@ -154,7 +156,7 @@ public class EnvApiControllerTest {
         String envVar = "JAVA_HOME";
         String notExpectedValue = "this_value_wont_be_injected_because_its_an_existing_system_env_var";
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
+                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env/" + envVar, ApiResponse.class);
 
         ApiResponse body = responseEntity.getBody();
 
@@ -180,7 +182,7 @@ public class EnvApiControllerTest {
         String envVarName = envVars.split(";")[0];
         String expectedEnvVarValue = envVars.split(";")[1];
         String envVarsJson = String.format("{\"%s\":\"%s\"}", envVarName, expectedEnvVarValue);
-        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
                 .exchange(SERVER_PREFIX + port + "/env",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(envVarsJson, new HashMap<>()),
@@ -197,13 +199,12 @@ public class EnvApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
         body = responseEntity.getBody();
 
         assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(((Map) body.getDescription()).get(envVarName)).isEqualTo(expectedEnvVarValue);
     }
-
 
 
     @ParameterizedTest
@@ -221,7 +222,7 @@ public class EnvApiControllerTest {
 
         String envVarsJson = String.format("{\"%s\":\"%s\", \"PATH\": \"%s\"}",
                 envVarName, expectedEnvVarValue, attemptedShellEnvVarValue);
-        ResponseEntity<ApiResponse> responseEntity = this.restTemplate
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
                 .exchange(SERVER_PREFIX + port + "/env",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(envVarsJson, new HashMap<>()),
@@ -239,7 +240,7 @@ public class EnvApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
         body = responseEntity.getBody();
 
         assertThat(body.getDescription()).isInstanceOf(Map.class);
@@ -254,7 +255,7 @@ public class EnvApiControllerTest {
 
         for (int i = 0; i < 2 * VIRTUAL_ENV_VARS_LIMIT_SIZE; i++) {
             String envVarsJson = String.format("{\"%s\":\"%s\"}", i, i);
-            this.restTemplate
+            this.restTemplate.withBasicAuth(USER, PASSWORD)
                     .exchange(SERVER_PREFIX + port + "/env",
                             HttpMethod.POST,
                             httpRequestUtils.getRequestEntityContentTypeAppJson(envVarsJson, new HashMap<>()),
@@ -262,7 +263,7 @@ public class EnvApiControllerTest {
         }
 
         ResponseEntity responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
         ApiResponse body = (ApiResponse) responseEntity.getBody();
 
         assertThat(body.getDescription()).isInstanceOf(Map.class);
@@ -275,7 +276,7 @@ public class EnvApiControllerTest {
         String envVarName = "FOO1";
         String envVarJson = String.format("{\"%s\":\"BAR1\"}", envVarName);
 
-        ResponseEntity responseEntity = this.restTemplate
+        ResponseEntity responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
                 .exchange(SERVER_PREFIX + port + "/env",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(envVarJson, new HashMap<>()),
@@ -285,7 +286,7 @@ public class EnvApiControllerTest {
         assertThat(((Map) body.getDescription()).size()).isGreaterThan(0);
 
         //delete all virtual env
-        responseEntity = this.restTemplate
+        responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
                 .exchange(SERVER_PREFIX + port + "/env",
                         HttpMethod.DELETE,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, new HashMap<>()),
@@ -296,7 +297,7 @@ public class EnvApiControllerTest {
 
         //check again with GET if it was deleted
         responseEntity =
-                this.restTemplate.getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
         body = (ApiResponse) responseEntity.getBody();
 
         assertThat(body.getDescription()).isInstanceOf(Map.class);

@@ -22,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.dinuta.estuary.agent.constants.Authentication.PASSWORD;
+import static com.github.dinuta.estuary.agent.constants.Authentication.USER;
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,7 +50,7 @@ public class FolderApiControllerTest {
         headers.put(HeaderConstants.FOLDER_PATH, "src");
 
         ResponseEntity<String> responseEntity =
-                this.restTemplate
+                this.restTemplate.withBasicAuth(USER, PASSWORD)
                         .exchange(SERVER_PREFIX + port + "/folder",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
@@ -67,7 +69,7 @@ public class FolderApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate
+                this.restTemplate.withBasicAuth(USER, PASSWORD)
                         .exchange(SERVER_PREFIX + port + "/folder",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
@@ -94,7 +96,7 @@ public class FolderApiControllerTest {
         headers.put(HeaderConstants.FOLDER_PATH, folderName);
 
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate
+                this.restTemplate.withBasicAuth(USER, PASSWORD)
                         .exchange(SERVER_PREFIX + port + "/folder",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),

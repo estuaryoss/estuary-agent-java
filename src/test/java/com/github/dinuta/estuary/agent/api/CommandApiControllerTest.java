@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.dinuta.estuary.agent.constants.Authentication.PASSWORD;
+import static com.github.dinuta.estuary.agent.constants.Authentication.USER;
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -290,7 +292,7 @@ public class CommandApiControllerTest {
     private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionResponseEntity(String command) {
         Map<String, String> headers = new HashMap<>();
 
-        return this.restTemplate
+        return this.restTemplate.withBasicAuth(USER, PASSWORD)
                 .exchange(SERVER_PREFIX + port + "/command",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
@@ -301,7 +303,7 @@ public class CommandApiControllerTest {
     private ResponseEntity<ApiResponse> getApiResponseConfigDescriptorResponseEntity(String yamlConfig) {
         Map<String, String> headers = new HashMap<>();
 
-        return this.restTemplate
+        return this.restTemplate.withBasicAuth(USER, PASSWORD)
                 .exchange(SERVER_PREFIX + port + "/commandyaml",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(yamlConfig, headers),
@@ -311,7 +313,7 @@ public class CommandApiControllerTest {
     private ResponseEntity<ApiResponse> getApiResponseResponseEntity(String yamlConfig) {
         Map<String, String> headers = new HashMap<>();
 
-        return this.restTemplate
+        return this.restTemplate.withBasicAuth(USER, PASSWORD)
                 .exchange(SERVER_PREFIX + port + "/commandyaml",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(yamlConfig, headers),

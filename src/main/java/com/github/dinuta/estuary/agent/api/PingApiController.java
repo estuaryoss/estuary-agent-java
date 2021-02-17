@@ -14,14 +14,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 @Api(tags = {"estuary-agent"}, description = "root")
-@Controller
+@RestController
 public class PingApiController implements PingApi {
 
     private static final Logger log = LoggerFactory.getLogger(PingApiController.class);

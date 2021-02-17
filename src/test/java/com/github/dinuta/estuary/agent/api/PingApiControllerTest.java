@@ -16,6 +16,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 
+import static com.github.dinuta.estuary.agent.constants.Authentication.PASSWORD;
+import static com.github.dinuta.estuary.agent.constants.Authentication.USER;
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,7 +37,7 @@ public class PingApiControllerTest {
 
     @Test
     public void whenCallingGetThenInformationIsRetrivedOk() {
-        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.getForEntity(SERVER_PREFIX + port + "/ping",
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/ping",
                 ApiResponse.class);
 
         ApiResponse body = responseEntity.getBody();

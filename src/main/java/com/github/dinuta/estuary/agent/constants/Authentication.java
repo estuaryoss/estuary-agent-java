@@ -1,4 +1,4 @@
-package com.github.dinuta.estuary.agent.api.constants;
+package com.github.dinuta.estuary.agent.constants;
 
 public class Authentication {
     public static final String USER = "user";

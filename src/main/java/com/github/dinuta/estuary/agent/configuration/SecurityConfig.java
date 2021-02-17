@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+import static com.github.dinuta.estuary.agent.constants.Authentication.PASSWORD;
+import static com.github.dinuta.estuary.agent.constants.Authentication.USER;
 import static com.github.dinuta.estuary.agent.constants.EnvConstants.HTTP_AUTH_PASSWORD;
 import static com.github.dinuta.estuary.agent.constants.EnvConstants.HTTP_AUTH_USER;
 
@@ -40,8 +42,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     @Override
     public UserDetailsService userDetailsService() {
-        String username = System.getenv(HTTP_AUTH_USER) != null ? System.getenv(HTTP_AUTH_USER) : "user";
-        String password = System.getenv(HTTP_AUTH_PASSWORD) != null ? System.getenv(HTTP_AUTH_PASSWORD) : "password";
+        String username = System.getenv(HTTP_AUTH_USER) != null ? System.getenv(HTTP_AUTH_USER) : USER;
+        String password = System.getenv(HTTP_AUTH_PASSWORD) != null ? System.getenv(HTTP_AUTH_PASSWORD) : PASSWORD;
 
         UserDetails userDetails =
                 User.withDefaultPasswordEncoder()

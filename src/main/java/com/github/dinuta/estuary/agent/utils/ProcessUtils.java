@@ -27,6 +27,7 @@ public class ProcessUtils {
         ProcessHandle.allProcesses().forEach(p -> {
             long parent = -1L;
             List<String> arguments = new ArrayList<>();
+
             try {
                 parent = p.parent().get().pid();
             } catch (Exception e) {
@@ -44,8 +45,7 @@ public class ProcessUtils {
                     .pid(p.pid())
                     .username(p.info().user().orElse(""))
                     .parent(parent)
-                    .arguments(arguments)
-                    .children(p.children().collect(Collectors.toList()));
+                    .arguments(arguments);
 
             customProcessInfoList.add(processInfo);
         });
@@ -55,8 +55,27 @@ public class ProcessUtils {
 
     @NotNull
     public static List<ProcessInfo> getProcessInfoForPid(Long pid) {
+        List<ProcessInfo> processInfoList = getProcesses().stream().filter(elem ->
+                elem.getPid() == pid).collect(Collectors.toList());
+        if (processInfoList.size() == 1)
+            processInfoList.add(ProcessUtils.getProcessInfoForPid(processInfoList.get(0).getParent()).get(0));
+
+        return processInfoList;
+    }
+
+    @NotNull
+    public static List<ProcessInfo> getProcessInfoForPidAndParent(Long pid) {
+        List<ProcessInfo> processInfoList = ProcessUtils.getProcessInfoForPid(pid);
+        if (processInfoList.size() == 1)
+            processInfoList.add(ProcessUtils.getProcessInfoForPid(processInfoList.get(0).getParent()).get(0));
+
+        return processInfoList;
+    }
+
+    @NotNull
+    public static List<ProcessInfo> getProcessInfoForExec(String exec) {
         List<ProcessInfo> backgroundCmdProcessInfo = getProcesses().stream().filter(elem ->
-                elem.getPid() == pid && pid != 0L).collect(Collectors.toList());
+                elem.getName().contains(exec)).collect(Collectors.toList());
 
         return backgroundCmdProcessInfo;
     }

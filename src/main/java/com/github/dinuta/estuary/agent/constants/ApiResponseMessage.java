@@ -11,6 +11,7 @@ public class ApiResponseMessage {
         message.put(ApiResponseCode.GET_FILE_FAILURE.getCode(), "Getting file or folder from the estuary agent service failed");
         message.put(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode(), "Starting detached command with id %s failed");
         message.put(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode(), "Stopping running detached commands failed");
+        message.put(ApiResponseCode.COMMAND_DETACHED_PROCESS_DOES_NOT_EXIST.getCode(), "No process running on pid %s");
         message.put(ApiResponseCode.GET_FILE_FAILURE_IS_DIR.getCode(), "Getting %s failed. It is a directory.getCode(), not a file.");
         message.put(ApiResponseCode.GET_ENV_VAR_FAILURE.getCode(), "Getting env var %s failed.");
         message.put(ApiResponseCode.MISSING_PARAMETER_POST.getCode(), "Body parameter \"%s\" sent in request missing. Please include parameter. E.g. {\"parameter\"); \"value\"}");

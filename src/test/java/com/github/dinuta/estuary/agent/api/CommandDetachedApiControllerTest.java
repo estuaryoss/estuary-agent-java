@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.component.About;
+import com.github.dinuta.estuary.agent.component.Authentication;
 import com.github.dinuta.estuary.agent.constants.ApiResponseCode;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.constants.DateTimeConstants;
@@ -37,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import static com.github.dinuta.estuary.agent.constants.Authentication.PASSWORD;
-import static com.github.dinuta.estuary.agent.constants.Authentication.USER;
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,6 +61,9 @@ public class CommandDetachedApiControllerTest {
 
     @Autowired
     private About about;
+
+    @Autowired
+    private Authentication auth;
 
     @ParameterizedTest
     @ValueSource(
@@ -191,7 +193,7 @@ public class CommandDetachedApiControllerTest {
         String command = command1 + "\n" + command2;
         Map<String, String> headers = new HashMap<>();
 
-        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + testId,
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityJsonContentTypeAppText(command, headers),
@@ -259,7 +261,7 @@ public class CommandDetachedApiControllerTest {
         String command = "sleep 400 && echo 400";
         Map<String, String> headers = new HashMap<>();
 
-        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + testId,
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityJsonContentTypeAppText(command, headers),
@@ -311,7 +313,7 @@ public class CommandDetachedApiControllerTest {
         YamlConfig yamlConfig = objectMapper.readValue(yamlConfigString, YamlConfig.class);
         List<String> list = new YamlConfigParser().getCommandsList(yamlConfig);
 
-        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
+        ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/commanddetachedyaml/" + testId,
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityJsonContentTypeAppText(yamlConfigString, new HashMap<>()),
@@ -369,7 +371,7 @@ public class CommandDetachedApiControllerTest {
     private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionEntity() {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE, MediaType.TEXT_PLAIN.toString());
-        return this.restTemplate.withBasicAuth(USER, PASSWORD)
+        return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/commanddetached",
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
@@ -380,7 +382,7 @@ public class CommandDetachedApiControllerTest {
     private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionEntityForId(String id) {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE, MediaType.TEXT_PLAIN.toString());
-        return this.restTemplate.withBasicAuth(USER, PASSWORD)
+        return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
@@ -391,7 +393,7 @@ public class CommandDetachedApiControllerTest {
     private ResponseEntity<ApiResponse> getApiResponseEntityForId(String id) {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE, MediaType.TEXT_PLAIN.toString());
-        return this.restTemplate.withBasicAuth(USER, PASSWORD)
+        return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
@@ -401,7 +403,7 @@ public class CommandDetachedApiControllerTest {
     private ResponseEntity<ApiResponse> deleteApiResponseEntityForId(String id) {
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE, MediaType.TEXT_PLAIN.toString());
-        return this.restTemplate.withBasicAuth(USER, PASSWORD)
+        return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.DELETE,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
@@ -411,7 +413,7 @@ public class CommandDetachedApiControllerTest {
     private ResponseEntity<ApiResponse<String>> postApiResponseCommandDescriptionEntity(String command, String id) {
         Map<String, String> headers = new HashMap<>();
 
-        return this.restTemplate.withBasicAuth(USER, PASSWORD)
+        return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/commanddetached/" + id,
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),

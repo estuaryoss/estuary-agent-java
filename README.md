@@ -39,8 +39,10 @@ java -jar \
 ## Authentication
 
 - HTTP_AUTH_USER
-- HTTP_AUTH_PASSWORD These env vars will be matched against basic authentication from your HttpClient.  
-  After the authentication the user can get a cookie to communicate further with the agent.
+- HTTP_AUTH_PASSWORD
+
+These env vars will be matched against basic authentication from your HttpClient. After the authentication the user can
+get a cookie to communicate further with the agent.
 
 ## Command timeout
 

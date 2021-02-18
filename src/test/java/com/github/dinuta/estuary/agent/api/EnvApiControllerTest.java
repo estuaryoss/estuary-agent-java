@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -259,15 +260,22 @@ public class EnvApiControllerTest {
                     .exchange(SERVER_PREFIX + port + "/env",
                             HttpMethod.POST,
                             httpRequestUtils.getRequestEntityContentTypeAppJson(envVarsJson, new HashMap<>()),
-                            ApiResponse.class);
+                            new ParameterizedTypeReference<>() {
+                            });
         }
 
-        ResponseEntity responseEntity =
-                this.restTemplate.withBasicAuth(USER, PASSWORD).getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
-        ApiResponse body = (ApiResponse) responseEntity.getBody();
+        ResponseEntity<ApiResponse<Map<String, String>>> responseEntity =
+                this.restTemplate.withBasicAuth(USER, PASSWORD)
+                        .exchange(SERVER_PREFIX + port + "/env",
+                                HttpMethod.GET,
+                                httpRequestUtils.getRequestEntityContentTypeAppJson(null, new HashMap<>()),
+                                new ParameterizedTypeReference<>() {
+                                });
+
+        ApiResponse<Map<String, String>> body = responseEntity.getBody();
 
         assertThat(body.getDescription()).isInstanceOf(Map.class);
-        assertThat(((Map<String, String>) body.getDescription()).get(String.valueOf(VIRTUAL_ENV_VARS_LIMIT_SIZE))).isEqualTo(null);
+        assertThat((body.getDescription()).get(String.valueOf(VIRTUAL_ENV_VARS_LIMIT_SIZE))).isEqualTo(null);
     }
 
     @Test

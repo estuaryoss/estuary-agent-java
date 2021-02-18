@@ -22,6 +22,7 @@ import com.github.dinuta.estuary.agent.utils.ProcessUtils;
 import com.github.dinuta.estuary.agent.utils.YamlConfigParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import lombok.Cleanup;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +42,8 @@ import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import static com.github.dinuta.estuary.agent.utils.ProcessUtils.getParentProcessForDetachedCmd;
+import static com.github.dinuta.estuary.agent.utils.ProcessUtils.getProcessInfoForPid;
+import static com.github.dinuta.estuary.agent.utils.ProcessUtils.getProcessInfoForPidAndParent;
 
 @Api(tags = {"estuary-agent"})
 @RestController
@@ -75,7 +76,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         this.request = request;
     }
 
-    public ResponseEntity<ApiResponse> commandDetachedDelete(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> commandDetachedDelete() {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.NOT_IMPLEMENTED.getCode())
@@ -88,7 +89,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .build(), HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<ApiResponse> commandDetachedGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> commandDetachedGet() {
         String accept = request.getHeader("Accept");
         String testInfoFilename = stateHolder.getLastCommand();
         log.debug("Reading content from file: " + testInfoFilename);
@@ -107,7 +108,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         try (InputStream in = new FileInputStream(testInfo)) {
             commandDescription = objectMapper.readValue(IOUtils.toString(in, "UTF-8"), CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
-            commandDescription.setProcesses(ProcessUtils.getProcesses());
+            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid()));
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
@@ -124,33 +125,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .build(), HttpStatus.OK);
     }
 
-    private CommandDescription streamOutAndErr(CommandDescription commandDescription) {
-        CommandDescription finalCommandDescription = commandDescription;
-        Base64FilePath base64FilePath = new Base64FilePath();
-        Set<String> commandKeys = commandDescription.getCommands().keySet();
-        commandKeys.forEach(cmd -> {
-            String output = "";
-            String error = "";
-            try (
-                    InputStream isOut = new FileInputStream(
-                            base64FilePath.getEncodedFileNameInBase64(cmd, stateHolder.getLastCommandId(), ".out"));
-                    InputStream isErr = new FileInputStream(
-                            base64FilePath.getEncodedFileNameInBase64(cmd, stateHolder.getLastCommandId(), ".err"))
-            ) {
-                output = IOUtils.toString(isOut, "UTF-8");
-                error = IOUtils.toString(isErr, "UTF-8");
-            } catch (Exception e) {
-                log.debug(ExceptionUtils.getStackTrace(e));
-            }
-
-            finalCommandDescription.getCommands().get(cmd).getDetails().setOut(output);
-            finalCommandDescription.getCommands().get(cmd).getDetails().setErr(error);
-        });
-
-        return finalCommandDescription;
-    }
-
-    public ResponseEntity<ApiResponse> commandDetachedIdGet(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> commandDetachedIdGet(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id) {
         String accept = request.getHeader("Accept");
         String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
         log.debug("Reading content from file: " + testInfoFilename);
@@ -160,7 +135,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             String fileContent = IOUtils.toString(is, "UTF-8");
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
-            commandDescription.setProcesses(ProcessUtils.getProcesses());
+            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid()));
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
@@ -177,13 +152,31 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id) {
         String accept = request.getHeader("Accept");
 
+        String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
+        log.debug("Reading content from file: " + testInfoFilename);
+
+        CommandDescription commandDescription;
+        try (InputStream is = new FileInputStream(testInfoFilename)) {
+            String fileContent = IOUtils.toString(is, "UTF-8");
+            commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
+            commandDescription = streamOutAndErr(commandDescription);
+        } catch (IOException e) {
+            throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+        }
+
         try {
-            ProcessInfo parentProcessInfo = getParentProcessForDetachedCmd(id);
-            List<ProcessHandle> children = parentProcessInfo.getChildren();
-            ProcessUtils.killProcess(parentProcessInfo);
+            List<ProcessInfo> processInfoList = getProcessInfoForPid(commandDescription.getPid());
+            if (processInfoList.size() == 0) {
+                throw new ApiException(ApiResponseCode.COMMAND_DETACHED_PROCESS_DOES_NOT_EXIST.getCode(),
+                        String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_PROCESS_DOES_NOT_EXIST.getCode()),
+                                String.valueOf(commandDescription.getPid())));
+            }
+            List<ProcessHandle> children = processInfoList.get(0).getChildren();
+            ProcessUtils.killProcess(processInfoList.get(0));
             if (children != null) ProcessUtils.killChildrenProcesses(children);
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode(),
@@ -207,7 +200,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandDetachedIdPost(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> commandDetachedIdPost(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String commandContent) {
         String accept = request.getHeader("Accept");
         File testInfo = new File(String.format(stateHolder.getLastCommandFormat(), id));
         CommandDescription commandDescription = CommandDescription.builder()
@@ -252,7 +245,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .build(), HttpStatus.ACCEPTED);
     }
 
-    public ResponseEntity<ApiResponse> commandDetachedIdPostYaml(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other in yaml format.", required = true) @Valid @RequestBody String commandContent, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> commandDetachedIdPostYaml(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other in yaml format.", required = true) @Valid @RequestBody String commandContent) {
         String accept = request.getHeader("Accept");
         List<String> commandsList;
         File testInfo = new File(String.format(stateHolder.getLastCommandFormat(), id));
@@ -274,7 +267,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         String commandsStripped = commandContent.replace("\r\n", "\n").strip();
         try {
             yamlConfig = mapper.readValue(commandsStripped, YamlConfig.class);
-            apiResponse = envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()), token);
+            apiResponse = envApiController.envPost(objectMapper.writeValueAsString(yamlConfig.getEnv()));
             yamlConfig.setEnv((Map<String, String>) apiResponse.getBody().getDescription());
             commandsList = new YamlConfigParser().getCommandsList(yamlConfig).stream()
                     .map(elem -> elem.strip()).collect(Collectors.toList());
@@ -312,10 +305,35 @@ public class CommandDetachedApiController implements CommandDetachedApi {
                 .build(), HttpStatus.OK);
     }
 
+    private CommandDescription streamOutAndErr(CommandDescription commandDescription) {
+        CommandDescription finalCommandDescription = commandDescription;
+        Base64FilePath base64FilePath = new Base64FilePath();
+        Set<String> commandKeys = commandDescription.getCommands().keySet();
+        commandKeys.forEach(cmd -> {
+            String output = "";
+            String error = "";
+            try (
+                    InputStream isOut = new FileInputStream(
+                            base64FilePath.getEncodedFileNameInBase64(cmd, stateHolder.getLastCommandId(), ".out"));
+                    InputStream isErr = new FileInputStream(
+                            base64FilePath.getEncodedFileNameInBase64(cmd, stateHolder.getLastCommandId(), ".err"))
+            ) {
+                output = IOUtils.toString(isOut, "UTF-8");
+                error = IOUtils.toString(isErr, "UTF-8");
+            } catch (Exception e) {
+                log.debug(ExceptionUtils.getStackTrace(e));
+            }
+
+            finalCommandDescription.getCommands().get(cmd).getDetails().setOut(output);
+            finalCommandDescription.getCommands().get(cmd).getDetails().setErr(error);
+        });
+
+        return finalCommandDescription;
+    }
+
     private void writeContentInFile(File testInfo, CommandDescription commandDescription) throws IOException {
-        FileWriter fileWriter = new FileWriter(testInfo);
+        @Cleanup FileWriter fileWriter = new FileWriter(testInfo);
         fileWriter.write(objectMapper.writeValueAsString(commandDescription));
         fileWriter.flush();
-        fileWriter.close();
     }
 }

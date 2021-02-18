@@ -48,7 +48,7 @@ public class FileApiController implements FileApi {
         this.request = request;
     }
 
-    public ResponseEntity<? extends Object> fileGet(@ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token, @ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<? extends Object> fileGet(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
         String headerName = "File-Path";
 
@@ -70,7 +70,7 @@ public class FileApiController implements FileApi {
                 .body(resource);
     }
 
-    public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
+    public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
         String headerName = "File-Path";
 
@@ -98,8 +98,8 @@ public class FileApiController implements FileApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> filePost(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath, @ApiParam(value = "") @RequestHeader(value = "Token", required = false) String token) {
-        return filePut(content, filePath, token);
+    public ResponseEntity<ApiResponse> filePost(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
+        return filePut(content, filePath);
     }
 
 }

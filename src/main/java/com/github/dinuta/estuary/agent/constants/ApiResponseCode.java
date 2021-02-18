@@ -21,6 +21,7 @@ public enum ApiResponseCode {
     INVALID_JSON_PAYLOAD(1018),
     NOT_IMPLEMENTED(1019),
     INVALID_YAML_CONFIG(1020),
+    COMMAND_DETACHED_PROCESS_DOES_NOT_EXIST(1021),
     GENERAL(1100);
 
     private final int code;

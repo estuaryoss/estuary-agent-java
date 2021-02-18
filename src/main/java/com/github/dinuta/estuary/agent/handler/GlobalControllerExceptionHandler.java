@@ -33,7 +33,7 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
     @Autowired
     private About about;
 
-    @ExceptionHandler({ApiException.class})
+    @ExceptionHandler({Exception.class})
     public ResponseEntity<ApiResponse> handleException(ApiException e, HttpServletRequest request) {
         log.error("Exception: " + ExceptionUtils.getStackTrace(e));
         return new ResponseEntity<>(ApiResponse.builder()

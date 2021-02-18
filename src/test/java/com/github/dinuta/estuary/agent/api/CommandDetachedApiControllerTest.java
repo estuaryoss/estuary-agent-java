@@ -143,7 +143,7 @@ public class CommandDetachedApiControllerTest {
 
         Thread.sleep(1000);
         ApiResponse<CommandDescription> body1 = getApiResponseCommandDescriptionEntityForId(id).getBody();
-        Thread.sleep(2000);
+        Thread.sleep(3000);
         ApiResponse<CommandDescription> body2 = getApiResponseCommandDescriptionEntityForId(id).getBody();
 
         assertThat(body1.getDescription().getId()).isEqualTo(id);
@@ -244,9 +244,13 @@ public class CommandDetachedApiControllerTest {
         ResponseEntity<ApiResponse> response = deleteApiResponseEntityForId(id);
 
         ApiResponse body = response.getBody();
-        assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
-        assertThat(body.getDescription().toString()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
+        assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode());
+        assertThat(body.getMessage().toString()).isEqualTo(
+                ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+
+        assertThat(body.getDescription().toString()).contains(
+                ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
     }
 
     @Test

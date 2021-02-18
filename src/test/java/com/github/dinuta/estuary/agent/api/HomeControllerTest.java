@@ -1,5 +1,6 @@
 package com.github.dinuta.estuary.agent.api;
 
+import com.github.dinuta.estuary.agent.component.Authentication;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Map;
 
-import static com.github.dinuta.estuary.agent.constants.Authentication.PASSWORD;
-import static com.github.dinuta.estuary.agent.constants.Authentication.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,9 +26,12 @@ public class HomeControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private Authentication auth;
+
     @Test
     public void whenCallingRootUrlThenInformationIsFound() {
-        ResponseEntity<String> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
+        ResponseEntity<String> responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .getForEntity(SERVER_PREFIX + port + "/",
                         String.class);
 
@@ -38,7 +40,7 @@ public class HomeControllerTest {
 
     @Test
     public void whenCallingSwaggerUiThenInformationIsRetrivedOk() {
-        ResponseEntity<String> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
+        ResponseEntity<String> responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .getForEntity(SERVER_PREFIX + port + "/swagger-ui/",
                         String.class);
 
@@ -51,7 +53,7 @@ public class HomeControllerTest {
 
     @Test
     public void whenCallingApiDocsThenInformationIsRetrivedOk() {
-        ResponseEntity<Map> responseEntity = this.restTemplate.withBasicAuth(USER, PASSWORD)
+        ResponseEntity<Map> responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .getForEntity(SERVER_PREFIX + port + "/apidocs", Map.class);
         Map body = responseEntity.getBody();
 

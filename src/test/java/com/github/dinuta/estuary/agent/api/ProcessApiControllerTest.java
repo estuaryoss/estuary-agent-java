@@ -2,6 +2,7 @@ package com.github.dinuta.estuary.agent.api;
 
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.component.About;
+import com.github.dinuta.estuary.agent.component.Authentication;
 import com.github.dinuta.estuary.agent.model.ProcessInfo;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
 import org.assertj.core.api.Assertions;
@@ -18,9 +19,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static com.github.dinuta.estuary.agent.constants.Authentication.PASSWORD;
-import static com.github.dinuta.estuary.agent.constants.Authentication.USER;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
@@ -39,9 +37,12 @@ public class ProcessApiControllerTest {
     @Autowired
     private HttpRequestUtils httpRequestUtils;
 
+    @Autowired
+    private Authentication auth;
+
     @Test
     public void whenGettingAllTheProcesses_ThenTheListIsNotEmpty() {
-        ResponseEntity<ApiResponse<ArrayList<ProcessInfo>>> response = this.restTemplate.withBasicAuth(USER, PASSWORD)
+        ResponseEntity<ApiResponse<ArrayList<ProcessInfo>>> response = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/processes",
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, new HashMap<>()),
@@ -55,7 +56,7 @@ public class ProcessApiControllerTest {
     @Test
     public void whenGettingTheProcessesForExec_ThenTheListIsNotEmpty() {
         final String EXEC = "java";
-        ResponseEntity<ApiResponse<ArrayList<ProcessInfo>>> response = this.restTemplate.withBasicAuth(USER, PASSWORD)
+        ResponseEntity<ApiResponse<ArrayList<ProcessInfo>>> response = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/processes/" + EXEC,
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, new HashMap<>()),

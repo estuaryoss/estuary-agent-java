@@ -2,6 +2,7 @@ package com.github.dinuta.estuary.agent.api;
 
 import com.github.dinuta.estuary.agent.api.utils.HttpRequestUtils;
 import com.github.dinuta.estuary.agent.component.About;
+import com.github.dinuta.estuary.agent.component.Authentication;
 import com.github.dinuta.estuary.agent.constants.ApiResponseCode;
 import com.github.dinuta.estuary.agent.constants.ApiResponseMessage;
 import com.github.dinuta.estuary.agent.model.api.ApiResponse;
@@ -20,8 +21,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.dinuta.estuary.agent.constants.Authentication.PASSWORD;
-import static com.github.dinuta.estuary.agent.constants.Authentication.USER;
 import static com.github.dinuta.estuary.agent.constants.DateTimeConstants.PATTERN;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,12 +41,15 @@ public class AuthTest {
     @Autowired
     private About about;
 
+    @Autowired
+    private Authentication auth;
+
     @Test
-    public void whenCallingWithValidCredentialsThenInformationIsRetrivedOk() {
+    public void whenCallingWithValidCredentials_ThenInformationIsRetrivedOk() {
         Map<String, String> headers = new HashMap<>();
 
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.withBasicAuth(USER, PASSWORD)
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                         .exchange(SERVER_PREFIX + port + "/about",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
@@ -65,11 +67,11 @@ public class AuthTest {
     }
 
     @Test
-    public void whenCallingWithInvalidPasswordThenNotAuthorized() {
+    public void whenCallingWithInvalidPassword_ThenNotAuthorized() {
         Map<String, String> headers = new HashMap<>();
 
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.withBasicAuth(USER, "whatever_invalid")
+                this.restTemplate.withBasicAuth(auth.getUser(), "whatever_invalid")
                         .exchange(SERVER_PREFIX + port + "/about",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
@@ -79,11 +81,11 @@ public class AuthTest {
     }
 
     @Test
-    public void whenCallingWithInvalidUserThenNotAuthorized() {
+    public void whenCallingWithInvalidUser_ThenNotAuthorized() {
         Map<String, String> headers = new HashMap<>();
 
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.withBasicAuth("invalid", PASSWORD)
+                this.restTemplate.withBasicAuth("invalid", auth.getPassword())
                         .exchange(SERVER_PREFIX + port + "/about",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),

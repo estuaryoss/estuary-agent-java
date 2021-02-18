@@ -11,32 +11,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProcessUtilsTest {
     @Test
     public void whenGettingTheSystemProcesses_ThenTheListIsGreaterThanZero() {
-        List<ProcessInfo> processUtils = ProcessUtils.getProcesses();
+        List<ProcessInfo> processInfoList = ProcessUtils.getProcesses();
 
-        assertThat(processUtils.size()).isGreaterThan(0);
+        assertThat(processInfoList.size()).isGreaterThan(0);
     }
 
 
     @Test
     public void whenGettingTheSystemProcessesForPid_ThenTheListIsOne() {
-        List<ProcessInfo> processUtils = ProcessUtils.getProcessInfoForPid(
-                ProcessUtils.getProcesses().get(0).getPid());
+        List<ProcessInfo> processList = ProcessUtils.getProcesses();
+        assertThat(processList.size()).isGreaterThan(0);
 
-        assertThat(processUtils.size()).isEqualTo(1);
+        List<ProcessInfo> processesPid = ProcessUtils.getProcessInfoForPid(processList.get(0).getPid());
+
+        assertThat(processesPid.size()).isEqualTo(1);
     }
 
     @Test
     public void whenGettingTheSystemProcessesForInvalidPid_ThenTheListIsOne() {
-        List<ProcessInfo> processUtils = ProcessUtils.getProcessInfoForPid(-999L);
+        List<ProcessInfo> processInfoList = ProcessUtils.getProcessInfoForPid(-999L);
 
-        assertThat(processUtils.size()).isEqualTo(0);
+        assertThat(processInfoList.size()).isEqualTo(0);
     }
 
     @Test
     public void whenGettingTheSystemProcessesForExec_ThenTheListIsGreaterThanZero() {
-        List<ProcessInfo> processUtils = ProcessUtils.getProcessInfoForExec("java");
+        List<ProcessInfo> processInfoList = ProcessUtils.getProcessInfoForExec("java");
 
-        assertThat(processUtils.size()).isGreaterThan(0);
+        assertThat(processInfoList.size()).isGreaterThan(0);
     }
 
     @Test

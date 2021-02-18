@@ -57,8 +57,6 @@ public class ProcessUtils {
     public static List<ProcessInfo> getProcessInfoForPid(Long pid) {
         List<ProcessInfo> processInfoList = getProcesses().stream().filter(elem ->
                 elem.getPid() == pid).collect(Collectors.toList());
-        if (processInfoList.size() == 1)
-            processInfoList.add(ProcessUtils.getProcessInfoForPid(processInfoList.get(0).getParent()).get(0));
 
         return processInfoList;
     }

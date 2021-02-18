@@ -246,7 +246,10 @@ public class CommandDetachedApiControllerTest {
         ApiResponse body = response.getBody();
         assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode());
-        assertThat(body.getDescription().toString()).isEqualTo(
+        assertThat(body.getMessage().toString()).isEqualTo(
+                ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+
+        assertThat(body.getDescription().toString()).contains(
                 ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
     }
 

@@ -38,11 +38,20 @@ java -jar \
 
 ## Authentication
 
+### Method 1 - Spring security
+
 - HTTP_AUTH_USER
 - HTTP_AUTH_PASSWORD
 
-These env vars will be matched against basic authentication from your HttpClient. After the authentication the user can
-get a cookie to communicate further with the agent.
+These env vars will be matched against basic authentication from your HttpClient.  
+After user auth, set the received cookie (JSESSIONID) to communicate further with the agent.  
+The same settings can be set through application properties: **app.user** & **app.password**.  
+The env vars precedence is higher than the one set through the application properties.
+
+### Method 2 - Token auth - No spring-security
+
+- HTTP_AUTH_TOKEN -> This env var sets the auth token for the service. Will be matched with the header 'Token'  
+  Note: The profile to be used is 'test'.
 
 ## Command timeout
 

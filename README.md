@@ -60,8 +60,8 @@ The env vars precedence is higher than the one set through the application prope
 ## Enable HTTPS
 
 Set **HTTPS_ENABLE** env var option to *true* or *false*.    
-Set the certificate path (is relative!) with **HTTPS_CERT** and **HTTPS_KEYSTORE_PASSWORD** env variables. E.g.
-HTTPS_CERT=file:https/cert.p12  
+Set the certificate path (is relative!) with **HTTPS_KEYSTORE** and **HTTPS_KEYSTORE_PASSWORD** env variables. E.g.
+HTTPS_KEYSTORE=file:https/keystore.p12  
 If you do not set cert and keystore password env vars, it uses the ones from default *application.properties* in the
 resource folder.
 

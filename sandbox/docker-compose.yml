@@ -1,0 +1,44 @@
+version: '2'
+services:
+  eureka:
+    image: dinutac/netflixoss-eureka:latest
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+
+  estuary-discovery:
+    hostname: estuary-discovery
+    image: dinutac/estuary-discovery:latest
+    command: bash -c "sleep 25 && /scripts/main_flask.py"
+    environment:
+      FLUENTD_IP_PORT: fluentd:24224
+      EUREKA_SERVER: http://eureka:8080/eureka/v2
+      APP_IP_PORT: 192.168.0.11:8081
+    expose:
+      - "8080"
+    ports:
+      - "8081:8080"
+
+
+  estuary-agent-java:
+    hostname: estuary-agent-java
+    image: dinutac/estuary-agent-java:latest
+    entrypoint: bash -c "sleep 30 && java -jar /app/agent-exec.jar --eureka.client.enabled=true"
+    environment:
+      spring_profiles_active: test
+      FLUENTD_IP_PORT: fluentd:24224
+      EUREKA_SERVER: http://eureka:8080/eureka/v2
+      APP_IP: 192.168.0.11
+      PORT: 8082 # <--
+      HTTP_AUTH_TOKEN: None
+    ports:
+      - "8082:8082"
+
+  fluentd:
+    build: ./fluentd
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"

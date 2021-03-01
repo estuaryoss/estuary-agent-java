@@ -1,21 +1,61 @@
 <h1 align="center"><img src="./docs/images/banner_agent.png" alt="Estuary Agent"></h1>  
 
-Support project: <a href="https://paypal.me/catalindinuta?locale.x=en_US"><img src="https://lh3.googleusercontent.com/Y2_nyEd0zJftXnlhQrWoweEvAy4RzbpDah_65JGQDKo9zCcBxHVpajYgXWFZcXdKS_o=s180-rw" height="40" width="40" align="center"></a>   
-
 # About
-Agent written in Java (SpringBoot) as part of **estuary** stack. 
 
-The advantage of this implementation is that java libraries can be integrated within, rather than executing the logic through cli commands pointing to a main class in a jar, as per the original python implementation.
+The agent is written in Java (SpringBoot), and it executes low-level commands.
+
+It enables any use case which implies system commands:
+
+- Controlling and configuring the machines (via REST API)
+- Exposing CLI applications via REST API
+- Testing support by enabling SUT control and automation framework control
+- IoT
+- Home control integrations
+
+It supports command execution having several modes:
+
+- Commands executed sequentially
+- Commands executed in parallel
+- Commands executed in background
+- Commands executed synchronously
+
+With the help of the agent the user can also do IO operations:
+
+- File upload and download (binary / text)
+- Folder download (as zip archive)
+
+This code acts both as a microservice as well as a library:
+
+a) Standalone microservice jar with the
+extension: [exec.jar](https://search.maven.org/artifact/com.github.estuaryoss/agent/4.2.0/jar)
+
+```bash
+java -jar agent-4.2.0-exec.jar
+```
+
+b) Library as a Maven dependency:
+
+```xml
+
+<dependency>
+    <groupId>com.github.estuaryoss</groupId>
+    <artifactId>agent</artifactId>
+    <version>4.2.0</version>
+</dependency>
+```
 
 ## Artifact
+
 ![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/com.github.estuaryoss/agent/4.2.0)
 ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.github.estuaryoss/agent?server=https%3A%2F%2Fs01.oss.sonatype.org)
 
 ## Build status
-[![CircleCI](https://circleci.com/gh/estuaryoss/estuary-agent-java.svg?style=svg&circle-token=2036f4d0e07fadce8101e00e790970fcfb43e03f)](https://circleci.com/gh/dinuta/estuary-agent-java)
+
+[![CircleCI](https://circleci.com/gh/estuaryoss/estuary-agent-java.svg?style=svg&circle-token=2036f4d0e07fadce8101e00e790970fcfb43e03f)](https://circleci.com/gh/estuaryoss/estuary-agent-java)
 
 ## Code quality
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/20bec8d5bf1b4197b6447b9f926c32ad)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=estuaryoss/estuary-agent-java&amp;utm_campaign=Badge_Grade)
+
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/20bec8d5bf1b4197b6447b9f926c32ad)](https://www.codacy.com/gh/estuaryoss/estuary-agent-java/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=estuaryoss/estuary-agent-java&amp;utm_campaign=Badge_Grade)
 [![Maintainability](https://api.codeclimate.com/v1/badges/cb9958e3b834d93cb082/maintainability)](https://codeclimate.com/repos/5f6783d35aa6290178006578/maintainability)
 
 ## Eureka client registration
@@ -161,3 +201,6 @@ To use a snapshot version, set the s01.oss.sonatype.org repo in settings.xml:
     <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
 </repository>
 ```
+
+Support
+project: <a href="https://paypal.me/catalindinuta?locale.x=en_US"><img src="https://lh3.googleusercontent.com/Y2_nyEd0zJftXnlhQrWoweEvAy4RzbpDah_65JGQDKo9zCcBxHVpajYgXWFZcXdKS_o=s180-rw" height="40" width="40" align="center"></a>   

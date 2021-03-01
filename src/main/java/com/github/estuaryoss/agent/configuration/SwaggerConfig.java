@@ -32,7 +32,7 @@ public class SwaggerConfig {
     public Docket customImplementation() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.github.dinuta.estuary.agent.api"))
+                .apis(RequestHandlerSelectors.basePackage("com.github.estuaryoss.agent.api"))
                 .build()
                 .apiInfo(apiInfo());
     }

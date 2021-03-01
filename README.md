@@ -58,12 +58,19 @@ b) Library as a Maven dependency:
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/20bec8d5bf1b4197b6447b9f926c32ad)](https://www.codacy.com/gh/estuaryoss/estuary-agent-java/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=estuaryoss/estuary-agent-java&amp;utm_campaign=Badge_Grade)
 [![Maintainability](https://api.codeclimate.com/v1/badges/cb9958e3b834d93cb082/maintainability)](https://codeclimate.com/repos/5f6783d35aa6290178006578/maintainability)
 
-## Eureka client registration
-Set the following env vars:  
--   APP_IP -> the ip which this service binds to
--   PORT  -> the port which this service binds to
+## Postman collection
 
-Example:  
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/4ec667d46953db653784)
+
+## Eureka client registration
+
+Set the following env vars:
+
+- APP_IP -> the ip which this service binds to
+- PORT -> the port which this service binds to
+
+Example:
+
  ```bash
 export APP_IP=192.168.0.4
 export PORT=8081

@@ -8,8 +8,8 @@ Agent written in Java (SpringBoot) as part of **estuary** stack.
 The advantage of this implementation is that java libraries can be integrated within, rather than executing the logic through cli commands pointing to a main class in a jar, as per the original python implementation.
 
 ## Artifact
-![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/com.github.dinuta.estuary/agent/4.0.8)
-![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.github.dinuta.estuary/agent?server=https%3A%2F%2Foss.sonatype.org)
+![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/com.github.estuaryoss/agent/4.2.0)
+![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.github.estuaryoss/agent?server=https%3A%2F%2Fs01.oss.sonatype.org)
 
 ## Build status
 [![CircleCI](https://circleci.com/gh/estuaryoss/estuary-agent-java.svg?style=svg&circle-token=2036f4d0e07fadce8101e00e790970fcfb43e03f)](https://circleci.com/gh/dinuta/estuary-agent-java)
@@ -75,10 +75,6 @@ There are two ways to inject user defined environment variables.
 
 *! All environment variables described above can also be set using **environment.properties**. However, the vars set through **application.yml** can't be set: PORT, APP_IP, EUREKA_SERVER.*
 
-## More information
-This service acts with small differences as the original [python implementation](https://github.com/dinuta/estuary-agent).  
-All the documentation should be matched, minus some differences in terms how this service registers to eureka.
-
 ## Example output
 curl -X POST -d 'ls -lrt' http://localhost:8080/command
 
@@ -136,7 +132,7 @@ Change default port value in application.properties
 Get this dependency:
 ```xml
 <dependency>
-    <groupId>com.github.dinuta.estuary</groupId>
+    <groupId>com.github.estuaryoss</groupId>
     <artifactId>agent</artifactId>
     <version>4.0.8</version>
 </dependency>
@@ -144,12 +140,13 @@ Get this dependency:
 ## Maven devendency snapshot
 ```xml
 <dependency>
-    <groupId>com.github.dinuta.estuary</groupId>
+    <groupId>com.github.estuaryoss</groupId>
   <artifactId>agent</artifactId>
   <version>4.2.0-SNAPSHOT</version>
 </dependency>
 ```
-To use a snapshot version, set the oss.sonatype.org repo in settings.xml:
+
+To use a snapshot version, set the s01.oss.sonatype.org repo in settings.xml:
 ```xml
 <repository>
     <id>snaphosts4</id>
@@ -161,6 +158,6 @@ To use a snapshot version, set the oss.sonatype.org repo in settings.xml:
         <updatePolicy>always</updatePolicy>
     </releases>
     <name>all-external8</name>
-    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
 </repository>
 ```

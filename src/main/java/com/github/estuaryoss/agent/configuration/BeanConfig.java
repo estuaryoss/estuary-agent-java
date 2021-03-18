@@ -1,7 +1,7 @@
 package com.github.estuaryoss.agent.configuration;
 
 import com.github.estuaryoss.agent.component.About;
-import com.github.estuaryoss.agent.model.StateHolder;
+import com.github.estuaryoss.agent.model.BackgroundStateHolder;
 import com.github.estuaryoss.agent.model.api.CommandParallel;
 import com.github.estuaryoss.agent.service.FluentdService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public StateHolder getStateHolder() {
-        return new StateHolder();
+    public BackgroundStateHolder getStateHolder() {
+        return new BackgroundStateHolder();
     }
 
     @Bean

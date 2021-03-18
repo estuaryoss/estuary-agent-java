@@ -1,6 +1,7 @@
 package com.github.estuaryoss.agent.utils;
 
 import com.github.estuaryoss.agent.model.ProcessInfo;
+import com.github.estuaryoss.agent.model.ProcessState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.process.PidProcess;
@@ -45,6 +46,7 @@ public class ProcessUtils {
                     .pid(p.pid())
                     .username(p.info().user().orElse(""))
                     .parent(parent)
+                    .children(p.children().collect(Collectors.toList()))
                     .arguments(arguments);
 
             customProcessInfoList.add(processInfo);
@@ -99,7 +101,7 @@ public class ProcessUtils {
 
         log.debug("Process PID " + (int) processInfo.getPid() + " is alive: " + process.isAlive());
         if (process.isAlive() && (int) processInfo.getPid() != 0)
-            ProcessUtil.destroyGracefullyOrForcefullyAndWait(process, 5, TimeUnit.SECONDS, 10, TimeUnit.SECONDS);
+            ProcessUtil.destroyGracefullyOrForcefullyAndWait(process, 2, TimeUnit.SECONDS, 3, TimeUnit.SECONDS);
         log.debug("Process PID " + (int) processInfo.getPid() + " is alive: " + process.isAlive());
     }
 
@@ -108,7 +110,16 @@ public class ProcessUtils {
 
         log.debug("Process PID " + (int) processHandle.pid() + " is alive: " + process.isAlive());
         if (process.isAlive() && (int) processHandle.pid() != 0)
-            ProcessUtil.destroyGracefullyOrForcefullyAndWait(process, 5, TimeUnit.SECONDS, 10, TimeUnit.SECONDS);
+            ProcessUtil.destroyGracefullyOrForcefullyAndWait(process, 2, TimeUnit.SECONDS, 3, TimeUnit.SECONDS);
         log.debug("Process PID " + (int) processHandle.pid() + " is alive: " + process.isAlive());
+    }
+
+    public static void killProcessAndChildren(ProcessState processState) throws InterruptedException, TimeoutException, IOException {
+        @NotNull List<ProcessInfo> processInfoList = getProcessInfoForPid(processState.getProcess().pid());
+        List<ProcessHandle> children = processInfoList.get(0).getChildren();
+        if (children != null) {
+            ProcessUtils.killChildrenProcesses(children);
+        }
+        ProcessUtils.killProcess(processInfoList.get(0));
     }
 }

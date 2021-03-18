@@ -177,8 +177,8 @@ public class CommandDetachedApiControllerTest {
         ApiResponse body1 = getApiResponseEntityForId(id + "invalid").getBody();
 
         assertThat(body1.getDescription().toString()).contains("Exception");
-        assertThat(body1.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
-        assertThat(body1.getCode()).isEqualTo(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode());
+        assertThat(body1.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode()));
+        assertThat(body1.getCode()).isEqualTo(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode());
     }
 
     @Test
@@ -247,12 +247,12 @@ public class CommandDetachedApiControllerTest {
 
         ApiResponse body = response.getBody();
         assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode());
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode());
         assertThat(body.getMessage().toString()).isEqualTo(
-                ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+                ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode()));
 
         assertThat(body.getDescription().toString()).contains(
-                ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+                ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode()));
     }
 
     @Test

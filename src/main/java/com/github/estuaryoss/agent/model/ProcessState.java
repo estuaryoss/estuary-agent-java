@@ -5,6 +5,7 @@ import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.Future;
 
 public class ProcessState {
@@ -68,5 +69,10 @@ public class ProcessState {
 
     public void setErrOutputStream(ByteArrayOutputStream errOutputStream) {
         this.errOutputStream = errOutputStream;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startedProcess, process);
     }
 }

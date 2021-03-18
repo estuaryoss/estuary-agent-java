@@ -108,7 +108,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         try (InputStream in = new FileInputStream(testInfo)) {
             commandDescription = objectMapper.readValue(IOUtils.toString(in, "UTF-8"), CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
-            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid()));
+            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid(), false));
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode()));
@@ -135,7 +135,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             String fileContent = IOUtils.toString(is, "UTF-8");
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
-            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid()));
+            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid(), false));
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode()));
@@ -169,7 +169,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
         }
 
         try {
-            List<ProcessInfo> processInfoList = getProcessInfoForPid(commandDescription.getPid());
+            List<ProcessInfo> processInfoList = getProcessInfoForPid(commandDescription.getPid(), false);
             if (processInfoList.size() == 0) {
                 throw new ApiException(ApiResponseCode.COMMAND_PROCESS_DOES_NOT_EXIST.getCode(),
                         String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_PROCESS_DOES_NOT_EXIST.getCode()),

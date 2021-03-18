@@ -48,7 +48,7 @@ public class ProcessApiController implements ProcessApi {
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(ProcessUtils.getProcesses())
+                .description(ProcessUtils.getProcesses(false))
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

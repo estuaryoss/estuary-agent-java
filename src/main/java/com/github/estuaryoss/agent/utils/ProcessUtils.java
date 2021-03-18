@@ -23,7 +23,7 @@ public class ProcessUtils {
     private static String EXEC = "runcmd";
 
 
-    public static List<ProcessInfo> getProcesses() {
+    public static List<ProcessInfo> getProcesses(boolean addChildren) {
         List customProcessInfoList = new ArrayList();
         ProcessHandle.allProcesses().forEach(p -> {
             long parent = -1L;
@@ -46,8 +46,9 @@ public class ProcessUtils {
                     .pid(p.pid())
                     .username(p.info().user().orElse(""))
                     .parent(parent)
-                    .children(p.children().collect(Collectors.toList()))
                     .arguments(arguments);
+
+            if (addChildren) processInfo.setChildren(p.children().collect(Collectors.toList()));
 
             customProcessInfoList.add(processInfo);
         });
@@ -56,25 +57,25 @@ public class ProcessUtils {
     }
 
     @NotNull
-    public static List<ProcessInfo> getProcessInfoForPid(Long pid) {
-        List<ProcessInfo> processInfoList = getProcesses().stream().filter(elem ->
+    public static List<ProcessInfo> getProcessInfoForPid(Long pid, boolean addChildren) {
+        List<ProcessInfo> processInfoList = getProcesses(addChildren).stream().filter(elem ->
                 elem.getPid() == pid).collect(Collectors.toList());
 
         return processInfoList;
     }
 
     @NotNull
-    public static List<ProcessInfo> getProcessInfoForPidAndParent(Long pid) {
-        List<ProcessInfo> processInfoList = ProcessUtils.getProcessInfoForPid(pid);
+    public static List<ProcessInfo> getProcessInfoForPidAndParent(Long pid, boolean addChildren) {
+        List<ProcessInfo> processInfoList = ProcessUtils.getProcessInfoForPid(pid, addChildren);
         if (processInfoList.size() == 1)
-            processInfoList.add(ProcessUtils.getProcessInfoForPid(processInfoList.get(0).getParent()).get(0));
+            processInfoList.add(ProcessUtils.getProcessInfoForPid(processInfoList.get(0).getParent(), addChildren).get(0));
 
         return processInfoList;
     }
 
     @NotNull
     public static List<ProcessInfo> getProcessInfoForExec(String exec) {
-        List<ProcessInfo> backgroundCmdProcessInfo = getProcesses().stream().filter(elem ->
+        List<ProcessInfo> backgroundCmdProcessInfo = getProcesses(false).stream().filter(elem ->
                 elem.getName().contains(exec)).collect(Collectors.toList());
 
         return backgroundCmdProcessInfo;
@@ -115,7 +116,7 @@ public class ProcessUtils {
     }
 
     public static void killProcessAndChildren(ProcessState processState) throws InterruptedException, TimeoutException, IOException {
-        @NotNull List<ProcessInfo> processInfoList = getProcessInfoForPid(processState.getProcess().pid());
+        @NotNull List<ProcessInfo> processInfoList = getProcessInfoForPid(processState.getProcess().pid(), true);
         List<ProcessHandle> children = processInfoList.get(0).getChildren();
         if (children != null) {
             ProcessUtils.killChildrenProcesses(children);

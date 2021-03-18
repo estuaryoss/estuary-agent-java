@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProcessUtilsTest {
     @Test
     public void whenGettingTheSystemProcesses_ThenTheListIsGreaterThanZero() {
-        List<ProcessInfo> processInfoList = ProcessUtils.getProcesses();
+        List<ProcessInfo> processInfoList = ProcessUtils.getProcesses(true);
 
         assertThat(processInfoList.size()).isGreaterThan(0);
     }
@@ -19,17 +19,17 @@ public class ProcessUtilsTest {
 
     @Test
     public void whenGettingTheSystemProcessesForPid_ThenTheListIsOne() {
-        List<ProcessInfo> processList = ProcessUtils.getProcesses();
+        List<ProcessInfo> processList = ProcessUtils.getProcesses(true);
         assertThat(processList.size()).isGreaterThan(0);
 
-        List<ProcessInfo> processesPid = ProcessUtils.getProcessInfoForPid(processList.get(0).getPid());
+        List<ProcessInfo> processesPid = ProcessUtils.getProcessInfoForPid(processList.get(0).getPid(), true);
 
         assertThat(processesPid.size()).isEqualTo(1);
     }
 
     @Test
     public void whenGettingTheSystemProcessesForInvalidPid_ThenTheListIsOne() {
-        List<ProcessInfo> processInfoList = ProcessUtils.getProcessInfoForPid(-999L);
+        List<ProcessInfo> processInfoList = ProcessUtils.getProcessInfoForPid(-999L, true);
 
         assertThat(processInfoList.size()).isEqualTo(0);
     }

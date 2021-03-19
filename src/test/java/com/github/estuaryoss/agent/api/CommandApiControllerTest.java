@@ -69,7 +69,7 @@ public class CommandApiControllerTest {
             }
     )
     public void whenSendingCorrectCommandsThenApiReturnsZeroExitCode(String commandInfo) {
-        ResponseEntity<ApiResponse<CommandDescription>> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo.split(";")[0]);
+        ResponseEntity<ApiResponse<CommandDescription>> responseEntity = postCommand(commandInfo.split(";")[0]);
 
         ApiResponse<CommandDescription> body = responseEntity.getBody();
 
@@ -83,6 +83,12 @@ public class CommandApiControllerTest {
         assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+
+        ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
+
+        body = responseEntityMap.getBody();
+        assertThat(((Map) body.getDescription()).size()).isEqualTo(0);
     }
 
     @Test
@@ -91,7 +97,7 @@ public class CommandApiControllerTest {
         float timeout = 3f;
         String command = "sleep " + sleep;
         ResponseEntity<ApiResponse<CommandDescription>> responseEntity =
-                getApiResponseCommandDescriptionResponseEntity(command);
+                postCommand(command);
 
         ApiResponse<CommandDescription> body = responseEntity.getBody();
 
@@ -122,7 +128,7 @@ public class CommandApiControllerTest {
         String command2 = "sleep " + sleep2;
         String command = command1 + "\n" + command2;
         ResponseEntity<ApiResponse<CommandDescription>> responseEntity =
-                getApiResponseCommandDescriptionResponseEntity(command);
+                postCommand(command);
 
         ApiResponse<CommandDescription> body = responseEntity.getBody();
 
@@ -156,7 +162,7 @@ public class CommandApiControllerTest {
         String command2 = "sleep " + sleep2;
         String command = command1 + "\n" + command2;
         ResponseEntity<ApiResponse<CommandDescription>> responseEntity =
-                getApiResponseCommandDescriptionResponseEntity(command);
+                postCommand(command);
 
         ApiResponse<CommandDescription> body = responseEntity.getBody();
 
@@ -177,12 +183,12 @@ public class CommandApiControllerTest {
     }
 
     @Test
-    public void whenSendingTwoCommandsOneSuccessOneFailureThenApiReturnsTheCorrectDetailsForEachOne() {
+    public void whenSendingTwoCommandsOneSuccessOneFailureThenApiReturnsTcoheCorrectDetailsForEachOne() {
         String command1 = "ls -lrt";
         String command2 = "whatever";
         String command = command1 + "\n" + command2;
         ResponseEntity<ApiResponse<CommandDescription>> responseEntity =
-                getApiResponseCommandDescriptionResponseEntity(command);
+                postCommand(command);
 
         ApiResponse<CommandDescription> body = responseEntity.getBody();
 
@@ -202,6 +208,11 @@ public class CommandApiControllerTest {
         assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+        ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
+
+        body = responseEntityMap.getBody();
+        assertThat(((Map) body.getDescription()).size()).isEqualTo(0);
     }
 
     @Test
@@ -213,7 +224,7 @@ public class CommandApiControllerTest {
         List<String> list = new YamlConfigParser().getCommandsList(yamlConfig);
 
         ResponseEntity<ApiResponse> responseEntity =
-                getApiResponseConfigDescriptorResponseEntity(yamlConfigString);
+                postCommandYaml(yamlConfigString);
 
         ApiResponse body = responseEntity.getBody();
         CommandDescription commandDescription = objectMapperJson.readValue(
@@ -250,7 +261,7 @@ public class CommandApiControllerTest {
         yamlConfig.setScript(new ArrayList<>());
 
         ResponseEntity<ApiResponse> responseEntity =
-                getApiResponseResponseEntity(objectMapper.writeValueAsString(yamlConfigString));
+                getCommandYaml(objectMapper.writeValueAsString(yamlConfigString));
 
         ApiResponse body = responseEntity.getBody();
         String description = body.getDescription().toString();
@@ -274,7 +285,7 @@ public class CommandApiControllerTest {
             }
     )
     public void whenSendingIncorrectCommandsThenApiReturnsNonZeroExitCode(String commandInfo) {
-        ResponseEntity<ApiResponse<CommandDescription>> responseEntity = getApiResponseCommandDescriptionResponseEntity(commandInfo.split(";")[0]);
+        ResponseEntity<ApiResponse<CommandDescription>> responseEntity = postCommand(commandInfo.split(";")[0]);
 
         ApiResponse<CommandDescription> body = responseEntity.getBody();
 
@@ -291,7 +302,7 @@ public class CommandApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
-    private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionResponseEntity(String command) {
+    private ResponseEntity<ApiResponse<CommandDescription>> postCommand(String command) {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
@@ -302,7 +313,7 @@ public class CommandApiControllerTest {
                         });
     }
 
-    private ResponseEntity<ApiResponse> getApiResponseConfigDescriptorResponseEntity(String yamlConfig) {
+    private ResponseEntity<ApiResponse> postCommandYaml(String yamlConfig) {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
@@ -312,7 +323,7 @@ public class CommandApiControllerTest {
                         ApiResponse.class);
     }
 
-    private ResponseEntity<ApiResponse> getApiResponseResponseEntity(String yamlConfig) {
+    private ResponseEntity<ApiResponse> getCommandYaml(String yamlConfig) {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())

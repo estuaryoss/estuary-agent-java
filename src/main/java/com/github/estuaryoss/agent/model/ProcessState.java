@@ -1,13 +1,14 @@
 package com.github.estuaryoss.agent.model;
 
+import lombok.EqualsAndHashCode;
 import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.Future;
 
+@EqualsAndHashCode
 public class ProcessState {
     private StartedProcess startedProcess;
     private Process process;
@@ -71,8 +72,4 @@ public class ProcessState {
         this.errOutputStream = errOutputStream;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(startedProcess, process);
-    }
 }

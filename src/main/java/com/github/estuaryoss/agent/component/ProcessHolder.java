@@ -24,16 +24,16 @@ public class ProcessHolder {
         return inMemoryCmdProcessState;
     }
 
-    public void remove(String[] command) {
-        inMemoryCmdProcessState.remove(joinCommand(command));
+    public void remove(ProcessState processState) {
+        inMemoryCmdProcessState.remove(processState);
     }
 
     public Map<String, String> dumpAll() {
-        Map<String, String> dumpCmdProcessState = new HashMap<>();
+        Map<String, String> dumpProcessStateCmd = new HashMap<>();
         inMemoryCmdProcessState.forEach((pState, cmd) -> {
-            dumpCmdProcessState.put(pState.toString(), cmd);
+            dumpProcessStateCmd.put(pState.toString(), cmd);
         });
-        return dumpCmdProcessState;
+        return dumpProcessStateCmd;
     }
 
     private String joinCommand(String[] command) {

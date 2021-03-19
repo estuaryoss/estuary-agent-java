@@ -260,7 +260,7 @@ public class CommandRunner {
             }
         }
 
-        processHolder.remove(command);
+        processHolder.remove(processState);
 
         return commandDetails;
     }

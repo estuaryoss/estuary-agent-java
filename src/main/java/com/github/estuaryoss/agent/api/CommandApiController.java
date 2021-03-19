@@ -5,13 +5,16 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.component.ClientRequest;
 import com.github.estuaryoss.agent.component.CommandRunner;
+import com.github.estuaryoss.agent.component.ProcessHolder;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.ConfigDescriptor;
+import com.github.estuaryoss.agent.model.ProcessState;
 import com.github.estuaryoss.agent.model.YamlConfig;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
+import com.github.estuaryoss.agent.utils.ProcessUtils;
 import com.github.estuaryoss.agent.utils.YamlConfigParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -52,12 +55,62 @@ public class CommandApiController implements CommandApi {
     private ClientRequest clientRequest;
 
     @Autowired
+    private ProcessHolder processHolder;
+
+    @Autowired
     private About about;
 
     @Autowired
     public CommandApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
+    }
+
+    public ResponseEntity<ApiResponse> commandGetAll() {
+        String accept = request.getHeader("Accept");
+
+        log.debug("Dumping all in memory processes associated with active commands");
+        return new ResponseEntity<>(ApiResponse.builder()
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(processHolder.dumpAll())
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<ApiResponse> commandDeleteAll() {
+        String accept = request.getHeader("Accept");
+        log.debug("Killing all processes associated with active commands");
+        log.debug(String.format("Active processes number: %s", processHolder.getAll().size()));
+
+        for (Map.Entry<ProcessState, String> entry : processHolder.getAll().entrySet()) {
+            ProcessState processState = entry.getKey();
+            if (processState.getProcess().isAlive()) {
+                try {
+                    ProcessUtils.killProcessAndChildren(processState);
+                } catch (Exception e) {
+                    throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
+                            ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode()));
+                }
+            }
+        }
+
+        processHolder.clearAll();
+
+        log.debug(String.format("Active processes number: %s", processHolder.getAll().size()));
+        return new ResponseEntity<>(ApiResponse.builder()
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(processHolder.dumpAll())
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
     }
 
     public ResponseEntity<ApiResponse> commandPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {

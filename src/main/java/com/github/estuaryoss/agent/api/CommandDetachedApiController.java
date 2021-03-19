@@ -11,9 +11,9 @@ import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.exception.YamlConfigException;
+import com.github.estuaryoss.agent.model.BackgroundStateHolder;
 import com.github.estuaryoss.agent.model.ConfigDescriptor;
 import com.github.estuaryoss.agent.model.ProcessInfo;
-import com.github.estuaryoss.agent.model.StateHolder;
 import com.github.estuaryoss.agent.model.YamlConfig;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
@@ -65,7 +65,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
     private EnvApiController envApiController;
 
     @Autowired
-    private StateHolder stateHolder;
+    private BackgroundStateHolder backgroundStateHolder;
 
     @Autowired
     private About about;
@@ -91,7 +91,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedGet() {
         String accept = request.getHeader("Accept");
-        String testInfoFilename = stateHolder.getLastCommand();
+        String testInfoFilename = backgroundStateHolder.getLastCommand();
         log.debug("Reading content from file: " + testInfoFilename);
 
         File testInfo = new File(testInfoFilename);
@@ -101,17 +101,17 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             if (!testInfo.exists())
                 writeContentInFile(testInfo, commandDescription);
         } catch (IOException e) {
-            throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
-                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+            throw new ApiException(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode()));
         }
 
         try (InputStream in = new FileInputStream(testInfo)) {
             commandDescription = objectMapper.readValue(IOUtils.toString(in, "UTF-8"), CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
-            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid()));
+            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid(), false));
         } catch (IOException e) {
-            throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
-                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+            throw new ApiException(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode()));
         }
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -127,7 +127,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedIdGet(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id) {
         String accept = request.getHeader("Accept");
-        String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
+        String testInfoFilename = String.format(backgroundStateHolder.getLastCommandFormat(), id);
         log.debug("Reading content from file: " + testInfoFilename);
 
         CommandDescription commandDescription;
@@ -135,10 +135,10 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             String fileContent = IOUtils.toString(is, "UTF-8");
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
-            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid()));
+            commandDescription.setProcesses(getProcessInfoForPidAndParent(commandDescription.getPid(), false));
         } catch (IOException e) {
-            throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
-                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+            throw new ApiException(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode()));
         }
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -155,7 +155,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
     public ResponseEntity<ApiResponse> commandDetachedIdDelete(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id) {
         String accept = request.getHeader("Accept");
 
-        String testInfoFilename = String.format(stateHolder.getLastCommandFormat(), id);
+        String testInfoFilename = String.format(backgroundStateHolder.getLastCommandFormat(), id);
         log.debug("Reading content from file: " + testInfoFilename);
 
         CommandDescription commandDescription;
@@ -164,29 +164,29 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             commandDescription = objectMapper.readValue(fileContent, CommandDescription.class);
             commandDescription = streamOutAndErr(commandDescription);
         } catch (IOException e) {
-            throw new ApiException(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode(),
-                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_DETACHED_INFO_FAILURE.getCode()));
+            throw new ApiException(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode()));
         }
 
         try {
-            List<ProcessInfo> processInfoList = getProcessInfoForPid(commandDescription.getPid());
+            List<ProcessInfo> processInfoList = getProcessInfoForPid(commandDescription.getPid(), false);
             if (processInfoList.size() == 0) {
-                throw new ApiException(ApiResponseCode.COMMAND_DETACHED_PROCESS_DOES_NOT_EXIST.getCode(),
-                        String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_PROCESS_DOES_NOT_EXIST.getCode()),
+                throw new ApiException(ApiResponseCode.COMMAND_PROCESS_DOES_NOT_EXIST.getCode(),
+                        String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_PROCESS_DOES_NOT_EXIST.getCode()),
                                 String.valueOf(commandDescription.getPid())));
             }
             List<ProcessHandle> children = processInfoList.get(0).getChildren();
             ProcessUtils.killProcess(processInfoList.get(0));
             if (children != null) ProcessUtils.killChildrenProcesses(children);
         } catch (IOException e) {
-            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode(),
-                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode())));
+            throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode())));
         } catch (InterruptedException e) {
-            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode(),
-                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode())));
+            throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode())));
         } catch (TimeoutException e) {
-            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode(),
-                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_STOP_FAILURE.getCode())));
+            throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode())));
         }
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -202,7 +202,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
     public ResponseEntity<ApiResponse> commandDetachedIdPost(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other. E.g. make/mvn/sh/npm", required = true) @Valid @RequestBody String commandContent) {
         String accept = request.getHeader("Accept");
-        File testInfo = new File(String.format(stateHolder.getLastCommandFormat(), id));
+        File testInfo = new File(String.format(backgroundStateHolder.getLastCommandFormat(), id));
         CommandDescription commandDescription = CommandDescription.builder()
                 .started(true)
                 .finished(false)
@@ -228,10 +228,10 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
             log.debug("Sending args: " + argumentsList.toString());
             commandRunner.runStartCommandInBackground(argumentsList);
-            stateHolder.setLastCommand(id);
+            backgroundStateHolder.setLastCommand(id);
         } catch (IOException e) {
-            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode(),
-                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode()), id));
+            throw new ApiException(ApiResponseCode.COMMAND_START_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_START_FAILURE.getCode()), id));
         }
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -248,7 +248,7 @@ public class CommandDetachedApiController implements CommandDetachedApi {
     public ResponseEntity<ApiResponse> commandDetachedIdPostYaml(@ApiParam(value = "Command detached id set by the user", required = true) @PathVariable("id") String id, @ApiParam(value = "List of commands to run one after the other in yaml format.", required = true) @Valid @RequestBody String commandContent) {
         String accept = request.getHeader("Accept");
         List<String> commandsList;
-        File testInfo = new File(String.format(stateHolder.getLastCommandFormat(), id));
+        File testInfo = new File(String.format(backgroundStateHolder.getLastCommandFormat(), id));
         YAMLMapper mapper = new YAMLMapper();
         CommandDescription commandDescription = CommandDescription.builder()
                 .started(true)
@@ -286,10 +286,10 @@ public class CommandDetachedApiController implements CommandDetachedApi {
 
             log.debug("Sending args: " + argumentsList.toString());
             commandRunner.runStartCommandInBackground(argumentsList);
-            stateHolder.setLastCommand(id);
+            backgroundStateHolder.setLastCommand(id);
         } catch (IOException e) {
-            throw new ApiException(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode(),
-                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_DETACHED_START_FAILURE.getCode()), id));
+            throw new ApiException(ApiResponseCode.COMMAND_START_FAILURE.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_START_FAILURE.getCode()), id));
         }
 
         configDescriptor.setYamlConfig(yamlConfig);
@@ -314,9 +314,9 @@ public class CommandDetachedApiController implements CommandDetachedApi {
             String error = "";
             try (
                     InputStream isOut = new FileInputStream(
-                            base64FilePath.getEncodedFileNameInBase64(cmd, stateHolder.getLastCommandId(), ".out"));
+                            base64FilePath.getEncodedFileNameInBase64(cmd, backgroundStateHolder.getLastCommandId(), ".out"));
                     InputStream isErr = new FileInputStream(
-                            base64FilePath.getEncodedFileNameInBase64(cmd, stateHolder.getLastCommandId(), ".err"))
+                            base64FilePath.getEncodedFileNameInBase64(cmd, backgroundStateHolder.getLastCommandId(), ".err"))
             ) {
                 output = IOUtils.toString(isOut, "UTF-8");
                 error = IOUtils.toString(isErr, "UTF-8");

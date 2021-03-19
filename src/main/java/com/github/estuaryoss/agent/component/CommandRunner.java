@@ -47,9 +47,13 @@ public class CommandRunner {
     private static final float DENOMINATOR = 1000F;
 
     @Autowired
+    private final ProcessHolder processHolder;
+
+    @Autowired
     private final VirtualEnvironment environment;
 
-    public CommandRunner(VirtualEnvironment environment) {
+    public CommandRunner(ProcessHolder processHolder, VirtualEnvironment environment) {
+        this.processHolder = processHolder;
         this.environment = environment;
     }
 
@@ -256,6 +260,8 @@ public class CommandRunner {
             }
         }
 
+        processHolder.remove(processState);
+
         return commandDetails;
     }
 
@@ -269,7 +275,6 @@ public class CommandRunner {
         } else {
             platformCmd.add(EXEC_LINUX);
             platformCmd.add(ARGS_LINUX);
-
         }
 
         return platformCmd;
@@ -286,13 +291,19 @@ public class CommandRunner {
     }
 
     private ProcessState runCmdDetached(String[] command) throws IOException {
-        return getProcessState(command);
+        ProcessState processState = getProcessState(command);
+
+        processHolder.put(command, processState);
+
+        return processState;
     }
 
     private CommandDetails getCommandDetails(String[] command) throws IOException {
-        ProcessState pState = getProcessState(command);
+        ProcessState processState = getProcessState(command);
 
-        return this.getCmdDetailsOfProcess(command, pState);
+        processHolder.put(command, processState);
+
+        return this.getCmdDetailsOfProcess(command, processState);
     }
 
     private ProcessState getProcessState(String[] command) throws IOException {
@@ -306,6 +317,7 @@ public class CommandRunner {
                 .readOutput(true)
                 .redirectError(outputStream)
                 .start();
+
 
         processState.startedProcess(startedProcess);
         processState.process(startedProcess.getProcess());

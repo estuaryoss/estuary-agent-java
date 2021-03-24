@@ -7,7 +7,9 @@ import com.github.estuaryoss.agent.component.CommandRunner;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
+import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
+import com.github.estuaryoss.agent.model.api.CommandDescription;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -57,10 +59,17 @@ public class CommandParallelApiController implements CommandParallelApi {
                 .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());
 
         log.debug("Executing commands: " + commandsList.toString());
+        CommandDescription commandDescription;
+        try {
+            commandDescription = commandRunner.runCommandsParallel(commandsList.toArray(new String[0]));
+        } catch (Exception e) {
+            throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
+        }
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(commandRunner.runCommandsParallel(commandsList.toArray(new String[0])))
+                .description(commandDescription)
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

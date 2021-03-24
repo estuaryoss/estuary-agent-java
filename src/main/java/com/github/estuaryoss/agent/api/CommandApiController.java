@@ -14,6 +14,7 @@ import com.github.estuaryoss.agent.model.ConfigDescriptor;
 import com.github.estuaryoss.agent.model.ProcessState;
 import com.github.estuaryoss.agent.model.YamlConfig;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
+import com.github.estuaryoss.agent.model.api.CommandDescription;
 import com.github.estuaryoss.agent.utils.ProcessUtils;
 import com.github.estuaryoss.agent.utils.YamlConfigParser;
 import io.swagger.annotations.Api;
@@ -120,10 +121,18 @@ public class CommandApiController implements CommandApi {
                 .stream().map(elem -> elem.strip()).collect(Collectors.toList());
 
         log.debug("Executing commands: " + commandsList.toString());
+        CommandDescription commandDescription;
+        try {
+            commandDescription = commandRunner.runCommands(commandsList.toArray(new String[0]));
+        } catch (Exception e) {
+            throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
+        }
+
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(commandRunner.runCommands(commandsList.toArray(new String[0])))
+                .description(commandDescription)
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -153,7 +162,13 @@ public class CommandApiController implements CommandApi {
 
         log.debug("Executing commands: " + commandsList.toString());
         configDescriptor.setYamlConfig(yamlConfig);
-        configDescriptor.setDescription(commandRunner.runCommands(commandsList.toArray(new String[0])));
+        try {
+            configDescriptor.setDescription(commandRunner.runCommands(commandsList.toArray(new String[0])));
+        } catch (Exception e) {
+            throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
+        }
+
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))

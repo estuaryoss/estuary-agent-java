@@ -99,7 +99,7 @@ public class FluentdService {
             enrichedMsgCopy.setMsg(parentMessage);
         }
 
-        if (virtualEnvironment.getEnvAndVirtualEnv().get(EnvConstants.FLUENTD_IP_PORT) == null) {
+        if (virtualEnvironment.getEnv().get(EnvConstants.FLUENTD_IP_PORT) == null) {
             return String.format("Fluentd logging not enabled",
                     EnvConstants.FLUENTD_IP_PORT);
         }

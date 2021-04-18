@@ -19,7 +19,7 @@ public class SwaggerConfig {
     ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("estuary-agent")
-                .description("Estuary agent will run your shell commands via REST API")
+                .description("Estuary Agent will run your shell commands via REST API")
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
                 .termsOfServiceUrl("")

@@ -110,6 +110,9 @@ After user auth, set the received cookie (JSESSIONID) to communicate further wit
 The same settings can be set through application properties: **app.user** & **app.password**.  
 The env vars precedence is higher than the one set through the application properties.
 
+[!!!]() USe these env variables or swap application.properties file if you use it as dependency, otherwise you will open a major security hole. The attacker will have access to your system. [!!!]()
+
+
 ### Method 2 - Token auth - No spring-security
 
 - HTTP_AUTH_TOKEN -> This env var sets the auth token for the service. Will be matched with the header 'Token'  

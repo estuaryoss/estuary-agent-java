@@ -1,7 +1,6 @@
 package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.api.utils.HttpRequestUtils;
-import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.component.Authentication;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
@@ -26,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
-public class CommandApiController_Repo_Test {
+public class CommandApiControllerRepoTest {
     private final static String SERVER_PREFIX = "http://localhost:";
 
     @LocalServerPort
@@ -37,9 +36,6 @@ public class CommandApiController_Repo_Test {
 
     @Autowired
     private TestRestTemplate restTemplate;
-
-    @Autowired
-    private About about;
 
     @Autowired
     private Authentication auth;

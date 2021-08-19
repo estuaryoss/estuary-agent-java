@@ -24,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.estuaryoss.agent.constants.DateTimeConstants.PATTERN;
@@ -78,7 +79,7 @@ public class CommandParallelApiControllerTest {
                 .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
 
         body = responseEntityMap.getBody();
-        assertThat(((Map) body.getDescription()).size()).isEqualTo(0);
+        assertThat(((List) body.getDescription()).size()).isEqualTo(0);
     }
 
     @Test
@@ -200,7 +201,7 @@ public class CommandParallelApiControllerTest {
                 .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
 
         body = responseEntityMap.getBody();
-        assertThat(((Map) body.getDescription()).size()).isEqualTo(0);
+        assertThat(((List) body.getDescription()).size()).isEqualTo(0);
     }
 
     private ResponseEntity<ApiResponse<CommandDescription>> getApiResponseCommandDescriptionResponseEntity(String command) {

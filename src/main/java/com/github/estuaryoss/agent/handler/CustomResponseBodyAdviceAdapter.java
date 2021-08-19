@@ -1,7 +1,7 @@
 package com.github.estuaryoss.agent.handler;
 
 import com.github.estuaryoss.agent.constants.FluentdServiceConstants;
-import com.github.estuaryoss.agent.service.FluentdService;
+import com.github.estuaryoss.agent.service.Fluentd;
 import com.github.estuaryoss.agent.utils.MessageDumper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -18,7 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class CustomResponseBodyAdviceAdapter implements ResponseBodyAdvice<Object> {
 
     @Autowired
-    private FluentdService fluentdService;
+    private Fluentd fluentd;
 
     @Override
     public boolean supports(MethodParameter methodParameter,
@@ -36,7 +36,7 @@ public class CustomResponseBodyAdviceAdapter implements ResponseBodyAdvice<Objec
 
         if (serverHttpRequest instanceof ServletServerHttpRequest &&
                 serverHttpResponse instanceof ServletServerHttpResponse) {
-            fluentdService.emit(FluentdServiceConstants.API,
+            fluentd.emit(FluentdServiceConstants.API,
                     MessageDumper.dumpResponse(((ServletServerHttpResponse) serverHttpResponse).getServletResponse(), o));
         }
 

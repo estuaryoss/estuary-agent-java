@@ -1,7 +1,6 @@
 package com.github.estuaryoss.agent.utils;
 
 import com.github.estuaryoss.agent.model.ProcessInfo;
-import com.github.estuaryoss.agent.model.ProcessState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.process.PidProcess;
@@ -115,8 +114,8 @@ public class ProcessUtils {
         log.debug("Process PID " + (int) processHandle.pid() + " is alive: " + process.isAlive());
     }
 
-    public static void killProcessAndChildren(ProcessState processState) throws InterruptedException, TimeoutException, IOException {
-        @NotNull List<ProcessInfo> processInfoList = getProcessInfoForPid(processState.getProcess().pid(), true);
+    public static void killProcessAndChildren(long pid) throws InterruptedException, TimeoutException, IOException {
+        @NotNull List<ProcessInfo> processInfoList = getProcessInfoForPid(pid, true);
         List<ProcessHandle> children = processInfoList.get(0).getChildren();
         if (children != null) {
             ProcessUtils.killChildrenProcesses(children);

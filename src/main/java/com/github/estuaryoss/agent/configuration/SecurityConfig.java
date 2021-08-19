@@ -40,6 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .permitAll();
+
+        http.headers().frameOptions().sameOrigin();
     }
 
     @Bean

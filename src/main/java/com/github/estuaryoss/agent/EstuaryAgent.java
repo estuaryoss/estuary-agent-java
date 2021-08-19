@@ -3,7 +3,7 @@ package com.github.estuaryoss.agent;
 import com.github.estuaryoss.agent.component.VirtualEnvironment;
 import com.github.estuaryoss.agent.constants.DefaultConstants;
 import com.github.estuaryoss.agent.constants.FluentdServiceConstants;
-import com.github.estuaryoss.agent.service.FluentdService;
+import com.github.estuaryoss.agent.service.Fluentd;
 import com.github.estuaryoss.agent.utils.MessageDumper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ import java.io.File;
 })
 public class EstuaryAgent implements CommandLineRunner {
     @Autowired
-    private FluentdService fluentdService;
+    private Fluentd fluentd;
 
     @Autowired
     private VirtualEnvironment environment;
@@ -71,7 +71,7 @@ public class EstuaryAgent implements CommandLineRunner {
             throw new ExitException();
         }
 
-        fluentdService.emit(FluentdServiceConstants.STARTUP,
+        fluentd.emit(FluentdServiceConstants.STARTUP,
                 MessageDumper.dumpMessage(environment.getEnvAndVirtualEnv().toString()));
     }
 

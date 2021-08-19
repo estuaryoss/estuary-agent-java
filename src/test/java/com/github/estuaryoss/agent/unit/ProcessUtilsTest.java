@@ -18,7 +18,7 @@ public class ProcessUtilsTest {
 
 
     @Test
-    public void whenGettingTheSystemProcessesForPid_ThenTheListIsOne() {
+    public void whenGettingTheSystemProcessesForPid_ThenTheListHasOneEntry() {
         List<ProcessInfo> processList = ProcessUtils.getProcesses(true);
         assertThat(processList.size()).isGreaterThan(0);
 

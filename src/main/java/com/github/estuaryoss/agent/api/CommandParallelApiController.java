@@ -7,9 +7,12 @@ import com.github.estuaryoss.agent.component.CommandRunner;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
+import com.github.estuaryoss.agent.entity.FinishedCommand;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
+import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
+import com.github.estuaryoss.agent.utils.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
@@ -48,6 +51,9 @@ public class CommandParallelApiController implements CommandParallelApi {
     private About about;
 
     @Autowired
+    private FinishedCommandRepository repository;
+
+    @Autowired
     public CommandParallelApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -66,6 +72,20 @@ public class CommandParallelApiController implements CommandParallelApi {
             throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
         }
+
+        commandDescription.getCommands().forEach((command, commandStatus) -> {
+            repository.saveAndFlush(FinishedCommand.builder()
+                    .command(command)
+                    .code(commandStatus.getDetails().getCode())
+                    .out(StringUtils.trimString(commandStatus.getDetails().getOut()))
+                    .err(StringUtils.trimString(commandStatus.getDetails().getErr()))
+                    .startedAt(commandStatus.getStartedat())
+                    .finishedAt(commandStatus.getFinishedat())
+                    .duration(commandStatus.getDuration())
+                    .pid(commandStatus.getDetails().getPid())
+                    .build());
+        });
+
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))

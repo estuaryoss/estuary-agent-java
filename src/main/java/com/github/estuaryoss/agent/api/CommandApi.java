@@ -20,14 +20,26 @@ public interface CommandApi {
 
     @ApiOperation(value = "Dumps the active commands that are running on the Agent.", nickname = "commandGetAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "All commands in memory dump success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "All commands in memory dump failure", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump active commands success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump active commands failure", response = ApiResponse.class)})
     @RequestMapping(value = "/commands",
             produces = {"application/json"},
             method = RequestMethod.GET)
     default ResponseEntity<ApiResponse> commandGetAll() {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
+
+    @ApiOperation(value = "Dumps the finished commands on the Agent.", nickname = "commandFinishedGetAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump finished commands success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump finished commands failure", response = ApiResponse.class)})
+    @RequestMapping(value = "/commandsfinished",
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    default ResponseEntity<ApiResponse> commandFinishedGetAll() {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
 
     @ApiOperation(value = "Stops all the active commands on the Agent by terminating their corresponding process", nickname = "commandDeleteAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {

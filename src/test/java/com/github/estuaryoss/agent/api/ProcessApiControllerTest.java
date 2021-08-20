@@ -1,7 +1,6 @@
 package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.api.utils.HttpRequestUtils;
-import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.component.Authentication;
 import com.github.estuaryoss.agent.model.ProcessInfo;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
@@ -30,9 +29,6 @@ public class ProcessApiControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-
-    @Autowired
-    private About about;
 
     @Autowired
     private HttpRequestUtils httpRequestUtils;

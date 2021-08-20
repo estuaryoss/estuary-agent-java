@@ -5,20 +5,24 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.component.ClientRequest;
 import com.github.estuaryoss.agent.component.CommandRunner;
-import com.github.estuaryoss.agent.component.ProcessHolder;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
+import com.github.estuaryoss.agent.entity.ActiveCommand;
+import com.github.estuaryoss.agent.entity.FinishedCommand;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.ConfigDescriptor;
-import com.github.estuaryoss.agent.model.ProcessState;
 import com.github.estuaryoss.agent.model.YamlConfig;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
+import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
+import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.utils.ProcessUtils;
+import com.github.estuaryoss.agent.utils.StringUtils;
 import com.github.estuaryoss.agent.utils.YamlConfigParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +45,7 @@ import java.util.stream.Collectors;
 public class CommandApiController implements CommandApi {
 
     private static final Logger log = LoggerFactory.getLogger(CommandApiController.class);
-
+    private final int COMMAND_HISTORY_MAX_LENGTH = 50;
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
@@ -56,10 +60,13 @@ public class CommandApiController implements CommandApi {
     private ClientRequest clientRequest;
 
     @Autowired
-    private ProcessHolder processHolder;
+    private DbService dbService;
 
     @Autowired
     private About about;
+
+    @Autowired
+    private FinishedCommandRepository repository;
 
     @Autowired
     public CommandApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -70,11 +77,11 @@ public class CommandApiController implements CommandApi {
     public ResponseEntity<ApiResponse> commandGetAll() {
         String accept = request.getHeader("Accept");
 
-        log.debug("Dumping all in memory processes associated with active commands");
+        log.debug("Dumping all active commands from the database");
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(processHolder.dumpAll())
+                .description(dbService.getAllActiveCommands())
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -82,31 +89,53 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
+    public ResponseEntity<ApiResponse> commandFinishedGetAll() {
+        String accept = request.getHeader("Accept");
+        String limitString = request.getParameter("limit");
+        Long limit = Long.valueOf(COMMAND_HISTORY_MAX_LENGTH);
+        if (limitString != null) {
+            try {
+                limit = Long.valueOf(limitString);
+            } catch (NumberFormatException e) {
+                log.debug(String.format("Received invalid limit number '%s'\n", limit) + ExceptionUtils.getMessage(e));
+            }
+        }
+
+        log.debug("Dumping all finished commands from the database");
+        return new ResponseEntity<>(ApiResponse.builder()
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(dbService.getAllFinishedCommands(limit))
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
+    }
 
     public ResponseEntity<ApiResponse> commandDeleteAll() {
         String accept = request.getHeader("Accept");
         log.debug("Killing all processes associated with active commands");
-        log.debug(String.format("Active processes number: %s", processHolder.getAll().size()));
+        log.debug(String.format("Active commands number: %s", dbService.getAllActiveCommands().size()));
 
-        for (Map.Entry<ProcessState, String> entry : processHolder.getAll().entrySet()) {
-            ProcessState processState = entry.getKey();
-            if (processState.getProcess().isAlive()) {
-                try {
-                    ProcessUtils.killProcessAndChildren(processState);
-                } catch (Exception e) {
-                    throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
-                            ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode()));
-                }
+        List<ActiveCommand> activeCommandList = dbService.getAllActiveCommands();
+        activeCommandList.forEach(activeCommand -> {
+            try {
+                ProcessUtils.killProcessAndChildren(activeCommand.getPid());
+            } catch (Exception e) {
+                throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
+                        ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode()));
             }
-        }
+        });
 
-        processHolder.clearAll();
 
-        log.debug(String.format("Active processes number: %s", processHolder.getAll().size()));
+        dbService.clearAll();
+
+        log.debug(String.format("Active commands number: %s", dbService.getAllActiveCommands().size()));
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(processHolder.dumpAll())
+                .description(dbService.getAllActiveCommands())
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -128,6 +157,19 @@ public class CommandApiController implements CommandApi {
             throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
         }
+
+        commandDescription.getCommands().forEach((command, commandStatus) -> {
+            repository.saveAndFlush(FinishedCommand.builder()
+                    .command(command)
+                    .code(commandStatus.getDetails().getCode())
+                    .out(StringUtils.trimString(commandStatus.getDetails().getOut()))
+                    .err(StringUtils.trimString(commandStatus.getDetails().getErr()))
+                    .startedAt(commandStatus.getStartedat())
+                    .finishedAt(commandStatus.getFinishedat())
+                    .duration(commandStatus.getDuration())
+                    .pid(commandStatus.getDetails().getPid())
+                    .build());
+        });
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
@@ -168,6 +210,19 @@ public class CommandApiController implements CommandApi {
             throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
         }
+
+        ((CommandDescription) configDescriptor.getDescription()).getCommands().forEach((command, commandStatus) -> {
+            repository.saveAndFlush(FinishedCommand.builder()
+                    .command(command)
+                    .code(commandStatus.getDetails().getCode())
+                    .out(StringUtils.trimString(commandStatus.getDetails().getOut()))
+                    .err(StringUtils.trimString(commandStatus.getDetails().getErr()))
+                    .startedAt(commandStatus.getStartedat())
+                    .finishedAt(commandStatus.getFinishedat())
+                    .duration(commandStatus.getDuration())
+                    .pid(commandStatus.getDetails().getPid())
+                    .build());
+        });
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())

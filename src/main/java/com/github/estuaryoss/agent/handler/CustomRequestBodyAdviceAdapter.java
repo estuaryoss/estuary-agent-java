@@ -1,7 +1,7 @@
 package com.github.estuaryoss.agent.handler;
 
 import com.github.estuaryoss.agent.constants.FluentdServiceConstants;
-import com.github.estuaryoss.agent.service.FluentdService;
+import com.github.estuaryoss.agent.service.Fluentd;
 import com.github.estuaryoss.agent.utils.MessageDumper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -17,7 +17,7 @@ import java.lang.reflect.Type;
 public class CustomRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
 
     @Autowired
-    private FluentdService fluentdService;
+    private Fluentd fluentd;
 
     @Autowired
     private HttpServletRequest httpServletRequest;
@@ -33,7 +33,7 @@ public class CustomRequestBodyAdviceAdapter extends RequestBodyAdviceAdapter {
                                 MethodParameter parameter, Type targetType,
                                 Class<? extends HttpMessageConverter<?>> converterType) {
 
-        fluentdService.emit(FluentdServiceConstants.API, MessageDumper.dumpRequest(httpServletRequest, body));
+        fluentd.emit(FluentdServiceConstants.API, MessageDumper.dumpRequest(httpServletRequest, body));
 
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
     }

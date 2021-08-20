@@ -88,7 +88,7 @@ public class CommandApiControllerTest {
                 .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
 
         body = responseEntityMap.getBody();
-        assertThat(((Map) body.getDescription()).size()).isEqualTo(0);
+        assertThat(((List) body.getDescription()).size()).isEqualTo(0);
     }
 
     @Test
@@ -212,7 +212,7 @@ public class CommandApiControllerTest {
                 .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
 
         body = responseEntityMap.getBody();
-        assertThat(((Map) body.getDescription()).size()).isEqualTo(0);
+        assertThat(((List) body.getDescription()).size()).isEqualTo(0);
     }
 
     @Test

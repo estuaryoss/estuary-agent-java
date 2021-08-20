@@ -1,7 +1,7 @@
 package com.github.estuaryoss.agent.handler;
 
 import com.github.estuaryoss.agent.constants.FluentdServiceConstants;
-import com.github.estuaryoss.agent.service.FluentdService;
+import com.github.estuaryoss.agent.service.Fluentd;
 import com.github.estuaryoss.agent.utils.MessageDumper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.DispatcherType;
@@ -18,7 +18,7 @@ import java.io.IOException;
 public class CustomRequestInterceptorAdapter implements HandlerInterceptor {
 
     @Autowired
-    private FluentdService fluentdService;
+    private Fluentd fluentd;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
@@ -26,7 +26,7 @@ public class CustomRequestInterceptorAdapter implements HandlerInterceptor {
 
         if (DispatcherType.REQUEST.name().equals(request.getDispatcherType().name())
                 && request.getMethod().equals(HttpMethod.GET.name())) {
-            fluentdService.emit(FluentdServiceConstants.API, MessageDumper.dumpRequest(request));
+            fluentd.emit(FluentdServiceConstants.API, MessageDumper.dumpRequest(request));
         }
 
         return true;

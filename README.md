@@ -30,7 +30,7 @@ a) Standalone microservice jar with the
 extension: [exec.jar](https://search.maven.org/artifact/com.github.estuaryoss/agent/4.2.0/jar)
 
 ```bash
-java -jar agent-4.2.0-exec.jar
+java -jar agent-4.2.2-exec.jar
 ```
 
 b) Library as a Maven dependency:
@@ -40,13 +40,13 @@ b) Library as a Maven dependency:
 <dependency>
     <groupId>com.github.estuaryoss</groupId>
     <artifactId>agent</artifactId>
-    <version>4.2.0</version>
+    <version>4.2.2</version>
 </dependency>
 ```
 
 ## Artifact
 
-![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/com.github.estuaryoss/agent/4.2.0)
+![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/com.github.estuaryoss/agent/4.2.2)
 ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.github.estuaryoss/agent?server=https%3A%2F%2Fs01.oss.sonatype.org)
 
 ## Build status
@@ -91,7 +91,7 @@ export APP_IP=192.168.0.4
 export PORT=8081
 java -jar \
 -Deureka.client.serviceUrl.defaultZone=http://192.168.0.100:8080/eureka/v2 \
--Deureka.client.enabled=true agent-4.2.0-SNAPSHOT-exec.jar 
+-Deureka.client.enabled=true agent-4.2.3-SNAPSHOT-exec.jar 
 ```
 
 ## Fluentd logging
@@ -207,7 +207,7 @@ Get this dependency:
 <dependency>
     <groupId>com.github.estuaryoss</groupId>
   <artifactId>agent</artifactId>
-  <version>4.2.0-SNAPSHOT</version>
+  <version>4.2.3-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -218,14 +218,17 @@ To use a snapshot version, set the s01.oss.sonatype.org repo in settings.xml:
     <snapshots>
         <enabled>true</enabled>
     </snapshots>
-    <releases>
-        <enabled>false</enabled>
-        <updatePolicy>always</updatePolicy>
-    </releases>
-    <name>all-external8</name>
-    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+  <releases>
+    <enabled>false</enabled>
+    <updatePolicy>always</updatePolicy>
+  </releases>
+  <name>all-external8</name>
+  <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
 </repository>
 ```
+
+To generate Query classes needed for the DB queries run:  
+mvn clean install (-DskipTests=true for faster compilation)
 
 Support
 project: <a href="https://paypal.me/catalindinuta?locale.x=en_US"><img src="https://lh3.googleusercontent.com/Y2_nyEd0zJftXnlhQrWoweEvAy4RzbpDah_65JGQDKo9zCcBxHVpajYgXWFZcXdKS_o=s180-rw" height="40" width="40" align="center"></a>   

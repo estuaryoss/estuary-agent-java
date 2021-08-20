@@ -8,6 +8,7 @@ import com.github.estuaryoss.agent.model.api.CommandDescription;
 import com.github.estuaryoss.agent.model.api.CommandDetails;
 import com.github.estuaryoss.agent.model.api.CommandParallel;
 import com.github.estuaryoss.agent.model.api.CommandStatus;
+import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.utils.CommandStatusThread;
 import com.github.estuaryoss.agent.utils.ProcessUtils;
 import lombok.SneakyThrows;
@@ -49,13 +50,13 @@ public class CommandRunner {
     private static final float DENOMINATOR = 1000F;
 
     @Autowired
-    private final ProcessHolder processHolder;
+    private final DbService dbService;
 
     @Autowired
     private final VirtualEnvironment environment;
 
-    public CommandRunner(ProcessHolder processHolder, VirtualEnvironment environment) {
-        this.processHolder = processHolder;
+    public CommandRunner(DbService dbService, VirtualEnvironment environment) {
+        this.dbService = dbService;
         this.environment = environment;
     }
 
@@ -247,7 +248,7 @@ public class CommandRunner {
                     .code(DefaultConstants.PROCESS_EXCEPTION_TIMEOUT)
                     .args(command)
                     .build();
-            ProcessUtils.killProcessAndChildren(processState);
+            ProcessUtils.killProcessAndChildren(processState.getProcess().pid());
         } catch (Exception e) {
             log.debug(ExceptionUtils.getStackTrace(e));
             commandDetails = CommandDetails.builder()
@@ -264,7 +265,7 @@ public class CommandRunner {
             }
         }
 
-        processHolder.remove(processState);
+        dbService.remove(processState.getProcess().pid());
 
         return commandDetails;
     }
@@ -297,7 +298,7 @@ public class CommandRunner {
     private ProcessState runCmdDetached(String[] command) throws IOException {
         ProcessState processState = getProcessState(command);
 
-        processHolder.put(command, processState);
+        dbService.save(command, processState);
 
         return processState;
     }
@@ -305,7 +306,7 @@ public class CommandRunner {
     private CommandDetails getCommandDetails(String[] command) throws IOException {
         ProcessState processState = getProcessState(command);
 
-        processHolder.put(command, processState);
+        dbService.save(command, processState);
 
         return this.getCmdDetailsOfProcess(command, processState);
     }

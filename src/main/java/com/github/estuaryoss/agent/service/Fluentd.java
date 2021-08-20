@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 @Service
-public class FluentdService {
-    private static final Logger log = LoggerFactory.getLogger(FluentdService.class);
+public class Fluentd {
+    private static final Logger log = LoggerFactory.getLogger(Fluentd.class);
     private final VirtualEnvironment virtualEnvironment = new VirtualEnvironment();
     private FluentLogger fluentLogger;
     private About about;
@@ -32,7 +32,7 @@ public class FluentdService {
     @Autowired
     private Environment environment;
 
-    public FluentdService(About about) {
+    public Fluentd(About about) {
         this.about = about;
         this.setFluentdLogger();
     }

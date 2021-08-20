@@ -3,7 +3,7 @@ package com.github.estuaryoss.agent.configuration;
 import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.model.BackgroundStateHolder;
 import com.github.estuaryoss.agent.model.api.CommandParallel;
-import com.github.estuaryoss.agent.service.FluentdService;
+import com.github.estuaryoss.agent.service.Fluentd;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,7 @@ public class BeanConfig {
     }
 
     @Bean
-    public FluentdService getFluentdService() {
-        return new FluentdService(about);
+    public Fluentd getFluentdService() {
+        return new Fluentd(about);
     }
 }

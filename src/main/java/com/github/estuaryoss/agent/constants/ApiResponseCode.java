@@ -22,6 +22,7 @@ public enum ApiResponseCode {
     NOT_IMPLEMENTED(1019),
     INVALID_YAML_CONFIG(1020),
     COMMAND_PROCESS_DOES_NOT_EXIST(1021),
+    QUERY_PARAM_NOT_PROVIDED(1022),
     GENERAL(1100);
 
     private final int code;

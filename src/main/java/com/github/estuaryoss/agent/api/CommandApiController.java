@@ -81,7 +81,7 @@ public class CommandApiController implements CommandApi {
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(dbService.getAllActiveCommands())
+                .description(dbService.getActiveCommands())
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -105,7 +105,7 @@ public class CommandApiController implements CommandApi {
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(dbService.getAllFinishedCommands(limit))
+                .description(dbService.getFinishedCommands(limit))
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -116,9 +116,9 @@ public class CommandApiController implements CommandApi {
     public ResponseEntity<ApiResponse> commandDeleteAll() {
         String accept = request.getHeader("Accept");
         log.debug("Killing all processes associated with active commands");
-        log.debug(String.format("Active commands number: %s", dbService.getAllActiveCommands().size()));
+        log.debug(String.format("Active commands number: %s", dbService.getActiveCommands().size()));
 
-        List<ActiveCommand> activeCommandList = dbService.getAllActiveCommands();
+        List<ActiveCommand> activeCommandList = dbService.getActiveCommands();
         activeCommandList.forEach(activeCommand -> {
             try {
                 ProcessUtils.killProcessAndChildren(activeCommand.getPid());
@@ -131,11 +131,11 @@ public class CommandApiController implements CommandApi {
 
         dbService.clearAll();
 
-        log.debug(String.format("Active commands number: %s", dbService.getAllActiveCommands().size()));
+        log.debug(String.format("Active commands number: %s", dbService.getActiveCommands().size()));
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(dbService.getAllActiveCommands())
+                .description(dbService.getActiveCommands())
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

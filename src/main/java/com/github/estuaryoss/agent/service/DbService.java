@@ -36,12 +36,12 @@ public class DbService {
         activeCommandRepository.deleteAll();
     }
 
-    public List<ActiveCommand> getAllActiveCommands() {
+    public List<ActiveCommand> getActiveCommands() {
         return activeCommandRepository.findAll(Sort.by(Sort.Order.desc("id")))
                 .stream().collect(Collectors.toList());
     }
 
-    public List<FinishedCommand> getAllFinishedCommands(long limit) {
+    public List<FinishedCommand> getFinishedCommands(long limit) {
         return finishedCommandRepository
                 .findAll(Sort.by(Sort.Order.desc("id")))
                 .stream().limit(limit).collect(Collectors.toList());

@@ -1,11 +1,13 @@
 package com.github.estuaryoss.agent.utils;
 
 import com.github.estuaryoss.agent.model.logging.ParentMessage;
+import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,7 @@ public class MessageDumper {
         }
 
         headers.put(REQUEST_URI, ((HttpServletRequest) request).getRequestURI());
-        body.put(MESSAGE, request.getReader().lines().collect(Collectors.joining(System.lineSeparator())));
+        body.put(MESSAGE, IOUtils.readLines(request.getInputStream(), Charset.forName("UTF-8")).stream().collect(Collectors.joining(System.lineSeparator())));
 
         parentMessage.setHeaders(headers);
         parentMessage.setBody(body);

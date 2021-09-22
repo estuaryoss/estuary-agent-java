@@ -237,7 +237,7 @@ public class CommandDetachedApiControllerTest {
         assertThat(body1.getName()).isEqualTo(about.getAppName());
         assertThat(body1.getPath()).isEqualTo("/commanddetached?");
         assertThat(body1.getVersion()).isEqualTo(about.getVersion());
-        assertThat(LocalDateTime.parse(body1.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(LocalDateTime.parse(body1.getTimestamp(), PATTERN)).isBeforeOrEqualTo(LocalDateTime.now());
     }
 
     @Test

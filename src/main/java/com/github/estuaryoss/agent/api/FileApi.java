@@ -6,8 +6,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -45,7 +47,19 @@ public interface FileApi {
             produces = {"application/json", "text/plain"},
             consumes = {"application/json", "multipart/form-data", "application/x-www-form-urlencoded", "application/octet-stream", "text/plain"},
             method = RequestMethod.PUT)
-    default ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file") @Valid @RequestBody byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
+    default ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file") @Valid @RequestBody byte[] content, @ApiParam(value = "The path where the file to be saved", required = true) @RequestHeader(value = "File-Path", required = true) String filePath) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ApiOperation(value = "Uploads multiple files. Binary or raw", nickname = "filesPut", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The files were uploaded successfully", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the files could not be uploaded", response = ApiResponse.class)})
+    @RequestMapping(value = "/files",
+            produces = {"application/json"},
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
+            method = RequestMethod.POST)
+    default ResponseEntity<ApiResponse> filesPut(@ApiParam(value = "The files to be uploaded") @RequestPart("files") MultipartFile[] files, @ApiParam(value = "The folder path where the file to be saved", required = true) @RequestParam(value = "folderPath", required = false) String folderPath) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

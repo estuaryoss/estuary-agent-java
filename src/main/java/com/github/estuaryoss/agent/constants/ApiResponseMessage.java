@@ -18,7 +18,8 @@ public class ApiResponseMessage {
         message.put(ApiResponseCode.GET_COMMAND_INFO_FAILURE.getCode(), "Failed to get detached command info.");
         message.put(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode(), "Failed to zip folder %s.");
         message.put(ApiResponseCode.EMPTY_REQUEST_BODY_PROVIDED.getCode(), "Empty request body provided.");
-        message.put(ApiResponseCode.UPLOAD_FILE_FAILURE.getCode(), "Failed to upload test configuration.");
+        message.put(ApiResponseCode.UPLOAD_FILE_FAILURE.getCode(), "Failed to upload file.");
+        message.put(ApiResponseCode.UPLOAD_FILE_FAILURE_NAME.getCode(), "Failed to upload file '%s' in path '%s'.");
         message.put(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode(), "Http header value not provided.getCode(), '%s'");
         message.put(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(), "Starting command(s) failed");
         message.put(ApiResponseCode.EXEC_COMMAND_NOT_ALLOWED.getCode(), "'rm' commands are filtered. Command '%s' was not executed.");

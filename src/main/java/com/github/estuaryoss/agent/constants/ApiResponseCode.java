@@ -23,6 +23,7 @@ public enum ApiResponseCode {
     INVALID_YAML_CONFIG(1020),
     COMMAND_PROCESS_DOES_NOT_EXIST(1021),
     QUERY_PARAM_NOT_PROVIDED(1022),
+    UPLOAD_FILE_FAILURE_NAME(1023),
     GENERAL(1100);
 
     private final int code;

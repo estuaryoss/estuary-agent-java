@@ -14,12 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 public class FileApiControllerTest {
     private final static String SERVER_PREFIX = "http://localhost:";
+    private final String SOME_TEST_CONTENT = "some_test_content";
 
     @LocalServerPort
     private int port;
@@ -231,5 +237,100 @@ public class FileApiControllerTest {
         assertThat(body.getPath()).isEqualTo("/file?");
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenUploadingMultipleFiles_ThenUploadIsSuccessful() throws IOException {
+        MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("files", getTestFile());
+        requestBody.add("files", getTestFile());
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>() {{
+            add("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE);
+            add("Accept", MediaType.APPLICATION_JSON_VALUE);
+        }};
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .exchange(SERVER_PREFIX + port + "/files",
+                                HttpMethod.POST,
+                                requestEntity,
+                                ApiResponse.class);
+
+        ApiResponse responseBody = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(responseBody.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(responseBody.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
+        assertThat(responseBody.getDescription().toString()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
+        assertThat(responseBody.getName()).isEqualTo(about.getAppName());
+        assertThat(responseBody.getVersion()).isEqualTo(about.getVersion());
+        assertThat(LocalDateTime.parse(responseBody.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenUploadingMultipleFilesInTmpFolder_ThenUploadIsSuccessful() throws IOException {
+        MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("files", getTestFile());
+        requestBody.add("files", getTestFile());
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>() {{
+            add("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE);
+            add("Accept", MediaType.APPLICATION_JSON_VALUE);
+        }};
+        String folderPath = "/tmp";
+//        String folderPath  = "tmp";
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .exchange(SERVER_PREFIX + port + "/files?folderPath={folderPath}",
+                                HttpMethod.POST,
+                                requestEntity,
+                                ApiResponse.class,
+                                folderPath);
+
+        ApiResponse responseBody = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(responseBody.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(responseBody.getMessage()).isEqualTo(String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
+        assertThat(responseBody.getDescription().toString()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
+        assertThat(responseBody.getName()).isEqualTo(about.getAppName());
+        assertThat(responseBody.getVersion()).isEqualTo(about.getVersion());
+        assertThat(LocalDateTime.parse(responseBody.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenUploadingMultipleFilesInInvalidFolderPath_ThenException() throws IOException {
+        MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("files", getTestFile());
+        requestBody.add("files", getTestFile());
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>() {{
+            add("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE);
+            add("Accept", MediaType.APPLICATION_JSON_VALUE);
+        }};
+        String folderPath = "whateverInvalidFolderPath";
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .exchange(SERVER_PREFIX + port + "/files?folderPath={folderPath}",
+                                HttpMethod.POST,
+                                requestEntity,
+                                ApiResponse.class,
+                                folderPath);
+
+        ApiResponse responseBody = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(responseBody.getCode()).isEqualTo(ApiResponseCode.UPLOAD_FILE_FAILURE_NAME.getCode());
+        assertThat(responseBody.getDescription().toString()).contains("Exception");
+        assertThat(responseBody.getName()).isEqualTo(about.getAppName());
+        assertThat(responseBody.getVersion()).isEqualTo(about.getVersion());
+        assertThat(LocalDateTime.parse(responseBody.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    private Object getTestFile() throws IOException {
+        Path tempFile = Files.createTempFile("upload-file", ".txt");
+        Files.write(tempFile, SOME_TEST_CONTENT.getBytes(StandardCharsets.UTF_8));
+        return new FileSystemResource(tempFile.toFile());
     }
 }

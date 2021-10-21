@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class About {
     @Getter
-    private final String appName = "estuary-agent";
+    private final String appName = "Estuary-Agent";
 
     @Value("${app.version}")
     @Getter

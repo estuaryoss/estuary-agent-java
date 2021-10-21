@@ -3,6 +3,8 @@ package com.github.estuaryoss.agent.handler;
 
 import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.component.ClientRequest;
+import com.github.estuaryoss.agent.constants.ApiResponseCode;
+import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
@@ -33,12 +35,26 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
     @Autowired
     private About about;
 
-    @ExceptionHandler({Exception.class})
+    @ExceptionHandler({ApiException.class})
     public ResponseEntity<ApiResponse> handleException(ApiException e, HttpServletRequest request) {
         log.error("Exception: " + ExceptionUtils.getStackTrace(e));
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(e.getCode())
                 .message(e.getMessage())
+                .description(ExceptionUtils.getStackTrace(e))
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<ApiResponse> handleAgentUnexpectedException(Exception e, HttpServletRequest request) {
+        log.error("Exception: " + ExceptionUtils.getStackTrace(e));
+        return new ResponseEntity<>(ApiResponse.builder()
+                .code(ApiResponseCode.UNEXPECTED_EXCEPTION.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.UNEXPECTED_EXCEPTION.getCode()))
                 .description(ExceptionUtils.getStackTrace(e))
                 .name(about.getAppName())
                 .version(about.getVersion())

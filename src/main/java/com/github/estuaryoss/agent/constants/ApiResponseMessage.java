@@ -28,6 +28,7 @@ public class ApiResponseMessage {
         message.put(ApiResponseCode.INVALID_JSON_PAYLOAD.getCode(), "Invalid json body \"%s\"");
         message.put(ApiResponseCode.INVALID_YAML_CONFIG.getCode(), "Invalid yaml config");
         message.put(ApiResponseCode.QUERY_PARAM_NOT_PROVIDED.getCode(), "Query param '%s' not provided");
+        message.put(ApiResponseCode.UNEXPECTED_EXCEPTION.getCode(), "Unexpected exception occurred");
         message.put(ApiResponseCode.NOT_IMPLEMENTED.getCode(), "Not implemented");
     }
 

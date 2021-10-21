@@ -24,6 +24,7 @@ public enum ApiResponseCode {
     COMMAND_PROCESS_DOES_NOT_EXIST(1021),
     QUERY_PARAM_NOT_PROVIDED(1022),
     UPLOAD_FILE_FAILURE_NAME(1023),
+    UNEXPECTED_EXCEPTION(1024),
     GENERAL(1100);
 
     private final int code;

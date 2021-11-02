@@ -18,7 +18,6 @@ import com.github.estuaryoss.agent.model.api.CommandDescription;
 import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
 import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.utils.ProcessUtils;
-import com.github.estuaryoss.agent.utils.StringUtils;
 import com.github.estuaryoss.agent.utils.YamlConfigParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -40,14 +39,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.COMMAND_MAX_SIZE;
+import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FIELD_MAX_SIZE;
+import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
+
 @Api(tags = {"estuary-agent"})
 @RestController
 public class CommandApiController implements CommandApi {
-
     private static final Logger log = LoggerFactory.getLogger(CommandApiController.class);
+
     private final int COMMAND_HISTORY_MAX_LENGTH = 50;
     private final ObjectMapper objectMapper;
-
     private final HttpServletRequest request;
 
     @Autowired
@@ -160,10 +162,10 @@ public class CommandApiController implements CommandApi {
 
         commandDescription.getCommands().forEach((command, commandStatus) -> {
             repository.saveAndFlush(FinishedCommand.builder()
-                    .command(command)
+                    .command(trimString(command, COMMAND_MAX_SIZE))
                     .code(commandStatus.getDetails().getCode())
-                    .out(StringUtils.trimString(commandStatus.getDetails().getOut()))
-                    .err(StringUtils.trimString(commandStatus.getDetails().getErr()))
+                    .out(trimString(commandStatus.getDetails().getOut(), FIELD_MAX_SIZE))
+                    .err(trimString(commandStatus.getDetails().getErr(), FIELD_MAX_SIZE))
                     .startedAt(commandStatus.getStartedat())
                     .finishedAt(commandStatus.getFinishedat())
                     .duration(commandStatus.getDuration())
@@ -213,10 +215,10 @@ public class CommandApiController implements CommandApi {
 
         ((CommandDescription) configDescriptor.getDescription()).getCommands().forEach((command, commandStatus) -> {
             repository.saveAndFlush(FinishedCommand.builder()
-                    .command(command)
+                    .command(trimString(command, COMMAND_MAX_SIZE))
                     .code(commandStatus.getDetails().getCode())
-                    .out(StringUtils.trimString(commandStatus.getDetails().getOut()))
-                    .err(StringUtils.trimString(commandStatus.getDetails().getErr()))
+                    .out(trimString(commandStatus.getDetails().getOut(), FIELD_MAX_SIZE))
+                    .err(trimString(commandStatus.getDetails().getErr(), FIELD_MAX_SIZE))
                     .startedAt(commandStatus.getStartedat())
                     .finishedAt(commandStatus.getFinishedat())
                     .duration(commandStatus.getDuration())

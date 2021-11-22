@@ -29,7 +29,6 @@ import java.nio.charset.Charset;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -105,24 +104,6 @@ public class CommandRunner {
 
 
         return commandDescription;
-    }
-
-    /**
-     * Runs the commands in background
-     *
-     * @param commands The commands to be executed
-     * @return A reference to a Future of {@link ProcessResult}
-     * @throws IOException if the process could not be started
-     */
-    public List<ProcessState> runCommandsInBackground(List<String> commands, String commandId) throws IOException {
-        List<ProcessState> processResultList = new ArrayList<>();
-        for (String cmd : commands) {
-            ProcessState future = this.runCommandDetached(cmd.split(" "), commandId);
-
-            processResultList.add(future);
-        }
-
-        return processResultList;
     }
 
     /**
@@ -260,16 +241,6 @@ public class CommandRunner {
         }
 
         return platformCmd;
-    }
-
-    private ProcessExecutor runCommandsInBackground(String[] command) {
-        log.debug("Executing detached: " + Arrays.asList(command).toString());
-
-        return new ProcessExecutor()
-                .command(command)
-                .environment(environment.getEnvAndVirtualEnv())
-                .destroyOnExit()
-                .readOutput(true);
     }
 
     private ProcessState runCmdDetached(String[] command, String commandId) throws IOException {

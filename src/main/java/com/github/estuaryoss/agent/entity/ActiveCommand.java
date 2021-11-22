@@ -1,18 +1,19 @@
 package com.github.estuaryoss.agent.entity;
 
-import com.github.estuaryoss.agent.listener.ActiveCommandListener;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.COMMAND_MAX_SIZE;
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FIELD_MAX_SIZE;
 
-@EntityListeners(ActiveCommandListener.class)
 @Entity
 @Builder
 @NoArgsConstructor

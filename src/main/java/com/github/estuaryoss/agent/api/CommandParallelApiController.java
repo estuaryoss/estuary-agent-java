@@ -53,7 +53,7 @@ public class CommandParallelApiController implements CommandParallelApi {
         this.request = request;
     }
 
-    public ResponseEntity<ApiResponse> commandPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsParallelPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
         String commandsStripped = commands.replace("\r\n", "\n").stripLeading().stripTrailing();
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                 .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());

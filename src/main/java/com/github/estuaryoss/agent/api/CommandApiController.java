@@ -74,7 +74,7 @@ public class CommandApiController implements CommandApi {
         this.request = request;
     }
 
-    public ResponseEntity<ApiResponse> commandGetAll() {
+    public ResponseEntity<ApiResponse> commandActiveGetAll() {
         String accept = request.getHeader("Accept");
 
         log.debug("Dumping all active commands from the database");
@@ -101,6 +101,7 @@ public class CommandApiController implements CommandApi {
             }
         }
 
+        log.debug("Dumping all finished commands from the database");
         log.debug("Dumping all finished commands from the database");
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
@@ -142,7 +143,7 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.replace("\r\n", "\n").strip();
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
@@ -168,7 +169,7 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandPostYaml(@ApiParam(value = "Commands to run in yaml format", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsPostYaml(@ApiParam(value = "Commands to run in yaml format", required = true) @Valid @RequestBody String commands) throws IOException {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.strip();
         List<String> commandsList;

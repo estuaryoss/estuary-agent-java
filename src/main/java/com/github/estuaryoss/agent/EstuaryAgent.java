@@ -42,27 +42,15 @@ public class EstuaryAgent implements CommandLineRunner {
         SpringApplication.run(EstuaryAgent.class, args);
     }
 
-    @Value("${app.folder.streams}")
-    private String backgroundStreamsFolderName;
-
-    @Value("${app.folder.commands}")
-    private String backgroundCommandsFolderName;
-
     @Value("${app.folder.uploads}")
     private String uploadsFolderName;
 
     private void createFolders() {
-        File commandsFolder = new File(DefaultConstants.BACKGROUND_COMMANDS_FOLDER);
-        File streamsFolder = new File(DefaultConstants.BACKGROUND_COMMANDS_STREAMS_FOLDER);
         File uploadsFolder = new File(DefaultConstants.UPLOADS_FOLDER);
-        if (!commandsFolder.exists()) commandsFolder.mkdirs();
-        if (!streamsFolder.exists()) streamsFolder.mkdirs();
         if (!uploadsFolder.exists()) uploadsFolder.mkdirs();
     }
 
     private void initFolderConstants() {
-        DefaultConstants.BACKGROUND_COMMANDS_FOLDER = backgroundCommandsFolderName;
-        DefaultConstants.BACKGROUND_COMMANDS_STREAMS_FOLDER = backgroundStreamsFolderName;
         DefaultConstants.UPLOADS_FOLDER = uploadsFolderName;
     }
 

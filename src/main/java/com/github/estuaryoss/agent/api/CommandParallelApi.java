@@ -22,11 +22,11 @@ public interface CommandParallelApi {
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "commands start success", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "commands start failure", response = ApiResponse.class)})
-    @RequestMapping(value = "/commandparallel",
+    @RequestMapping(value = "/commandsparallel",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},
             method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> commandPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    default ResponseEntity<ApiResponse> commandsParallelPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

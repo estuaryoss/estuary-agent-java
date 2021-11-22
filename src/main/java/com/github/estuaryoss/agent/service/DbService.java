@@ -1,11 +1,8 @@
 package com.github.estuaryoss.agent.service;
 
-import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.entity.ActiveCommand;
 import com.github.estuaryoss.agent.entity.FinishedCommand;
-import com.github.estuaryoss.agent.model.ExecutionStatus;
 import com.github.estuaryoss.agent.model.ProcessState;
-import com.github.estuaryoss.agent.model.api.CommandDetails;
 import com.github.estuaryoss.agent.model.api.CommandStatus;
 import com.github.estuaryoss.agent.repository.ActiveCommandRepository;
 import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
@@ -13,14 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.estuaryoss.agent.component.CommandRunner.DENOMINATOR;
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.COMMAND_MAX_SIZE;
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FIELD_MAX_SIZE;
 import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
@@ -44,24 +39,6 @@ public class DbService {
                 .build();
 
         activeCommandRepository.saveAndFlush(activeCommand);
-    }
-
-    public void saveAsFinishedCommand(ActiveCommand activeCommand) {
-        CommandDetails commandDetails = CommandDetails.builder()
-                .args(activeCommand.getCommand().split(" "))
-                .pid(activeCommand.getPid())
-                .build();
-        CommandStatus commandStatus = CommandStatus.builder()
-                .startedat(activeCommand.getStartedAt())
-                .finishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .details(commandDetails)
-                .status(ExecutionStatus.FINISHED.getStatus())
-                .build();
-        commandStatus.setDuration(Duration.between(
-                LocalDateTime.parse(commandStatus.getStartedat(), DateTimeConstants.PATTERN),
-                LocalDateTime.parse(commandStatus.getFinishedat(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
-
-        saveFinishedCommand(activeCommand.getCommand(), activeCommand.getCommandId(), commandStatus);
     }
 
     public void saveFinishedCommand(String command, String commandId, CommandStatus commandStatus) {

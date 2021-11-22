@@ -28,7 +28,8 @@ import java.io.File;
         "com.github.estuaryoss.agent.api",
         "com.github.estuaryoss.agent.configuration",
         "com.github.estuaryoss.agent.component",
-        "com.github.estuaryoss.agent.handler"
+        "com.github.estuaryoss.agent.handler",
+        "com.github.estuaryoss.agent.listener"
 })
 public class EstuaryAgent implements CommandLineRunner {
     @Autowired

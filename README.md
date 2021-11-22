@@ -60,22 +60,13 @@ b) Library as a Maven dependency:
 
 ## Postman collection
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/4ec667d46953db653784)
+The postman collection is saved in folder **docs**
 
 ## Commands in background
 
-For /commanddetached endpoint **runcmd** binary is needed. The binary implements the same object as **/command**
-endpoint as per example found bellow.    
-Please download the execs from here:
-
-- [Windows](https://estuary-agent-go.s3.eu-central-1.amazonaws.com/4.1.0/runcmd.exe)
-- [Linux](https://estuary-agent-go.s3.eu-central-1.amazonaws.com/4.1.0/runcmd-linux)
-- [Alpine](https://estuary-agent-go.s3.eu-central-1.amazonaws.com/4.1.0/runcmd-alpine)
-
-Place the platform-specific binary under the same folder from where the service started. The exec must have its name
-as **runcmd**. E.g runcmd.exe (Windows) / runcmd (Linux)
-
-Compile this exec from the repository [runcmd](https://github.com/estuaryoss/runcmd)
+The endpoints are found in ```CommandsBackgroundApiController.java```
+The commands executed in background implements the same object as the usual **/command**
+endpoint.
 
 ## Eureka client registration
 

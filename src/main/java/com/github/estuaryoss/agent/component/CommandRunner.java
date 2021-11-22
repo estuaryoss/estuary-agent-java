@@ -12,10 +12,9 @@ import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.utils.CommandStatusThread;
 import com.github.estuaryoss.agent.utils.ProcessUtils;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -27,34 +26,29 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Component
+@Slf4j
 public class CommandRunner {
-    private static final Logger log = LoggerFactory.getLogger(CommandRunner.class);
-
     private static final String EXEC_WIN = "cmd.exe";
     private static final String ARGS_WIN = "/c";
     private static final String EXEC_LINUX = "/bin/sh";
     private static final String ARGS_LINUX = "-c";
+    public static final float DENOMINATOR = 1000F;
+    private static final String NONE_ID_COMMAND = "none";
 
-    private static final float DENOMINATOR = 1000F;
-
-    @Autowired
     private final DbService dbService;
-
-    @Autowired
     private final VirtualEnvironment environment;
 
+    @Autowired
     public CommandRunner(DbService dbService, VirtualEnvironment environment) {
         this.dbService = dbService;
         this.environment = environment;
@@ -68,19 +62,7 @@ public class CommandRunner {
      * @throws IOException if the process could not be started
      */
     public CommandDetails runCommand(String command) throws IOException {
-        boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
-        ArrayList<String> fullCommand = getPlatformCommand();
-        String commandWithSingleSpaces = command.trim().replaceAll("\\s+", " ");
-
-        if (isWindows) {
-            for (String cmd : commandWithSingleSpaces.split(" ")) {
-                fullCommand.add(cmd);
-            }
-        } else {
-            fullCommand.add(command);
-        }
-
-        return this.getCommandDetails(fullCommand.toArray(new String[0]));
+        return this.getCommandDetails(command, NONE_ID_COMMAND);
     }
 
     /**
@@ -110,6 +92,8 @@ public class CommandRunner {
             commandStatus.setStatus("finished");
             commandsStatus.put(cmd, commandStatus);
             commandDescription.setCommands(commandsStatus);
+
+            dbService.saveFinishedCommand(cmd, NONE_ID_COMMAND, commandStatus);
         }
 
         commandDescription.setFinishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
@@ -119,48 +103,37 @@ public class CommandRunner {
         commandDescription.setFinished(true);
         commandDescription.setStarted(false);
 
+
         return commandDescription;
     }
 
     /**
-     * Runs the commands through the 'runcmd' utility which is a golang implementation.
-     * Ref: https://github.com/estuaryoss/estuary-agent-java/releases.
-     * 'runcmd' is platform dependent and it must be downloaded in the same path along with this jar
+     * Runs the commands in background
      *
-     * @param command The commands to be executed separated by semicolon ;
+     * @param commands The commands to be executed
      * @return A reference to a Future of {@link ProcessResult}
      * @throws IOException if the process could not be started
      */
-    public Future<ProcessResult> runStartCommandInBackground(List<String> command) throws IOException {
-        String exec = "runcmd";
-        boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
-        ArrayList<String> fullCmd = getPlatformCommand();
+    public List<ProcessState> runCommandsInBackground(List<String> commands, String commandId) throws IOException {
+        List<ProcessState> processResultList = new ArrayList<>();
+        for (String cmd : commands) {
+            ProcessState future = this.runCommandDetached(cmd.split(" "), commandId);
 
-        if (isWindows) {
-            fullCmd.add(String.format("%s\\%s %s %s %s",
-                    Paths.get("").toAbsolutePath().toString(), exec,
-                    command.get(0), command.get(1), command.get(2)));
-        } else {
-            fullCmd.add(
-                    this.doQuoteCmd(String.format("%s/%s", Paths.get("").toAbsolutePath().toString(), exec)) + " " +
-                            command.get(0) + " " + command.get(1) + " " + command.get(2));
+            processResultList.add(future);
         }
 
-        return this.runStartCmdDetached(fullCmd.toArray(new String[0])).start().getFuture();
+        return processResultList;
     }
 
     /**
-     * Runs one command in detached mode, aka Non-blocking mode.
+     * Runs one command in background, aka Non-blocking mode.
      *
      * @param command The system command to be executed
      * @return A reference to a {@link ProcessExecutor}
      * @throws IOException if the process could not be started
      */
-    public ProcessState runCommandDetached(String[] command) throws IOException {
-        ArrayList<String> fullCommand = getPlatformCommand();
-        fullCommand.add(String.join(" ", command));
-
-        return this.runCmdDetached(fullCommand.toArray(new String[0]));
+    public ProcessState runCommandDetached(String[] command, String commandId) throws IOException {
+        return this.runCmdDetached(command, commandId);
     }
 
     /**
@@ -185,7 +158,7 @@ public class CommandRunner {
         for (int i = 0; i < commands.length; i++) {
             commandStatuses.add(new CommandStatus());
             commandStatuses.get(i).setStartedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-            processStates.add(this.runCommandDetached(commands[i].split(" ")));
+            processStates.add(this.runCommandDetached(commands[i].split(" "), NONE_ID_COMMAND));
         }
 
         //start threads that reads the stdout, stderr, pid and others
@@ -210,6 +183,10 @@ public class CommandRunner {
                 log.debug(ExceptionUtils.getStackTrace(e));
             }
         }
+
+        commandDescription.getCommands().forEach((cmd, cmdStatus) -> {
+            dbService.saveFinishedCommand(cmd, NONE_ID_COMMAND, cmdStatus);
+        });
 
         return commandDescription;
     }
@@ -265,7 +242,7 @@ public class CommandRunner {
             }
         }
 
-        dbService.remove(processState.getProcess().pid());
+        dbService.removeActiveCommand(processState.getProcess().pid());
 
         return commandDetails;
     }
@@ -285,7 +262,7 @@ public class CommandRunner {
         return platformCmd;
     }
 
-    private ProcessExecutor runStartCmdDetached(String[] command) {
+    private ProcessExecutor runCommandsInBackground(String[] command) {
         log.debug("Executing detached: " + Arrays.asList(command).toString());
 
         return new ProcessExecutor()
@@ -295,20 +272,33 @@ public class CommandRunner {
                 .readOutput(true);
     }
 
-    private ProcessState runCmdDetached(String[] command) throws IOException {
-        ProcessState processState = getProcessState(command);
+    private ProcessState runCmdDetached(String[] command, String commandId) throws IOException {
+        ArrayList<String> fullCommand = getPlatformCommand();
+        fullCommand.add(String.join(" ", command));
 
-        dbService.save(command, processState);
+        ProcessState processState = getProcessState(fullCommand.toArray(new String[0]));
+        dbService.saveActiveCommand(String.join(" ", command), commandId, processState);
 
         return processState;
     }
 
-    private CommandDetails getCommandDetails(String[] command) throws IOException {
-        ProcessState processState = getProcessState(command);
+    private CommandDetails getCommandDetails(String command, String commandId) throws IOException {
+        boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
+        List<String> fullCommand = getPlatformCommand();
+        String commandWithSingleSpaces = command.trim().replaceAll("\\s+", " ");
 
-        dbService.save(command, processState);
+        if (isWindows) {
+            for (String cmd : commandWithSingleSpaces.split(" ")) {
+                fullCommand.add(cmd);
+            }
+        } else {
+            fullCommand.add(command);
+        }
 
-        return this.getCmdDetailsOfProcess(command, processState);
+        ProcessState processState = getProcessState(fullCommand.toArray(new String[0]));
+        dbService.saveActiveCommand(command, commandId, processState);
+
+        return this.getCmdDetailsOfProcess(fullCommand.toArray(new String[0]), processState);
     }
 
     private ProcessState getProcessState(String[] command) throws IOException {

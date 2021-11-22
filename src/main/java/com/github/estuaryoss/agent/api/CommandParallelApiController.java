@@ -7,15 +7,13 @@ import com.github.estuaryoss.agent.component.CommandRunner;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
-import com.github.estuaryoss.agent.entity.FinishedCommand;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
 import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,18 +28,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.COMMAND_MAX_SIZE;
-import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FIELD_MAX_SIZE;
-import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
-
 @Api(tags = {"estuary-agent"})
 @RestController
+@Slf4j
 public class CommandParallelApiController implements CommandParallelApi {
-
-    private static final Logger log = LoggerFactory.getLogger(CommandParallelApiController.class);
-
     private final ObjectMapper objectMapper;
-
     private final HttpServletRequest request;
 
     @Autowired
@@ -75,19 +66,6 @@ public class CommandParallelApiController implements CommandParallelApi {
             throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
         }
-
-        commandDescription.getCommands().forEach((command, commandStatus) -> {
-            repository.saveAndFlush(FinishedCommand.builder()
-                    .command(trimString(command, COMMAND_MAX_SIZE))
-                    .code(commandStatus.getDetails().getCode())
-                    .out(trimString(commandStatus.getDetails().getOut(), FIELD_MAX_SIZE))
-                    .err(trimString(commandStatus.getDetails().getErr(), FIELD_MAX_SIZE))
-                    .startedAt(commandStatus.getStartedat())
-                    .finishedAt(commandStatus.getFinishedat())
-                    .duration(commandStatus.getDuration())
-                    .pid(commandStatus.getDetails().getPid())
-                    .build());
-        });
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())

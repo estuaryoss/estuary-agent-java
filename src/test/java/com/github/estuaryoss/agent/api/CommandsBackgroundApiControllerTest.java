@@ -46,7 +46,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
-public class CommandDetachedApiControllerTest {
+public class CommandsBackgroundApiControllerTest {
     private final static String SERVER_PREFIX = "http://localhost:";
     private final static String YAML_CONFIG = "config.yaml";
 

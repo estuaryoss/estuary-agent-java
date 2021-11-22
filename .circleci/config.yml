@@ -22,15 +22,6 @@ jobs: # a collection of steps
             - ~/.m2
           key: estuary-agent-{{ checksum "pom.xml" }}
       - run:
-          command: wget https://github.com/estuaryoss/runcmd/releases/download/1.0.0/runcmd-linux
-          name: "download runcmd-linux"
-      - run:
-          command: mv runcmd-linux  runcmd
-          name: "rename runcmd-linux"
-      - run:
-          command: chmod +x runcmd
-          name: "chmod +x runcmd-linux"
-      - run:
           command: printenv
           name: "print env vars"
       - run:

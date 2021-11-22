@@ -10,8 +10,7 @@ import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.service.StorageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -28,12 +27,9 @@ import java.util.Arrays;
 
 @Api(tags = {"estuary-agent"})
 @RestController
+@Slf4j
 public class FileApiController implements FileApi {
-
-    private static final Logger log = LoggerFactory.getLogger(FileApiController.class);
-
     private final ObjectMapper objectMapper;
-
     private final HttpServletRequest request;
 
     @Autowired

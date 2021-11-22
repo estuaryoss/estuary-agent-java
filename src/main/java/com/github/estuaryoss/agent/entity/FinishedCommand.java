@@ -22,8 +22,12 @@ import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FIELD_
 public class FinishedCommand {
     @Id
     @GeneratedValue
-    @Column(name = "ID")
+    @Column(name = "ID") //DB
     private Long id;
+
+    @Column(name = "CID")
+    @Length(max = FIELD_MAX_SIZE)
+    private String commandId = "none";
 
     @Column(name = "COMMAND")
     @Length(max = COMMAND_MAX_SIZE)

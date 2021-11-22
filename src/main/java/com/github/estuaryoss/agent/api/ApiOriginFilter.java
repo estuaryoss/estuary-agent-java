@@ -2,8 +2,7 @@ package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.component.VirtualEnvironment;
 import com.github.estuaryoss.agent.constants.HeaderConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -21,9 +20,8 @@ import java.util.UUID;
 import static com.github.estuaryoss.agent.constants.EnvConstants.HTTP_AUTH_TOKEN;
 
 @Component
+@Slf4j
 public class ApiOriginFilter extends GenericFilterBean {
-    private static final Logger log = LoggerFactory.getLogger(ApiOriginFilter.class);
-
     @Autowired
     private VirtualEnvironment environment;
 
@@ -47,9 +45,9 @@ public class ApiOriginFilter extends GenericFilterBean {
         log.debug(HeaderConstants.TOKEN + " Header: " + tokenHeader);
         log.debug(HeaderConstants.X_REQUEST_ID + " : " + xRequestId);
 
-        if (!(String.valueOf(tokenHeader)
-                .equals(String.valueOf(environment.getEnv().get(HTTP_AUTH_TOKEN))))) {
+        if (!(String.valueOf(tokenHeader).equals(String.valueOf(environment.getEnv().get(HTTP_AUTH_TOKEN))))) {
             httpResponse.sendError(HttpStatus.UNAUTHORIZED.value());
+
             return;
         }
 

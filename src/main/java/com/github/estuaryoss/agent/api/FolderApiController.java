@@ -7,9 +7,8 @@ import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.exception.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -27,12 +26,9 @@ import java.io.InputStream;
 
 @Api(tags = {"estuary-agent"})
 @RestController
+@Slf4j
 public class FolderApiController implements FolderApi {
-
-    private static final Logger log = LoggerFactory.getLogger(FolderApiController.class);
-
     private final ObjectMapper objectMapper;
-
     private final HttpServletRequest request;
 
     @Autowired

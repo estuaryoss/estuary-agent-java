@@ -21,7 +21,6 @@ public class SystemInformation {
         }
         String layer = new File("/.dockerenv").exists() ? "Docker" : "Machine";
         long maxMemory = Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024);
-        maxMemory = maxMemory;
 
         SystemInfo systemInfo = SystemInfo.builder()
                 .system(getSystem())

@@ -9,13 +9,11 @@ import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.entity.ActiveCommand;
-import com.github.estuaryoss.agent.entity.FinishedCommand;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.ConfigDescriptor;
 import com.github.estuaryoss.agent.model.YamlConfig;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
-import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
 import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.utils.ProcessUtils;
 import com.github.estuaryoss.agent.utils.YamlConfigParser;
@@ -37,10 +35,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.COMMAND_MAX_SIZE;
-import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FIELD_MAX_SIZE;
-import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
 
 @Api(tags = {"estuary-agent"})
 @RestController
@@ -64,9 +58,6 @@ public class CommandApiController implements CommandApi {
 
     @Autowired
     private About about;
-
-    @Autowired
-    private FinishedCommandRepository finishedCommandRepository;
 
     @Autowired
     public CommandApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -149,7 +140,7 @@ public class CommandApiController implements CommandApi {
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                 .stream().map(elem -> elem.strip()).collect(Collectors.toList());
 
-        log.debug("Executing commands: " + commandsList.toString());
+        log.debug("Executing commands: " + commandsList);
         CommandDescription commandDescription;
         try {
             commandDescription = commandRunner.runCommands(commandsList.toArray(new String[0]));
@@ -189,7 +180,7 @@ public class CommandApiController implements CommandApi {
                     ApiResponseMessage.getMessage(ApiResponseCode.INVALID_YAML_CONFIG.getCode()));
         }
 
-        log.debug("Executing commands: " + commandsList.toString());
+        log.debug("Executing commands: " + commandsList);
         configDescriptor.setYamlConfig(yamlConfig);
         try {
             configDescriptor.setDescription(commandRunner.runCommands(commandsList.toArray(new String[0])));
@@ -197,19 +188,6 @@ public class CommandApiController implements CommandApi {
             throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
         }
-
-        ((CommandDescription) configDescriptor.getDescription()).getCommands().forEach((command, commandStatus) -> {
-            finishedCommandRepository.saveAndFlush(FinishedCommand.builder()
-                    .command(trimString(command, COMMAND_MAX_SIZE))
-                    .code(commandStatus.getDetails().getCode())
-                    .out(trimString(commandStatus.getDetails().getOut(), FIELD_MAX_SIZE))
-                    .err(trimString(commandStatus.getDetails().getErr(), FIELD_MAX_SIZE))
-                    .startedAt(commandStatus.getStartedat())
-                    .finishedAt(commandStatus.getFinishedat())
-                    .duration(commandStatus.getDuration())
-                    .pid(commandStatus.getDetails().getPid())
-                    .build());
-        });
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())

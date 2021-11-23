@@ -10,7 +10,6 @@ import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
-import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +44,6 @@ public class CommandParallelApiController implements CommandParallelApi {
     private About about;
 
     @Autowired
-    private FinishedCommandRepository repository;
-
-    @Autowired
     public CommandParallelApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -58,7 +54,7 @@ public class CommandParallelApiController implements CommandParallelApi {
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                 .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());
 
-        log.debug("Executing commands: " + commandsList.toString());
+        log.debug("Executing commands: " + commandsList);
         CommandDescription commandDescription;
         try {
             commandDescription = commandRunner.runCommandsParallel(commandsList.toArray(new String[0]));

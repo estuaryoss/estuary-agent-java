@@ -6,6 +6,8 @@ public class StringUtils {
         if (input == null) return "";
         if (input.length() == 0) return "";
 
-        return input.substring(0, Math.min(input.length(), maxSize));
+        if (input.length() < maxSize) return input;
+
+        return input.substring(input.length() - maxSize);
     }
 }

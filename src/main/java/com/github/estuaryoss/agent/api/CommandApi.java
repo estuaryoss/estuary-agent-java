@@ -25,7 +25,7 @@ public interface CommandApi {
     @RequestMapping(value = "/commands",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    default ResponseEntity<ApiResponse> commandGetAll() {
+    default ResponseEntity<ApiResponse> commandActiveGetAll() {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -56,11 +56,11 @@ public interface CommandApi {
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Commands start success", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "Commands start failure", response = ApiResponse.class)})
-    @RequestMapping(value = "/command",
+    @RequestMapping(value = "/commands",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},
             method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> commandPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    default ResponseEntity<ApiResponse> commandsPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -70,11 +70,11 @@ public interface CommandApi {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Commands start success", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "Commands start failure", response = ApiResponse.class)
     })
-    @RequestMapping(value = "/commandyaml",
+    @RequestMapping(value = "/commandsyaml",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},
             method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> commandPostYaml(@ApiParam(value = "Commands to run described as yaml", required = true) @Valid @RequestBody String commands) throws IOException {
+    default ResponseEntity<ApiResponse> commandsPostYaml(@ApiParam(value = "Commands to run described as yaml", required = true) @Valid @RequestBody String commands) throws IOException {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 }

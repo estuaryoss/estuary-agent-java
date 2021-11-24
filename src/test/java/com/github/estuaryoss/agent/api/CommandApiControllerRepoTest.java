@@ -58,15 +58,15 @@ public class CommandApiControllerRepoTest {
 
         postCommands(commands);
 
-        assertThat(finishedCommandRepository.findAll().size()).isEqualTo(commands.split("\n").length);
         assertThat(activeCommandRepository.findAll().size()).isEqualTo(0);
+        assertThat(finishedCommandRepository.findAll().size()).isEqualTo(commands.split("\n").length);
     }
 
     private ResponseEntity<ApiResponse<CommandDescription>> postCommands(String command) {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .exchange(SERVER_PREFIX + port + "/command",
+                .exchange(SERVER_PREFIX + port + "/commands",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
                         new ParameterizedTypeReference<>() {

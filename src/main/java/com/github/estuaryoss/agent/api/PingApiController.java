@@ -8,8 +8,7 @@ import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import io.swagger.annotations.Api;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +19,9 @@ import java.time.LocalDateTime;
 
 @Api(tags = {"estuary-agent"}, description = "root")
 @RestController
+@Slf4j
 public class PingApiController implements PingApi {
-
-    private static final Logger log = LoggerFactory.getLogger(PingApiController.class);
-
     private final ObjectMapper objectMapper;
-
     private final HttpServletRequest request;
 
     @Autowired

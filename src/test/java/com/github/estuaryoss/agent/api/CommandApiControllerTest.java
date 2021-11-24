@@ -297,7 +297,7 @@ public class CommandApiControllerTest {
         this.assertFailureCommandDescriptionFields(commandInfo, body.getDescription());
 
         assertThat(body.getName()).isEqualTo(about.getAppName());
-        assertThat(body.getPath()).isEqualTo("/command?");
+        assertThat(body.getPath()).isEqualTo("/commands?");
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
@@ -306,7 +306,7 @@ public class CommandApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .exchange(SERVER_PREFIX + port + "/command",
+                .exchange(SERVER_PREFIX + port + "/commands",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
                         new ParameterizedTypeReference<ApiResponse<CommandDescription>>() {
@@ -317,7 +317,7 @@ public class CommandApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .exchange(SERVER_PREFIX + port + "/commandyaml",
+                .exchange(SERVER_PREFIX + port + "/commandsyaml",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(yamlConfig, headers),
                         ApiResponse.class);
@@ -327,7 +327,7 @@ public class CommandApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .exchange(SERVER_PREFIX + port + "/commandyaml",
+                .exchange(SERVER_PREFIX + port + "/commandsyaml",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(yamlConfig, headers),
                         ApiResponse.class);

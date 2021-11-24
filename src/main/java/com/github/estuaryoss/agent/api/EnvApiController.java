@@ -12,8 +12,7 @@ import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +28,8 @@ import java.util.Map;
 
 @Api(tags = {"estuary-agent"})
 @RestController
+@Slf4j
 public class EnvApiController implements EnvApi {
-    private static final Logger log = LoggerFactory.getLogger(EnvApiController.class);
-
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
 

@@ -22,15 +22,6 @@ jobs: # a collection of steps
             - ~/.m2
           key: estuary-agent-{{ checksum "pom.xml" }}
       - run:
-          command: wget https://github.com/estuaryoss/runcmd/releases/download/1.0.0/runcmd-linux
-          name: "download runcmd-linux"
-      - run:
-          command: mv runcmd-linux  runcmd
-          name: "rename runcmd-linux"
-      - run:
-          command: chmod +x runcmd
-          name: "chmod +x runcmd-linux"
-      - run:
           command: printenv
           name: "print env vars"
       - run:
@@ -52,5 +43,5 @@ jobs: # a collection of steps
 
       - store_artifacts: # store the jar as an artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: target/agent-4.2.3-SNAPSHOT-exec.jar
+          path: target/agent-4.2.4-SNAPSHOT-exec.jar
       # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples

@@ -9,8 +9,7 @@ import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.utils.SystemInformation;
 import io.swagger.annotations.Api;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +20,9 @@ import java.time.LocalDateTime;
 
 @Api(tags = {"estuary-agent"}, description = "estuary-agent swagger API")
 @RestController
+@Slf4j
 public class AboutApiController implements AboutApi {
-
-    private static final Logger log = LoggerFactory.getLogger(AboutApiController.class);
-
     private final ObjectMapper objectMapper;
-
     private final HttpServletRequest request;
 
     @Autowired

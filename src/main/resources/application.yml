@@ -15,7 +15,8 @@ eureka:
     statusPageUrl: http://${eureka.hostname}:${PORT:8080}/actuator/info
     healthCheckUrl: http://${eureka.hostname}:${PORT:8080}/actuator/health
     homePageUrl: http://${eureka.hostname}:${PORT:8080}/
-
+    metadata-map:
+      name: Estuary-Agent
 
 spring:
   application:

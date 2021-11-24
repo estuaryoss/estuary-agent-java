@@ -11,8 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.COMMAND_MAX_SIZE;
-import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FIELD_MAX_SIZE;
+import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.*;
 
 @Entity
 @Builder
@@ -22,8 +21,12 @@ import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FIELD_
 public class FinishedCommand {
     @Id
     @GeneratedValue
-    @Column(name = "ID")
+    @Column(name = "ID") //DB
     private Long id;
+
+    @Column(name = "CID")
+    @Length(max = FIELD_MAX_SIZE)
+    private String commandId = "none";
 
     @Column(name = "COMMAND")
     @Length(max = COMMAND_MAX_SIZE)
@@ -33,11 +36,11 @@ public class FinishedCommand {
     private Long code;
 
     @Column(name = "OUT")
-    @Length(max = FIELD_MAX_SIZE)
+    @Length(max = COMMAND_STDOUT_MAX_SIZE)
     private String out;
 
     @Column(name = "ERR")
-    @Length(max = FIELD_MAX_SIZE)
+    @Length(max = COMMAND_STDERR_MAX_SIZE)
     private String err;
 
     @Column(name = "STARTED_AT")

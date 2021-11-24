@@ -71,7 +71,7 @@ public class CommandParallelApiControllerTest {
         this.assertSuccessCommandDescriptionFields(commandInfo, body.getDescription());
 
         assertThat(body.getName()).isEqualTo(about.getAppName());
-        assertThat(body.getPath()).isEqualTo("/commandparallel?");
+        assertThat(body.getPath()).isEqualTo("/commandsparallel?");
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
@@ -208,7 +208,7 @@ public class CommandParallelApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .exchange(SERVER_PREFIX + port + "/commandparallel",
+                .exchange(SERVER_PREFIX + port + "/commandsparallel",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
                         new ParameterizedTypeReference<ApiResponse<CommandDescription>>() {

@@ -12,6 +12,12 @@ import java.util.LinkedHashMap;
 public class CommandParallel {
     @Setter
     @Getter
+    private int threadId;
+    @Setter
+    @Getter
+    private String command;
+    @Setter
+    @Getter
     private CommandDescription commandDescription;
     @Setter
     @Getter
@@ -22,10 +28,4 @@ public class CommandParallel {
     @Setter
     @Getter
     private ProcessState processState;
-    @Setter
-    @Getter
-    private String command;
-    @Setter
-    @Getter
-    private int threadId;
 }

@@ -5,8 +5,10 @@ import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.component.ClientRequest;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.*;
+import com.github.estuaryoss.agent.entity.FileTransfer;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
+import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.service.StorageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -25,6 +27,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_NAME_MAX_SIZE;
+import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_PATH_MAX_SIZE;
+import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
+
 @Api(tags = {"estuary-agent"})
 @RestController
 @Slf4j
@@ -40,6 +46,9 @@ public class FileApiController implements FileApi {
 
     @Autowired
     private StorageService storageService;
+
+    @Autowired
+    private DbService dbService;
 
     @Autowired
     public FileApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -101,7 +110,14 @@ public class FileApiController implements FileApi {
         }
 
         try {
+            File file = new File(filePath);
             storageService.store(content, filePath);
+            dbService.saveFileTransfer(FileTransfer.builder()
+                    .targetFileName(trimString(file.getName(), FILE_NAME_MAX_SIZE))
+                    .targetFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
+                    .targetFolder(trimString(file.getParent(), FILE_PATH_MAX_SIZE))
+                    .fileSize(content != null ? Long.valueOf(content.length) : 0L)
+                    .build());
             log.info(String.format("Stored file at '%s'", filePath));
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.UPLOAD_FILE_FAILURE.getCode(),
@@ -119,7 +135,7 @@ public class FileApiController implements FileApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> filesPut(@RequestPart("files") MultipartFile[] files, @RequestParam(value = "folderPath", required = false) String folderPath) {
+    public ResponseEntity<ApiResponse> filesPut(@RequestPart("files") MultipartFile[] files, @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
         String accept = request.getHeader("Accept");
         final String fPath = folderPath != null ? folderPath : DefaultConstants.UPLOADS_FOLDER;
 
@@ -129,6 +145,13 @@ public class FileApiController implements FileApi {
             try {
                 String filePath = fPath + File.separator + file.getOriginalFilename();
                 storageService.store(file, filePath);
+                dbService.saveFileTransfer(FileTransfer.builder()
+                        .targetFileName(trimString(file.getOriginalFilename(), FILE_NAME_MAX_SIZE))
+                        .sourceFileName(trimString(file.getOriginalFilename(), FILE_NAME_MAX_SIZE))
+                        .targetFilePath(trimString(filePath, FILE_PATH_MAX_SIZE))
+                        .fileSize(file.getSize())
+                        .targetFolder(trimString(fPath, FILE_PATH_MAX_SIZE))
+                        .build());
                 log.info(String.format("Stored file '%s' at '%s'", file.getName(), filePath));
             } catch (IOException e) {
                 throw new ApiException(ApiResponseCode.UPLOAD_FILE_FAILURE_NAME.getCode(),

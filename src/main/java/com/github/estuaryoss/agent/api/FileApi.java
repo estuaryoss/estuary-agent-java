@@ -58,8 +58,8 @@ public interface FileApi {
     @RequestMapping(value = "/files",
             produces = {"application/json"},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
-            method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> filesPut(@ApiParam(value = "The files to be uploaded") @RequestPart("files") MultipartFile[] files, @ApiParam(value = "The folder path where the file to be saved", required = true) @RequestParam(value = "folderPath", required = false) String folderPath) {
+            method = {RequestMethod.PUT, RequestMethod.POST})
+    default ResponseEntity<ApiResponse> filesPut(@ApiParam(value = "The files to be uploaded") @RequestPart("files") MultipartFile[] files, @ApiParam(value = "The folder path where the file to be saved", required = true) @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

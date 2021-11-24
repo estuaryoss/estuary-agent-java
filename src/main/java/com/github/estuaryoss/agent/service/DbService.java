@@ -1,10 +1,12 @@
 package com.github.estuaryoss.agent.service;
 
 import com.github.estuaryoss.agent.entity.ActiveCommand;
+import com.github.estuaryoss.agent.entity.FileTransfer;
 import com.github.estuaryoss.agent.entity.FinishedCommand;
 import com.github.estuaryoss.agent.model.ProcessState;
 import com.github.estuaryoss.agent.model.api.CommandStatus;
 import com.github.estuaryoss.agent.repository.ActiveCommandRepository;
+import com.github.estuaryoss.agent.repository.FileTransferRepository;
 import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -27,7 +29,14 @@ public class DbService {
     @Autowired
     private FinishedCommandRepository finishedCommandRepository;
 
+    @Autowired
+    private FileTransferRepository fileTransferRepository;
+
     private final Comparator<FinishedCommand> finishedCommandComparator = Comparator.comparing(finishedCommand -> finishedCommand.getFinishedAt());
+
+    public void saveFileTransfer(FileTransfer fileTransfer) {
+        fileTransferRepository.saveAndFlush(fileTransfer);
+    }
 
     public void saveActiveCommand(String command, String commandId, ProcessState processState) {
         ActiveCommand activeCommand = ActiveCommand.builder()

@@ -113,10 +113,10 @@ public class FileApiController implements FileApi {
             File file = new File(filePath);
             storageService.store(content, filePath);
             dbService.saveFileTransfer(FileTransfer.builder()
-                    .targetFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
                     .targetFileName(trimString(file.getName(), FILE_NAME_MAX_SIZE))
+                    .targetFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
                     .targetFolder(trimString(file.getParent(), FILE_PATH_MAX_SIZE))
-                    .fileSize(Long.valueOf(content.length))
+                    .fileSize(content != null ? Long.valueOf(content.length) : 0L)
                     .build());
             log.info(String.format("Stored file at '%s'", filePath));
         } catch (IOException e) {

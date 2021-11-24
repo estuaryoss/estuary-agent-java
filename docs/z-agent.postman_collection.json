@@ -498,6 +498,71 @@
       "response": []
     },
     {
+      "name": "{{SERVER}}:8080/files",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "password",
+              "value": "estuaryoss123!",
+              "type": "string"
+            },
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Folder-Path",
+            "value": "C:\\Users\\Catalin Dinuta\\Documents\\WindowsPowerShell"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "disabled": true
+          },
+          {
+            "key": "Content-Type",
+            "name": "Content-Type",
+            "type": "text",
+            "value": "application/json",
+            "disabled": true
+          },
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46U2VjcmV0MDE=",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "files",
+              "type": "file",
+              "src": "/D:/poze ion/DSC_0336.JPG"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{SERVER}}:8080/files",
+          "host": [
+            "{{SERVER}}"
+          ],
+          "port": "8080",
+          "path": [
+            "files"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "{{SERVER}}:8080/folder",
       "request": {
         "method": "GET",

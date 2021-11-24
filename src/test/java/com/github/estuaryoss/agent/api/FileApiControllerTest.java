@@ -273,16 +273,16 @@ public class FileApiControllerTest {
         MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("files", getTestFile());
         requestBody.add("files", getTestFile());
+        String folderPath = "/tmp";
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>() {{
             add("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE);
             add("Accept", MediaType.APPLICATION_JSON_VALUE);
+            add("Folder-Path", folderPath);
         }};
-        String folderPath = "/tmp";
-//        String folderPath  = "tmp";
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                        .exchange(SERVER_PREFIX + port + "/files?folderPath={folderPath}",
+                        .exchange(SERVER_PREFIX + port + "/files",
                                 HttpMethod.POST,
                                 requestEntity,
                                 ApiResponse.class,

@@ -100,8 +100,8 @@ After user auth, set the received cookie (JSESSIONID) to communicate further wit
 The same settings can be set through application properties: **app.user** & **app.password**.  
 The env vars precedence is higher than the one set through the application properties.
 
-[!!!]() Use these env variables or swap application.properties file if you use it as dependency, otherwise you will open a major security hole. The attacker will have access to your system. [!!!]()
-
+[!!!]() Use these env variables or swap application.properties file if you use it as dependency, otherwise you will open
+a major security hole. The attacker will have access to your system. [!!!]()
 
 ### Method 2 - Token auth - No spring-security
 
@@ -123,97 +123,111 @@ resource folder.
 ! Please also change the app port by setting the env var called **PORT** to *8443*. Default is 8080.
 
 ## Environment variables injection
-User defined environment variables will be stored in a 'virtual' environment. The extra env vars will be used by the process that executes system commands.  
-There are two ways to inject user defined environment variables.    
--   call POST on **/env** endpoint. The body will contain the env vars in JSON format. E.g. {"FOO1":"BAR1"}  
--   create an **environment.properties** file with the extra env vars needed and place it in the same path as the JAR. Example in this repo.  
 
-*! All environment variables described above can also be set using **environment.properties**. However, the vars set through **application.yml** can't be set: PORT, APP_IP, EUREKA_SERVER.*
+User defined environment variables will be stored in a 'virtual' environment. The extra env vars will be used by the
+process that executes system commands.  
+There are two ways to inject user defined environment variables.
+
+- call POST on **/env** endpoint. The body will contain the env vars in JSON format. E.g. {"FOO1":"BAR1"}
+- create an **environment.properties** file with the extra env vars needed and place it in the same path as the JAR.
+  Example in this repo.
+
+*! All environment variables described above can also be set using **environment.properties**. However, the vars set
+through **application.yml** can't be set: PORT, APP_IP, EUREKA_SERVER.*
 
 ## Example output
+
 curl -X POST -d 'ls -lrt' http://localhost:8080/command
 
 ```json
 {
-    "code": 1000,
-    "message": "Success",
-    "description": {
-        "finished": true,
-        "started": false,
-        "startedat": "2020-08-15 19:38:16.138962",
-        "finishedat": "2020-08-15 19:38:16.151067",
-        "duration": 0.012,
-        "pid": 2315,
-        "id": "none",
-        "commands": {
-            "ls -lrt": {
-                "status": "finished",
-                "details": {
-                    "out": "total 371436\n-rwxr-xr-x 1 dinuta qa  13258464 Jun 24 09:25 main-linux\ndrwxr-xr-x 4 dinuta qa        40 Jul  1 11:42 tmp\n-rw-r--r-- 1 dinuta qa  77707265 Jul 25 19:38 testrunner-linux.zip\n-rw------- 1 dinuta qa   4911271 Aug 14 10:00 nohup.out\n",
-                    "err": "",
-                    "code": 0,
-                    "pid": 6803,
-                    "args": [
-                        "/bin/sh",
-                        "-c",
-                        "ls -lrt"
-                    ]
-                },
-                "startedat": "2020-08-15 19:38:16.138970",
-                "finishedat": "2020-08-15 19:38:16.150976",
-                "duration": 0.012
-            }
-        }
-    },
-    "timestamp": "2020-08-15 19:38:16.151113",
-    "path": "/command?",
-    "name": "estuary-agent",
-    "version": "4.0.8"
+  "code": 1000,
+  "message": "Success",
+  "description": {
+    "finished": true,
+    "started": false,
+    "startedat": "2020-08-15 19:38:16.138962",
+    "finishedat": "2020-08-15 19:38:16.151067",
+    "duration": 0.012,
+    "pid": 2315,
+    "id": "none",
+    "commands": {
+      "ls -lrt": {
+        "status": "finished",
+        "details": {
+          "out": "total 371436\n-rwxr-xr-x 1 dinuta qa  13258464 Jun 24 09:25 main-linux\ndrwxr-xr-x 4 dinuta qa        40 Jul  1 11:42 tmp\n-rw-r--r-- 1 dinuta qa  77707265 Jul 25 19:38 testrunner-linux.zip\n-rw------- 1 dinuta qa   4911271 Aug 14 10:00 nohup.out\n",
+          "err": "",
+          "code": 0,
+          "pid": 6803,
+          "args": [
+            "/bin/sh",
+            "-c",
+            "ls -lrt"
+          ]
+        },
+        "startedat": "2020-08-15 19:38:16.138970",
+        "finishedat": "2020-08-15 19:38:16.150976",
+        "duration": 0.012
+      }
+    }
+  },
+  "timestamp": "2020-08-15 19:38:16.151113",
+  "path": "/command?",
+  "name": "estuary-agent",
+  "version": "4.0.8"
 }
 ```
 
-## Overview  
-The underlying library integrating swagger to SpringBoot is [springfox](https://github.com/springfox/springfox)  
+## Overview
 
-Start your server as an simple java application  
+The underlying library integrating swagger to SpringBoot is [springfox](https://github.com/springfox/springfox)
+
+Start your server as an simple java application
 
 You can view the api documentation in swagger-ui by pointing to  
-http://localhost:8080/  
+http://localhost:8080/
 
 Change default port value in application.properties
 
+## Maven dependency && settings.xml
 
-## Maven dependency && settings.xml 
 Get this dependency:
+
 ```xml
+
+<dependency>
+  <groupId>com.github.estuaryoss</groupId>
+  <artifactId>agent</artifactId>
+  <version>4.0.8</version>
+</dependency>
+```
+
+## Maven devendency snapshot
+
+```xml
+
 <dependency>
     <groupId>com.github.estuaryoss</groupId>
     <artifactId>agent</artifactId>
-    <version>4.0.8</version>
-</dependency>
-```
-## Maven devendency snapshot
-```xml
-<dependency>
-    <groupId>com.github.estuaryoss</groupId>
-  <artifactId>agent</artifactId>
-  <version>4.2.3-SNAPSHOT</version>
+    <version>4.2.3-SNAPSHOT</version>
 </dependency>
 ```
 
 To use a snapshot version, set the s01.oss.sonatype.org repo in settings.xml:
+
 ```xml
+
 <repository>
     <id>snaphosts4</id>
     <snapshots>
         <enabled>true</enabled>
     </snapshots>
-  <releases>
-    <enabled>false</enabled>
-    <updatePolicy>always</updatePolicy>
-  </releases>
-  <name>all-external8</name>
-  <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+    <releases>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+    </releases>
+    <name>all-external8</name>
+    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
 </repository>
 ```
 

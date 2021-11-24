@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "ee5169b0-9250-4b0b-a312-b4122b5b199f",
-    "name": "estuary-agent",
+    "name": "z-agent",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -633,6 +633,64 @@
           "port": "8080",
           "path": [
             "commands"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "{{SERVER}}:8080/commandsfinished",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "username",
+              "value": "user",
+              "type": "string"
+            },
+            {
+              "key": "password",
+              "value": "password",
+              "type": "string"
+            },
+            {
+              "key": "showPassword",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "File-Path",
+            "value": "/etc/hostname"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "name": "Content-Type",
+            "value": "text/plain",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Basic YWRtaW46U2VjcmV0MDE=",
+            "disabled": true
+          }
+        ],
+        "url": {
+          "raw": "{{SERVER}}:8080/commandsfinished",
+          "host": [
+            "{{SERVER}}"
+          ],
+          "port": "8080",
+          "path": [
+            "commandsfinished"
           ]
         }
       },

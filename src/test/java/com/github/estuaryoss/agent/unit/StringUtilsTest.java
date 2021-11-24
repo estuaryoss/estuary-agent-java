@@ -15,7 +15,7 @@ public class StringUtilsTest {
                     "aa;3;aa"
             }
     )
-    public void whenMaxSizeIsGreaterThanInputLenght_ThenOutIsTheSame(String inOutPairs) {
+    public void whenMaxSizeIsGreaterThanInputLenghtThenOutIsTheSame(String inOutPairs) {
         String[] inOut = inOutPairs.split(";");
         String out = StringUtils.trimString(inOut[0], Integer.parseInt(inOut[1]));
 
@@ -30,7 +30,7 @@ public class StringUtilsTest {
                     "123456;1;6"
             }
     )
-    public void whenMaxSizeIsLessThanInputLenght_ThenOutTruncatedToTheLast(String inOutPairs) {
+    public void whenMaxSizeIsLessThanInputLenghtThenOutTruncatedToTheLast(String inOutPairs) {
         String[] inOut = inOutPairs.split(";");
         String out = StringUtils.trimString(inOut[0], Integer.parseInt(inOut[1]));
 

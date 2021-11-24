@@ -16,8 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.COMMAND_MAX_SIZE;
-import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FIELD_MAX_SIZE;
+import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.*;
 import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
 
 @Service
@@ -28,12 +27,12 @@ public class DbService {
     @Autowired
     private FinishedCommandRepository finishedCommandRepository;
 
-    private Comparator<FinishedCommand> finishedCommandComparator = Comparator.comparing(finishedCommand -> finishedCommand.getFinishedAt());
+    private final Comparator<FinishedCommand> finishedCommandComparator = Comparator.comparing(finishedCommand -> finishedCommand.getFinishedAt());
 
     public void saveActiveCommand(String command, String commandId, ProcessState processState) {
         ActiveCommand activeCommand = ActiveCommand.builder()
-                .commandId(commandId)
-                .command(command)
+                .commandId(trimString(commandId, FIELD_MAX_SIZE))
+                .command(trimString(command, COMMAND_MAX_SIZE))
                 .startedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
                 .pid(processState.getProcess().pid())
                 .build();
@@ -43,11 +42,11 @@ public class DbService {
 
     public void saveFinishedCommand(String command, String commandId, CommandStatus commandStatus) {
         FinishedCommand finishedCommand = FinishedCommand.builder()
+                .commandId(trimString(commandId, FIELD_MAX_SIZE))
                 .command(trimString(command, COMMAND_MAX_SIZE))
-                .commandId(commandId)
                 .code(commandStatus.getDetails().getCode())
-                .out(trimString(commandStatus.getDetails().getOut(), FIELD_MAX_SIZE))
-                .err(trimString(commandStatus.getDetails().getErr(), FIELD_MAX_SIZE))
+                .out(trimString(commandStatus.getDetails().getOut(), COMMAND_STDOUT_MAX_SIZE))
+                .err(trimString(commandStatus.getDetails().getErr(), COMMAND_STDERR_MAX_SIZE))
                 .startedAt(commandStatus.getStartedat())
                 .finishedAt(commandStatus.getFinishedat())
                 .duration(commandStatus.getDuration())

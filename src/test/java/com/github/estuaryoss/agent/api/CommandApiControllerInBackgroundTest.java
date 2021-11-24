@@ -57,7 +57,7 @@ public class CommandApiControllerInBackgroundTest {
     }
 
     @Test
-    public void whenSendingBackgroundCommand_ThenTheUserMustPollActiveAndFinishedEndpointsForDetails() throws JsonProcessingException {
+    public void whenSendingBackgroundCommandThenTheUserMustPollActiveAndFinishedEndpointsForDetails() throws JsonProcessingException {
         String stdOut = "1";
         String command = "echo " + stdOut;
 

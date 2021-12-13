@@ -29,6 +29,10 @@ public class FileTransfer {
     @Length(max = FILE_NAME_MAX_SIZE)
     private String sourceFileName;
 
+    @Column(name = "SOURCE_FILEPATH")
+    @Length(max = FILE_PATH_MAX_SIZE)
+    private String sourceFilePath;
+
     @Column(name = "TARGET_FILENAME")
     @Length(max = FILE_NAME_MAX_SIZE)
     private String targetFileName;

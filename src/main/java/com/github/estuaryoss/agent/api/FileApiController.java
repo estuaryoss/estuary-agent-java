@@ -69,6 +69,12 @@ public class FileApiController implements FileApi {
         Resource resource;
         try {
             resource = storageService.loadAsResource(filePath);
+            File file = new File(filePath);
+            dbService.saveFileTransfer(FileTransfer.builder()
+                    .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
+                    .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
+                    .fileSize(resource.contentLength())
+                    .build());
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_FILE_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode()));
@@ -90,6 +96,12 @@ public class FileApiController implements FileApi {
         Resource resource;
         try {
             resource = storageService.loadAsResource(filePath);
+            File file = new File(filePath);
+            dbService.saveFileTransfer(FileTransfer.builder()
+                    .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
+                    .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
+                    .fileSize(resource.contentLength())
+                    .build());
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_FILE_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode()));
@@ -110,8 +122,8 @@ public class FileApiController implements FileApi {
         }
 
         try {
-            File file = new File(filePath);
             storageService.store(content, filePath);
+            File file = new File(filePath);
             dbService.saveFileTransfer(FileTransfer.builder()
                     .targetFileName(trimString(file.getName(), FILE_NAME_MAX_SIZE))
                     .targetFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))

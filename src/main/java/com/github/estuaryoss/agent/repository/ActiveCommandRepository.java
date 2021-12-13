@@ -10,5 +10,5 @@ import java.util.List;
 public interface ActiveCommandRepository extends JpaRepository<ActiveCommand, Long> {
     ActiveCommand findActiveCommandByPid(Long pid);
 
-    List<ActiveCommand> findActiveCommandByCommandId(String commandId);
+    List<ActiveCommand> findActiveCommandById(Long id);
 }

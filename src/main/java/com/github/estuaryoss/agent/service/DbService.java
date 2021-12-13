@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,15 +31,12 @@ public class DbService {
     @Autowired
     private FileTransferRepository fileTransferRepository;
 
-    private final Comparator<FinishedCommand> finishedCommandComparator = Comparator.comparing(finishedCommand -> finishedCommand.getFinishedAt());
-
     public void saveFileTransfer(FileTransfer fileTransfer) {
         fileTransferRepository.saveAndFlush(fileTransfer);
     }
 
-    public void saveActiveCommand(String command, String commandId, ProcessState processState) {
+    public void saveActiveCommand(String command, ProcessState processState) {
         ActiveCommand activeCommand = ActiveCommand.builder()
-                .commandId(trimString(commandId, FIELD_MAX_SIZE))
                 .command(trimString(command, COMMAND_MAX_SIZE))
                 .startedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
                 .pid(processState.getProcess().pid())
@@ -49,9 +45,8 @@ public class DbService {
         activeCommandRepository.saveAndFlush(activeCommand);
     }
 
-    public void saveFinishedCommand(String command, String commandId, CommandStatus commandStatus) {
+    public void saveFinishedCommand(String command, CommandStatus commandStatus) {
         FinishedCommand finishedCommand = FinishedCommand.builder()
-                .commandId(trimString(commandId, FIELD_MAX_SIZE))
                 .command(trimString(command, COMMAND_MAX_SIZE))
                 .code(commandStatus.getDetails().getCode())
                 .out(trimString(commandStatus.getDetails().getOut(), COMMAND_STDOUT_MAX_SIZE))
@@ -83,20 +78,5 @@ public class DbService {
     public void removeActiveCommand(long pid) {
         ActiveCommand activeCommand = activeCommandRepository.findActiveCommandByPid(pid);
         if (activeCommand != null) activeCommandRepository.delete(activeCommand);
-    }
-
-    public List<ActiveCommand> getAllActiveCommandsByCommandId(String commandId) {
-        return activeCommandRepository.findActiveCommandByCommandId(commandId);
-    }
-
-    public List<FinishedCommand> getAllFinishedCommandsByCommandId(String commandId) {
-        List<FinishedCommand> finishedCommandsList = finishedCommandRepository.findFinishedCommandByCommandId(commandId);
-        finishedCommandsList.sort(finishedCommandComparator);
-
-        return finishedCommandsList;
-    }
-
-    private String joinCommand(String[] command) {
-        return String.join(" ", command);
     }
 }

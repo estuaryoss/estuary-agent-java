@@ -24,10 +24,6 @@ public class FinishedCommand {
     @Column(name = "ID") //DB
     private Long id;
 
-    @Column(name = "CID")
-    @Length(max = FIELD_MAX_SIZE)
-    private String commandId = "none";
-
     @Column(name = "COMMAND")
     @Length(max = COMMAND_MAX_SIZE)
     private String command;

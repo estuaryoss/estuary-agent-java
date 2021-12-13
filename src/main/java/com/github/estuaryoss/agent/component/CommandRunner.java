@@ -42,7 +42,6 @@ public class CommandRunner {
     private static final String EXEC_LINUX = "/bin/sh";
     private static final String ARGS_LINUX = "-c";
     public static final float DENOMINATOR = 1000F;
-    private static final String NONE_ID_COMMAND = "none";
 
     private final DbService dbService;
     private final VirtualEnvironment environment;
@@ -61,7 +60,7 @@ public class CommandRunner {
      * @throws IOException if the process could not be started
      */
     public CommandDetails runCommand(String command) throws IOException {
-        return this.getCommandDetails(command, NONE_ID_COMMAND);
+        return this.getCommandDetails(command);
     }
 
     /**
@@ -92,7 +91,7 @@ public class CommandRunner {
             commandsStatus.put(cmd, commandStatus);
             commandDescription.setCommands(commandsStatus);
 
-            dbService.saveFinishedCommand(cmd, NONE_ID_COMMAND, commandStatus);
+            dbService.saveFinishedCommand(cmd, commandStatus);
         }
 
         commandDescription.setFinishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
@@ -113,8 +112,8 @@ public class CommandRunner {
      * @return A reference to a {@link ProcessExecutor}
      * @throws IOException if the process could not be started
      */
-    public ProcessState runCommandDetached(String[] command, String commandId) throws IOException {
-        return this.runCmdDetached(command, commandId);
+    public ProcessState runCommandDetached(String[] command) throws IOException {
+        return this.runCmdDetached(command);
     }
 
     /**
@@ -139,7 +138,7 @@ public class CommandRunner {
         for (int i = 0; i < commands.length; i++) {
             commandStatuses.add(new CommandStatus());
             commandStatuses.get(i).setStartedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-            processStates.add(this.runCommandDetached(commands[i].split(" "), NONE_ID_COMMAND));
+            processStates.add(this.runCommandDetached(commands[i].split(" ")));
         }
 
         //start threads that reads the stdout, stderr, pid and others
@@ -166,7 +165,7 @@ public class CommandRunner {
         }
 
         commandDescription.getCommands().forEach((cmd, cmdStatus) -> {
-            dbService.saveFinishedCommand(cmd, NONE_ID_COMMAND, cmdStatus);
+            dbService.saveFinishedCommand(cmd, cmdStatus);
         });
 
         return commandDescription;
@@ -243,17 +242,17 @@ public class CommandRunner {
         return platformCmd;
     }
 
-    private ProcessState runCmdDetached(String[] command, String commandId) throws IOException {
+    private ProcessState runCmdDetached(String[] command) throws IOException {
         ArrayList<String> fullCommand = getPlatformCommand();
         fullCommand.add(String.join(" ", command));
 
         ProcessState processState = getProcessState(fullCommand.toArray(new String[0]));
-        dbService.saveActiveCommand(String.join(" ", command), commandId, processState);
+        dbService.saveActiveCommand(String.join(" ", command), processState);
 
         return processState;
     }
 
-    private CommandDetails getCommandDetails(String command, String commandId) throws IOException {
+    private CommandDetails getCommandDetails(String command) throws IOException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         List<String> fullCommand = getPlatformCommand();
         String commandWithSingleSpaces = command.trim().replaceAll("\\s+", " ");
@@ -267,7 +266,7 @@ public class CommandRunner {
         }
 
         ProcessState processState = getProcessState(fullCommand.toArray(new String[0]));
-        dbService.saveActiveCommand(command, commandId, processState);
+        dbService.saveActiveCommand(command, processState);
 
         return this.getCmdDetailsOfProcess(fullCommand.toArray(new String[0]), processState);
     }

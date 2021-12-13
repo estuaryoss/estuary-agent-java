@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface FinishedCommandRepository extends JpaRepository<FinishedCommand, Long> {
-    List<FinishedCommand> findFinishedCommandByCommandId(String commandId);
+    List<FinishedCommand> findFinishedCommandById(Long id);
 }

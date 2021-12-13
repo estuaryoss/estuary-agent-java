@@ -9,7 +9,7 @@ ENV COMMAND_TIMEOUT 1200
 RUN mkdir $APP_DIR
 WORKDIR $APP_DIR
 
-COPY target/agent-4.2.4-SNAPSHOT-exec.jar $APP_DIR/agent-exec.jar
+COPY target/agent*exec.jar $APP_DIR/agent-exec.jar
 COPY https $APP_DIR/https
 
 ENTRYPOINT ["java", "-jar", "/app/agent-exec.jar"]

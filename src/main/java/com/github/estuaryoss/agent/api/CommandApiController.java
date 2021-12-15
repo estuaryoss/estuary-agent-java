@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 public class CommandApiController implements CommandApi {
-    private final int COMMAND_HISTORY_MAX_LENGTH = 50;
+    private final int COMMAND_HISTORY_MAX_LENGTH = 100;
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
 
@@ -80,13 +81,12 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandFinishedGetAll() {
+    public ResponseEntity<ApiResponse> commandFinishedGetAll(@RequestParam(name = "limit", required = false) String limit) {
         String accept = request.getHeader("Accept");
-        String limitString = request.getParameter("limit");
-        Long limit = Long.valueOf(COMMAND_HISTORY_MAX_LENGTH);
-        if (limitString != null) {
+        Long queryLimit = Long.valueOf(COMMAND_HISTORY_MAX_LENGTH);
+        if (limit != null) {
             try {
-                limit = Long.valueOf(limitString);
+                queryLimit = Long.valueOf(limit);
             } catch (NumberFormatException e) {
                 log.debug(String.format("Received invalid limit number '%s'\n", limit) + ExceptionUtils.getMessage(e));
             }
@@ -97,7 +97,7 @@ public class CommandApiController implements CommandApi {
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(dbService.getFinishedCommands(limit))
+                .description(dbService.getFinishedCommands(queryLimit))
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))

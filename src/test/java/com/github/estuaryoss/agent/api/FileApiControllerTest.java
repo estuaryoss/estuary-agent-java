@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.estuaryoss.agent.constants.DateTimeConstants.PATTERN;
@@ -72,25 +73,6 @@ public class FileApiControllerTest {
     }
 
     @Test
-    public void whenCallingGetWithQParam_ThenTheFileIsReadOk() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(SERVER_PREFIX + port + "/files")
-                .queryParam(QParamConstants.FILE_PATH_Q_PARAM, "README.md");
-
-
-        ResponseEntity<String> responseEntity =
-                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                        .exchange(builder.build().encode().toUri(),
-                                HttpMethod.GET,
-                                httpRequestUtils.getRequestEntityContentTypeAppJson(null, new HashMap<>()),
-                                String.class);
-
-        String body = responseEntity.getBody();
-
-        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body).contains("## Build status");
-    }
-
-    @Test
     public void whenFilePathIsMissingThenApiReturnsError() {
         Map<String, String> headers = new HashMap<>();
 
@@ -116,7 +98,7 @@ public class FileApiControllerTest {
     }
 
     @Test
-    public void whenRequestingForFileAndQParamIsMissing_ThenApiReturnsError() {
+    public void whenRequestingForFileUploadAndDownloadHistory_ThenApiReturnsSuccess() {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(SERVER_PREFIX + port + "/files");
 
         ResponseEntity<ApiResponse> responseEntity =
@@ -128,12 +110,11 @@ public class FileApiControllerTest {
 
         ApiResponse body = responseEntity.getBody();
 
-        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        assertThat(body.getCode()).isEqualTo(ApiResponseCode.QUERY_PARAM_NOT_PROVIDED.getCode());
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
-                String.format(ApiResponseMessage.getMessage(ApiResponseCode.QUERY_PARAM_NOT_PROVIDED.getCode()), QParamConstants.FILE_PATH_Q_PARAM));
-        assertThat(body.getDescription().toString()).contains(
-                String.format(ApiResponseMessage.getMessage(ApiResponseCode.QUERY_PARAM_NOT_PROVIDED.getCode()), QParamConstants.FILE_PATH_Q_PARAM));
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()), QParamConstants.FILE_PATH_Q_PARAM));
+        assertThat(body.getDescription().toString()).isInstanceOf(List.class);
         assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());

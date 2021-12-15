@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public interface CommandApi {
     @RequestMapping(value = "/commandsfinished",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    default ResponseEntity<ApiResponse> commandFinishedGetAll() {
+    default ResponseEntity<ApiResponse> commandFinishedGetAll(@RequestParam(name = "limit", required = false) String limit) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

@@ -114,7 +114,7 @@ public class FileApiControllerTest {
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()), QParamConstants.FILE_PATH_Q_PARAM));
-        assertThat(body.getDescription().toString()).isInstanceOf(List.class);
+        assertThat(body.getDescription()).isInstanceOf(List.class);
         assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());

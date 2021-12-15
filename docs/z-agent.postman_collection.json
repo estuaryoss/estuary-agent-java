@@ -1,1072 +1,1128 @@
 {
-  "info": {
-    "_postman_id": "ee5169b0-9250-4b0b-a312-b4122b5b199f",
-    "name": "z-agent",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "{{SERVER}}:8080/swagger/swagger.yml",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "",
-            "value": "",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/swagger/swagger.yml",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "swagger",
-            "swagger.yml"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8081/ping",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Token",
-            "value": "None",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/ping",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "ping"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/api/docs",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "",
-            "value": "",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/api/docs",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "docs"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/about",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Token",
-            "value": "None",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/about",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "about"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/render/json.j2/json.json",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Token",
-            "value": "None",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/render/json.j2/json.json",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "render",
-            "json.j2",
-            "json.json"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/render/standalone.yml/variables.yml",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Token",
-            "value": "None",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"DATABASE\":\"mysql56\",\n\t\"IMAGE\": \"2.6\"\n}"
-        },
-        "url": {
-          "raw": "{{SERVER}}:8080/render/standalone.yml/variables.yml",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "render",
-            "standalone.yml",
-            "variables.yml"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/env",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "",
-            "value": "",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/env",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "env"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/processes",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "",
-            "value": "",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/processes",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "processes"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/env",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "",
-            "value": "",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/env",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "env"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/env/VARS_DIR",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "",
-            "value": "",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/env/VARS_DIR",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "env",
-            "VARS_DIR"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/env",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "",
-            "value": "",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\t\"FOO1\":\"BARx\",\n    \"FOO3\": \"BAR3\"\n}"
-        },
-        "url": {
-          "raw": "{{SERVER}}:8080/env",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "env"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/file",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/file",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "file"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/file",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/tmp/config.properties"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "disabled": true
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "type": "text",
-            "value": "application/json",
-            "disabled": true
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n\"file\": \"/tmp/config.properties\",\n\"content\" : \"ip=10.0.0.1\\nrequest_sec=100\\nthreads=10\\ntype=dual\"\n}"
-        },
-        "url": {
-          "raw": "{{SERVER}}:8080/file",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "file"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/files",
-      "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "password",
-              "value": "estuaryoss123!",
-              "type": "string"
-            },
-            {
-              "key": "username",
-              "value": "admin",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Folder-Path",
-            "value": "C:\\Users\\Catalin Dinuta\\Documents\\WindowsPowerShell"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "disabled": true
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "type": "text",
-            "value": "application/json",
-            "disabled": true
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "files",
-              "type": "file",
-              "src": "/D:/poze ion/DSC_0336.JPG"
-            }
-          ]
-        },
-        "url": {
-          "raw": "{{SERVER}}:8080/files",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "files"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/folder",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Folder-Path",
-            "value": "/tmp"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/folder",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "folder"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/commands",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "text/plain",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "dir",
-          "options": {
-            "raw": {
-              "language": "text"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{SERVER}}:8080/commands",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "commands"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/commands",
-      "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "user",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "password",
-              "type": "string"
-            },
-            {
-              "key": "showPassword",
-              "value": false,
-              "type": "boolean"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "text/plain",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/commands",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "commands"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/commandsfinished",
-      "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "user",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "password",
-              "type": "string"
-            },
-            {
-              "key": "showPassword",
-              "value": false,
-              "type": "boolean"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "text/plain",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/commandsfinished",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "commandsfinished"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/commands",
-      "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "user",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "password",
-              "type": "string"
-            },
-            {
-              "key": "showPassword",
-              "value": false,
-              "type": "boolean"
-            }
-          ]
-        },
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "text/plain",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/commands",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "commands"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/commandsyaml",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "text/plain",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "env:\n  MINE: \"YOURS\"\n  Path: \"ceva\"\nbefore_script:\n  - echo before_script\nscript:\n  - echo script\nafter_script:\n  - echo after_script",
-          "options": {
-            "raw": {
-              "language": "text"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{SERVER}}:8080/commandsyaml",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "commandsyaml"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/commandsparallel",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "value": "text/plain",
-            "type": "text"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "rm -rf /tmp\nls -lrt\n"
-        },
-        "url": {
-          "raw": "{{SERVER}}:8080/commandsparallel",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "commandsparallel"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/commandscustom",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname"
-          },
-          {
-            "key": "Accept",
-            "value": "application/json"
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "type": "text",
-            "value": "text/plain"
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "rm -rf /tmp\nls -lrt\n"
-        },
-        "url": {
-          "raw": "{{SERVER}}:8080/commandscustom",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "commandscustom"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/actuator/shutdown",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "disabled": true
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "type": "text",
-            "value": "text/plain",
-            "disabled": true
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/actuator/shutdown",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "actuator",
-            "shutdown"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "{{SERVER}}:8080/actuator/restart",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "File-Path",
-            "value": "/etc/hostname",
-            "disabled": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "disabled": true
-          },
-          {
-            "key": "Content-Type",
-            "name": "Content-Type",
-            "type": "text",
-            "value": "text/plain",
-            "disabled": true
-          },
-          {
-            "key": "Authorization",
-            "value": "Basic YWRtaW46U2VjcmV0MDE=",
-            "disabled": true
-          }
-        ],
-        "url": {
-          "raw": "{{SERVER}}:8080/actuator/restart",
-          "host": [
-            "{{SERVER}}"
-          ],
-          "port": "8080",
-          "path": [
-            "actuator",
-            "restart"
-          ]
-        }
-      },
-      "response": []
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          ""
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          ""
-        ]
-      }
-    }
-  ],
-  "variable": [
-    {
-      "key": "SERVER",
-      "value": "192.168.0.100"
-    },
-    {
-      "key": "SERVER",
-      "value": "lb2batsa015.lab.phx.axway.int"
-    },
-    {
-      "key": "SERVER",
-      "value": "localhost"
-    }
-  ]
+	"info": {
+		"_postman_id": "ee5169b0-9250-4b0b-a312-b4122b5b199f",
+		"name": "z-agent",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "{{SERVER}}:8080/swagger/swagger.yml",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/swagger/swagger.yml",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"swagger",
+						"swagger.yml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8081/ping",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Token",
+						"value": "None",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/ping",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/api/docs",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/api/docs",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"docs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/about",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Token",
+						"value": "None",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/about",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"about"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/render/json.j2/json.json",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Token",
+						"value": "None",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/render/json.j2/json.json",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"render",
+						"json.j2",
+						"json.json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/render/standalone.yml/variables.yml",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Token",
+						"value": "None",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"DATABASE\":\"mysql56\",\n\t\"IMAGE\": \"2.6\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}:8080/render/standalone.yml/variables.yml",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"render",
+						"standalone.yml",
+						"variables.yml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/env",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/env",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"env"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/processes",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/processes",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"processes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/env",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/env",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"env"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/env/VARS_DIR",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/env/VARS_DIR",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"env",
+						"VARS_DIR"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/env",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"FOO1\":\"BARx\",\n    \"FOO3\": \"BAR3\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}:8080/env",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"env"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/file",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "README.md"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8082/file",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8082",
+					"path": [
+						"file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/file",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/tmp/config.properties"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"file\": \"/tmp/config.properties\",\n\"content\" : \"ip=10.0.0.1\\nrequest_sec=100\\nthreads=10\\ntype=dual\"\n}"
+				},
+				"url": {
+					"raw": "{{SERVER}}:8080/file",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/files",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "estuaryoss123!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Folder-Path",
+						"value": "C:\\Users\\Catalin Dinuta\\Documents\\WindowsPowerShell"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "files",
+							"type": "file",
+							"src": "/D:/poze ion/DSC_0336.JPG"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{SERVER}}:8080/files",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"files"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/files",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "estuaryoss123!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Folder-Path",
+						"value": "C:\\Users\\Catalin Dinuta\\Documents\\WindowsPowerShell"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/files",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"files"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/folder",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Folder-Path",
+						"value": "/tmp"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/folder",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"folder"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/commands",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "dir",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}:8080/commands",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"commands"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/commands",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/commands",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"commands"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/commandsfinished",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/commandsfinished",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"commandsfinished"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/commands",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/commands",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"commands"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/commandsyaml",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "env:\n  MINE: \"YOURS\"\n  Path: \"ceva\"\nbefore_script:\n  - echo before_script\nscript:\n  - echo script\nafter_script:\n  - echo after_script",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SERVER}}:8080/commandsyaml",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"commandsyaml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/commandsparallel",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "rm -rf /tmp\nls -lrt\n"
+				},
+				"url": {
+					"raw": "{{SERVER}}:8080/commandsparallel",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"commandsparallel"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/commandscustom",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "text/plain"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "rm -rf /tmp\nls -lrt\n"
+				},
+				"url": {
+					"raw": "{{SERVER}}:8080/commandscustom",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"commandscustom"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/actuator/shutdown",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "text/plain",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/actuator/shutdown",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"actuator",
+						"shutdown"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/actuator/restart",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "text/plain",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/actuator/restart",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8080",
+					"path": [
+						"actuator",
+						"restart"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "SERVER",
+			"value": "192.168.0.100"
+		},
+		{
+			"key": "SERVER",
+			"value": "lb2batsa015.lab.phx.axway.int"
+		},
+		{
+			"key": "SERVER",
+			"value": "localhost"
+		}
+	]
 }

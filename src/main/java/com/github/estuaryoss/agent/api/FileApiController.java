@@ -13,6 +13,7 @@ import com.github.estuaryoss.agent.service.StorageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_NAME_MAX_SIZE;
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_PATH_MAX_SIZE;
@@ -35,6 +37,7 @@ import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
 @RestController
 @Slf4j
 public class FileApiController implements FileApi {
+    private final int FILE_TRANSFER_HISTORY_MAX_LENGTH = 100;
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
 
@@ -71,33 +74,7 @@ public class FileApiController implements FileApi {
             resource = storageService.loadAsResource(filePath);
             File file = new File(filePath);
             dbService.saveFileTransfer(FileTransfer.builder()
-                    .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
-                    .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
-                    .fileSize(resource.contentLength())
-                    .build());
-        } catch (IOException e) {
-            throw new ApiException(ApiResponseCode.GET_FILE_FAILURE.getCode(),
-                    ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode()));
-        }
-
-        return ResponseEntity.ok()
-                .body(resource);
-    }
-
-    public ResponseEntity<? extends Object> fileGetQParam(@RequestParam(name = "filePath", required = false) String filePath) {
-        String accept = request.getHeader("Accept");
-
-        log.debug("Reading file: " + filePath);
-        if (filePath == null) {
-            throw new ApiException(ApiResponseCode.QUERY_PARAM_NOT_PROVIDED.getCode(),
-                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.QUERY_PARAM_NOT_PROVIDED.getCode()), QParamConstants.FILE_PATH_Q_PARAM));
-        }
-
-        Resource resource;
-        try {
-            resource = storageService.loadAsResource(filePath);
-            File file = new File(filePath);
-            dbService.saveFileTransfer(FileTransfer.builder()
+                    .type(FileTransferType.DOWNLOAD.getType())
                     .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
                     .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
                     .fileSize(resource.contentLength())
@@ -125,6 +102,7 @@ public class FileApiController implements FileApi {
             storageService.store(content, filePath);
             File file = new File(filePath);
             dbService.saveFileTransfer(FileTransfer.builder()
+                    .type(FileTransferType.UPLOAD.getType())
                     .targetFileName(trimString(file.getName(), FILE_NAME_MAX_SIZE))
                     .targetFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
                     .targetFolder(trimString(file.getParent(), FILE_PATH_MAX_SIZE))
@@ -147,6 +125,29 @@ public class FileApiController implements FileApi {
                 .build(), HttpStatus.OK);
     }
 
+    public ResponseEntity<ApiResponse> filesGet(@RequestParam(name = "limit", required = false) String limit) {
+        Long queryLimit = Long.valueOf(FILE_TRANSFER_HISTORY_MAX_LENGTH);
+        if (limit != null) {
+            try {
+                queryLimit = Long.valueOf(limit);
+            } catch (NumberFormatException e) {
+                log.debug(String.format("Received invalid limit number '%s'\n", limit) + ExceptionUtils.getMessage(e));
+            }
+        }
+
+        List<FileTransfer> fileTransfers = dbService.getFileTransfers(queryLimit);
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(fileTransfers)
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
+    }
+
     public ResponseEntity<ApiResponse> filesPut(@RequestPart("files") MultipartFile[] files, @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
         String accept = request.getHeader("Accept");
         final String fPath = folderPath != null ? folderPath : DefaultConstants.UPLOADS_FOLDER;
@@ -158,6 +159,7 @@ public class FileApiController implements FileApi {
                 String filePath = fPath + File.separator + file.getOriginalFilename();
                 storageService.store(file, filePath);
                 dbService.saveFileTransfer(FileTransfer.builder()
+                        .type(FileTransferType.UPLOAD.getType())
                         .targetFileName(trimString(file.getOriginalFilename(), FILE_NAME_MAX_SIZE))
                         .sourceFileName(trimString(file.getOriginalFilename(), FILE_NAME_MAX_SIZE))
                         .targetFilePath(trimString(filePath, FILE_PATH_MAX_SIZE))

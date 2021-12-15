@@ -54,8 +54,29 @@ public class FileApiControllerRepoTest {
         assertThat(fileTransferRepository.findAll().size()).isEqualTo(1);
     }
 
+    @Test
+    public void whenReadingAFileFromTheAgent_TheRepoContainsTheEntry() {
+        String filePath = "README.md";
+
+        getFileContent(filePath);
+
+        assertThat(fileTransferRepository.findAll().size()).isEqualTo(1);
+    }
+
+    private ResponseEntity<String> getFileContent(String filePath) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("File-Path", filePath);
+
+
+        return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                .exchange(SERVER_PREFIX + port + "/file",
+                        HttpMethod.GET,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
+                        String.class);
+    }
+
     private ResponseEntity<ApiResponse> putFileContent(String content) {
-        String filePath = "/tmp/RepoContent.txt";
+        String filePath = "savedContent.txt";
         Map<String, String> headers = new HashMap<>();
         headers.put("File-Path", filePath);
 

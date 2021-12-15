@@ -28,17 +28,6 @@ public interface FileApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Gets the content of the file, through query param", nickname = "fileGetQParam", notes = "", response = Object.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the file in plain text, success", response = Object.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the file content could not be read", response = Object.class)})
-    @RequestMapping(value = "/files",
-            produces = {"application/json", "application/octet-stream", "text/plain"},
-            method = RequestMethod.GET)
-    default ResponseEntity<? extends Object> fileGetQParam(@RequestParam(name = "filePath") String filePath) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
     @ApiOperation(value = "Uploads a file no mater the format. Binary or raw", nickname = "filePut", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the file was uploaded successfully", response = ApiResponse.class),
@@ -63,6 +52,17 @@ public interface FileApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @ApiOperation(value = "Gets the history of file transfers: uploads or downloads", nickname = "filesGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The file transfer history was retrieved successfully", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the file history could not be retrieved", response = ApiResponse.class)})
+    @RequestMapping(value = "/files",
+            produces = {"application/json"},
+            method = {RequestMethod.GET})
+    default ResponseEntity<ApiResponse> filesGet(@RequestParam(name = "limit") String limit) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
     @ApiOperation(value = "Uploads a file no mater the format. Binary or raw", nickname = "filePost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the file was uploaded successfully", response = ApiResponse.class),
@@ -74,5 +74,4 @@ public interface FileApi {
     default ResponseEntity<ApiResponse> filePost(@ApiParam(value = "The content of the file") @Valid @RequestBody byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
-
 }

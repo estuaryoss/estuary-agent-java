@@ -35,6 +35,11 @@ public class DbService {
         fileTransferRepository.saveAndFlush(fileTransfer);
     }
 
+    public List<FileTransfer> getFileTransfers(long limit) {
+        return fileTransferRepository.findAll(Sort.by(Sort.Order.desc("id")))
+                .stream().limit(limit).collect(Collectors.toList());
+    }
+
     public void saveActiveCommand(String command, ProcessState processState) {
         ActiveCommand activeCommand = ActiveCommand.builder()
                 .command(trimString(command, COMMAND_MAX_SIZE))

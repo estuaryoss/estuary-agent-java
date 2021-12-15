@@ -25,6 +25,9 @@ public class FileTransfer {
     @Column(name = "ID") //DB
     private Long id;
 
+    @Column(name = "TYPE")
+    private String type;
+
     @Column(name = "SOURCE_FILENAME")
     @Length(max = FILE_NAME_MAX_SIZE)
     private String sourceFileName;

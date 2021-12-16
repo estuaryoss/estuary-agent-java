@@ -82,7 +82,7 @@ public class CommandApiControllerInBackgroundTest {
 
     @Test
     public void whenSendingBackgroundCommandAndDeleteTheCommandByPidThenTheCommandGetsDeletedFromActiveCommandRepo() throws JsonProcessingException, InterruptedException {
-        String command = "sleep 10";
+        String command = "tail -f /etc/hostname";
 //        String command = "notepad"; //win
 
         CompletableFuture.runAsync(() -> {
@@ -112,7 +112,7 @@ public class CommandApiControllerInBackgroundTest {
 
     @Test
     public void whenSendingBackgroundCommandAndDeleteAllCommandsThenAllTheCommandsGetsDeletedFromActiveCommandRepo() throws JsonProcessingException, InterruptedException {
-        String command = "sleep 10";
+        String command = "tail -f /etc/hostname";
 //        String command = "notepad"; //win
 
         CompletableFuture.runAsync(() -> {

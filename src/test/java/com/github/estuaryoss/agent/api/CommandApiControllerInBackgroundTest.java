@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.estuaryoss.agent.api.utils.HttpRequestUtils;
 import com.github.estuaryoss.agent.component.Authentication;
+import com.github.estuaryoss.agent.entity.ActiveCommand;
 import com.github.estuaryoss.agent.entity.FinishedCommand;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
@@ -28,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -78,6 +80,94 @@ public class CommandApiControllerInBackgroundTest {
         assertThat(finishedCommandList.get(0).getDuration()).isGreaterThan(0);
     }
 
+    @Test
+    public void whenSendingBackgroundCommandAndDeleteTheCommandByPidThenTheCommandGetsDeletedFromActiveCommandRepo() throws JsonProcessingException, InterruptedException {
+        String command = "sleep 10";
+//        String command = "notepad"; //win
+
+        CompletableFuture.runAsync(() -> {
+            postCommands(command);
+        });
+
+        Thread.sleep(1000);
+
+        ResponseEntity<ApiResponse<List<ActiveCommand>>> requestEntityActiveCmds = getActiveCommands();
+        ApiResponse<List<ActiveCommand>> body = requestEntityActiveCmds.getBody();
+        List<ActiveCommand> activeCommandList = body.getDescription();
+
+        ResponseEntity<ApiResponse<List<FinishedCommand>>> requestEntityFinishedCmd = getFinishedCommands();
+        ApiResponse<List<FinishedCommand>> bodyFinishedCmd = requestEntityFinishedCmd.getBody();
+        List<FinishedCommand> finishedCommandList = bodyFinishedCmd.getDescription();
+
+        assertThat(activeCommandList.size()).isEqualTo(1);
+        assertThat(finishedCommandList.size()).isEqualTo(0);
+
+        ResponseEntity<ApiResponse<List<ActiveCommand>>> requestEntityDelete = deleteCommand(activeCommandList.get(0).getPid());
+        ApiResponse<List<ActiveCommand>> bodyDelete = requestEntityDelete.getBody();
+
+        assertThat(bodyDelete.getDescription().size()).isEqualTo(0);
+        assertThat(activeCommandRepository.findAll().size()).isEqualTo(0);
+        assertThat(finishedCommandRepository.findAll().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void whenSendingBackgroundCommandAndDeleteAllCommandsThenAllTheCommandsGetsDeletedFromActiveCommandRepo() throws JsonProcessingException, InterruptedException {
+        String command = "sleep 10";
+//        String command = "notepad"; //win
+
+        CompletableFuture.runAsync(() -> {
+            postCommands(command);
+        });
+
+        Thread.sleep(1000);
+
+        ResponseEntity<ApiResponse<List<ActiveCommand>>> requestEntityActiveCmds = getActiveCommands();
+        ApiResponse<List<ActiveCommand>> body = requestEntityActiveCmds.getBody();
+        List<ActiveCommand> activeCommandList = body.getDescription();
+
+        ResponseEntity<ApiResponse<List<FinishedCommand>>> requestEntityFinishedCmd = getFinishedCommands();
+        ApiResponse<List<FinishedCommand>> bodyFinishedCmd = requestEntityFinishedCmd.getBody();
+        List<FinishedCommand> finishedCommandList = bodyFinishedCmd.getDescription();
+
+        assertThat(activeCommandList.size()).isEqualTo(1);
+        assertThat(finishedCommandList.size()).isEqualTo(0);
+
+        ResponseEntity<ApiResponse<List<ActiveCommand>>> requestEntityDelete = deleteCommands();
+        ApiResponse<List<ActiveCommand>> bodyDelete = requestEntityDelete.getBody();
+
+        assertThat(bodyDelete.getDescription().size()).isEqualTo(0);
+        assertThat(activeCommandRepository.findAll().size()).isEqualTo(0);
+        assertThat(finishedCommandRepository.findAll().size()).isEqualTo(1);
+    }
+
+    private ResponseEntity<ApiResponse<List<ActiveCommand>>> deleteCommand(long pid) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", getEncodedAuthHeader());
+
+        HttpEntity httpEntity = httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers);
+
+        return this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/commands/" + pid,
+                        HttpMethod.DELETE,
+                        httpEntity,
+                        new ParameterizedTypeReference<>() {
+                        });
+    }
+
+    private ResponseEntity<ApiResponse<List<ActiveCommand>>> deleteCommands() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", getEncodedAuthHeader());
+
+        HttpEntity httpEntity = httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers);
+
+        return this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/commands",
+                        HttpMethod.DELETE,
+                        httpEntity,
+                        new ParameterizedTypeReference<>() {
+                        });
+    }
+
     private ResponseEntity<ApiResponse<CommandDescription>> postCommands(String command) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", getEncodedAuthHeader());
@@ -100,6 +190,20 @@ public class CommandApiControllerInBackgroundTest {
 
         return this.restTemplate
                 .exchange(SERVER_PREFIX + port + "/commandsfinished",
+                        HttpMethod.GET,
+                        httpEntity,
+                        new ParameterizedTypeReference<>() {
+                        });
+    }
+
+    private ResponseEntity<ApiResponse<List<ActiveCommand>>> getActiveCommands() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", getEncodedAuthHeader());
+
+        HttpEntity httpEntity = httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers);
+
+        return this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/commands",
                         HttpMethod.GET,
                         httpEntity,
                         new ParameterizedTypeReference<>() {

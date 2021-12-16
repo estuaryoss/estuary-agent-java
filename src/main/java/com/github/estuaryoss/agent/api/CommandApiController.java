@@ -24,6 +24,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -120,7 +121,36 @@ public class CommandApiController implements CommandApi {
             }
         });
 
-        dbService.clearAllActiveCommands();
+        log.debug(String.format("Active commands number: %s", dbService.getAllActiveCommands().size()));
+        return new ResponseEntity<>(ApiResponse.builder()
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(dbService.getAllActiveCommands())
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse> commandDeleteByPid(@PathVariable(name = "pid", required = true) String pid) {
+        String accept = request.getHeader("Accept");
+        log.debug("Killing command associated with process id: " + pid);
+
+        long processId;
+        try {
+            processId = Long.valueOf(pid);
+        } catch (Exception e) {
+            throw new ApiException(ApiResponseCode.ILLEGAL_VALUE_EXCEPTION.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.ILLEGAL_VALUE_EXCEPTION.getCode()), pid));
+        }
+
+        try {
+            ProcessUtils.killProcessAndChildren(processId);
+        } catch (Exception e) {
+            throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode()));
+        }
 
         log.debug(String.format("Active commands number: %s", dbService.getAllActiveCommands().size()));
         return new ResponseEntity<>(ApiResponse.builder()

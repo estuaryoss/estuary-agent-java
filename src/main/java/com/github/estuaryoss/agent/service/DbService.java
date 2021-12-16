@@ -68,6 +68,9 @@ public class DbService {
     public void clearAllActiveCommands() {
         activeCommandRepository.deleteAll();
     }
+    public void clearActiveCommandByPid(long pid) {
+        activeCommandRepository.deleteByPid(pid);
+    }
 
     public List<FinishedCommand> getFinishedCommands(long limit) {
         return finishedCommandRepository

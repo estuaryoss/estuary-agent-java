@@ -25,6 +25,7 @@ public enum ApiResponseCode {
     QUERY_PARAM_NOT_PROVIDED(1022),
     UPLOAD_FILE_FAILURE_NAME(1023),
     UNEXPECTED_EXCEPTION(1024),
+    ILLEGAL_VALUE_EXCEPTION(1025),
     GENERAL(1100);
 
     private final int code;

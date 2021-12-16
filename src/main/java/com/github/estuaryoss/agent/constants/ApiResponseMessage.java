@@ -29,6 +29,7 @@ public class ApiResponseMessage {
         message.put(ApiResponseCode.INVALID_YAML_CONFIG.getCode(), "Invalid yaml config");
         message.put(ApiResponseCode.QUERY_PARAM_NOT_PROVIDED.getCode(), "Query param '%s' not provided");
         message.put(ApiResponseCode.UNEXPECTED_EXCEPTION.getCode(), "Unexpected exception occurred");
+        message.put(ApiResponseCode.ILLEGAL_VALUE_EXCEPTION.getCode(), "Illegal value '%s' received");
         message.put(ApiResponseCode.NOT_IMPLEMENTED.getCode(), "Not implemented");
     }
 

@@ -876,6 +876,65 @@
 			"response": []
 		},
 		{
+			"name": "{{SERVER}}:8080/commands/{pid} [Delete command by PID]",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "estuaryoss123!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8082/commands/11320",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8082",
+					"path": [
+						"commands",
+						"11320"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "{{SERVER}}:8080/commandsyaml",
 			"request": {
 				"method": "POST",

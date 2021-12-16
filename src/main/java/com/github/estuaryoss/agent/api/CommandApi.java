@@ -7,10 +7,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -50,6 +47,17 @@ public interface CommandApi {
             produces = {"application/json"},
             method = RequestMethod.DELETE)
     default ResponseEntity<ApiResponse> commandDeleteAll() {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ApiOperation(value = "Stops Active Command on the Agent by pid", nickname = "commandDeleteByPid", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Terminate command process success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Terminate command process failure", response = ApiResponse.class)})
+    @RequestMapping(value = "/commands/{pid}",
+            produces = {"application/json"},
+            method = RequestMethod.DELETE)
+    default ResponseEntity<ApiResponse> commandDeleteByPid(@PathVariable(name = "pid", required = true) String pid) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

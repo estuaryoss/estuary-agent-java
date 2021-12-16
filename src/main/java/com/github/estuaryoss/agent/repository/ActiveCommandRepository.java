@@ -11,4 +11,6 @@ public interface ActiveCommandRepository extends JpaRepository<ActiveCommand, Lo
     ActiveCommand findActiveCommandByPid(Long pid);
 
     List<ActiveCommand> findActiveCommandById(Long id);
+
+    void deleteByPid(Long pid);
 }

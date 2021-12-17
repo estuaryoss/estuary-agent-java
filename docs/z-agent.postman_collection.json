@@ -760,6 +760,64 @@
 			"response": []
 		},
 		{
+			"name": "{{SERVER}}:8080/commandsrunning",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "estuaryoss123!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8082/commandsrunning",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8082",
+					"path": [
+						"commandsrunning"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "{{SERVER}}:8080/commandsfinished",
 			"request": {
 				"auth": {

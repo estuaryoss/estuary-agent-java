@@ -3,6 +3,8 @@ package com.github.estuaryoss.agent.component;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.constants.DefaultConstants;
 import com.github.estuaryoss.agent.constants.EnvConstants;
+import com.github.estuaryoss.agent.entity.Command;
+import com.github.estuaryoss.agent.model.ExecutionStatus;
 import com.github.estuaryoss.agent.model.ProcessState;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
 import com.github.estuaryoss.agent.model.api.CommandDetails;
@@ -28,11 +30,15 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.COMMAND_MAX_SIZE;
+import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
 
 @Component
 @Slf4j
@@ -87,11 +93,9 @@ public class CommandRunner {
             commandStatus.setDuration(Duration.between(
                     LocalDateTime.parse(commandStatus.getStartedat(), DateTimeConstants.PATTERN),
                     LocalDateTime.parse(commandStatus.getFinishedat(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
-            commandStatus.setStatus("finished");
+            commandStatus.setStatus(ExecutionStatus.FINISHED.getStatus());
             commandsStatus.put(cmd, commandStatus);
             commandDescription.setCommands(commandsStatus);
-
-            dbService.saveFinishedCommand(cmd, commandStatus);
         }
 
         commandDescription.setFinishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
@@ -134,11 +138,22 @@ public class CommandRunner {
                 .finished(false)
                 .pid(ProcessHandle.current().pid())
                 .build();
-
+        List<Command> commandList = new ArrayList<>();
         for (int i = 0; i < commands.length; i++) {
             commandStatuses.add(new CommandStatus());
             commandStatuses.get(i).setStartedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-            processStates.add(this.runCommandDetached(commands[i].split(" ")));
+            ProcessState processState = this.runCommandDetached(commands[i].split(" "));
+            processStates.add(processState);
+
+            Command command = Command.builder()
+                    .command(trimString(commands[i], COMMAND_MAX_SIZE))
+                    .startedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
+                    .pid(processState.getProcess().pid())
+                    .status(ExecutionStatus.RUNNING.getStatus())
+                    .build();
+
+            dbService.saveCommand(command);
+            commandList.add(command);
         }
 
         //start threads that reads the stdout, stderr, pid and others
@@ -147,7 +162,7 @@ public class CommandRunner {
                     .commandDescription(commandDescription)
                     .commandStatuses(commandStatuses)
                     .commandsStatus(commandsStatus)
-                    .command(commands[i])
+                    .command(commandList.get(i))
                     .processState(processStates.get(i))
                     .threadId(i)
                     .build());
@@ -164,10 +179,6 @@ public class CommandRunner {
             }
         }
 
-        commandDescription.getCommands().forEach((cmd, cmdStatus) -> {
-            dbService.saveFinishedCommand(cmd, cmdStatus);
-        });
-
         return commandDescription;
     }
 
@@ -177,7 +188,7 @@ public class CommandRunner {
      * @return The command details of the command executed
      */
     @SneakyThrows
-    public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessState processState) {
+    public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessState processState, Command commandDb) {
         CommandDetails commandDetails;
         InputStream inputStream = null;
         int timeout = environment.getEnv().get(EnvConstants.COMMAND_TIMEOUT) != null ?
@@ -198,6 +209,15 @@ public class CommandRunner {
                     .pid(processState.getProcess().pid())
                     .args(command)
                     .build();
+
+            commandDb.setOut(out);
+            commandDb.setErr(err);
+            commandDb.setCode(Long.valueOf(code));
+            commandDb.setFinishedAt(LocalDateTime.now().format(DateTimeConstants.PATTERN));
+            commandDb.setStatus(ExecutionStatus.FINISHED.getStatus());
+            commandDb.setDuration(Duration.between(
+                    LocalDateTime.parse(commandDb.getStartedAt(), DateTimeConstants.PATTERN),
+                    LocalDateTime.parse(commandDb.getFinishedAt(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
         } catch (TimeoutException e) {
             log.debug(ExceptionUtils.getStackTrace(e));
             commandDetails = CommandDetails.builder()
@@ -205,6 +225,15 @@ public class CommandRunner {
                     .code(DefaultConstants.PROCESS_EXCEPTION_TIMEOUT)
                     .args(command)
                     .build();
+
+            commandDb.setErr(ExceptionUtils.getStackTrace(e));
+            commandDb.setCode(Long.valueOf(DefaultConstants.PROCESS_EXCEPTION_TIMEOUT));
+            commandDb.setFinishedAt(LocalDateTime.now().format(DateTimeConstants.PATTERN));
+            commandDb.setStatus(ExecutionStatus.FINISHED.getStatus());
+            commandDb.setDuration(Duration.between(
+                    LocalDateTime.parse(commandDb.getStartedAt(), DateTimeConstants.PATTERN),
+                    LocalDateTime.parse(commandDb.getFinishedAt(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
+
             ProcessUtils.killProcessAndChildren(processState.getProcess().pid());
         } catch (Exception e) {
             log.debug(ExceptionUtils.getStackTrace(e));
@@ -213,6 +242,14 @@ public class CommandRunner {
                     .code(DefaultConstants.PROCESS_EXCEPTION_GENERAL)
                     .args(command)
                     .build();
+
+            commandDb.setErr(ExceptionUtils.getStackTrace(e));
+            commandDb.setCode(Long.valueOf(DefaultConstants.PROCESS_EXCEPTION_GENERAL));
+            commandDb.setFinishedAt(LocalDateTime.now().format(DateTimeConstants.PATTERN));
+            commandDb.setStatus(ExecutionStatus.FINISHED.getStatus());
+            commandDb.setDuration(Duration.between(
+                    LocalDateTime.parse(commandDb.getStartedAt(), DateTimeConstants.PATTERN),
+                    LocalDateTime.parse(commandDb.getFinishedAt(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
         } finally {
             try {
                 processState.closeErrOutputStream();
@@ -222,7 +259,7 @@ public class CommandRunner {
             }
         }
 
-        dbService.removeActiveCommand(processState.getProcess().pid());
+        dbService.saveCommand(commandDb);
 
         return commandDetails;
     }
@@ -242,33 +279,39 @@ public class CommandRunner {
         return platformCmd;
     }
 
-    private ProcessState runCmdDetached(String[] command) throws IOException {
+    private ProcessState runCmdDetached(String[] cmd) throws IOException {
         ArrayList<String> fullCommand = getPlatformCommand();
-        fullCommand.add(String.join(" ", command));
+        fullCommand.add(String.join(" ", cmd));
 
         ProcessState processState = getProcessState(fullCommand.toArray(new String[0]));
-        dbService.saveActiveCommand(String.join(" ", command), processState);
 
         return processState;
     }
 
-    private CommandDetails getCommandDetails(String command) throws IOException {
+    private CommandDetails getCommandDetails(String cmd) throws IOException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         List<String> fullCommand = getPlatformCommand();
-        String commandWithSingleSpaces = command.trim().replaceAll("\\s+", " ");
+        String commandWithSingleSpaces = cmd.trim().replaceAll("\\s+", " ");
 
         if (isWindows) {
-            for (String cmd : commandWithSingleSpaces.split(" ")) {
-                fullCommand.add(cmd);
+            for (String cmdPart : commandWithSingleSpaces.split(" ")) {
+                fullCommand.add(cmdPart);
             }
         } else {
-            fullCommand.add(command);
+            fullCommand.add(cmd);
         }
 
         ProcessState processState = getProcessState(fullCommand.toArray(new String[0]));
-        dbService.saveActiveCommand(command, processState);
+        Command command = Command.builder()
+                .command(trimString(cmd, COMMAND_MAX_SIZE))
+                .startedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
+                .pid(processState.getProcess().pid())
+                .status(ExecutionStatus.RUNNING.getStatus())
+                .build();
 
-        return this.getCmdDetailsOfProcess(fullCommand.toArray(new String[0]), processState);
+        dbService.saveCommand(command);
+
+        return this.getCmdDetailsOfProcess(fullCommand.toArray(new String[0]), processState, command);
     }
 
     private ProcessState getProcessState(String[] command) throws IOException {

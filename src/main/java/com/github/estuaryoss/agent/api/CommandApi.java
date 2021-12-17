@@ -23,7 +23,18 @@ public interface CommandApi {
     @RequestMapping(value = "/commands",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    default ResponseEntity<ApiResponse> commandActiveGetAll() {
+    default ResponseEntity<ApiResponse> commandGetAll() {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ApiOperation(value = "Dumps the running commands on the Agent.", nickname = "commandRunningGetAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump running commands success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump running commands failure", response = ApiResponse.class)})
+    @RequestMapping(value = "/commandsrunning",
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    default ResponseEntity<ApiResponse> commandRunningGetAll(@RequestParam(name = "limit", required = false) String limit) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

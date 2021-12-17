@@ -45,6 +45,7 @@ public class DbService {
                 .command(trimString(command, COMMAND_MAX_SIZE))
                 .startedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
                 .pid(processState.getProcess().pid())
+                .status("running")
                 .build();
 
         activeCommandRepository.saveAndFlush(activeCommand);
@@ -60,6 +61,7 @@ public class DbService {
                 .finishedAt(commandStatus.getFinishedat())
                 .duration(commandStatus.getDuration())
                 .pid(commandStatus.getDetails().getPid())
+                .status("finished")
                 .build();
 
         finishedCommandRepository.saveAndFlush(finishedCommand);

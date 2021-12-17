@@ -50,4 +50,7 @@ public class FinishedCommand {
 
     @Column(name = "PID")
     private Long pid;
+
+    @Column(name = "STATUS")
+    private String status;
 }

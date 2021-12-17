@@ -34,4 +34,7 @@ public class ActiveCommand {
 
     @Column(name = "PID")
     private Long pid;
+
+    @Column(name = "STATUS")
+    private String status;
 }

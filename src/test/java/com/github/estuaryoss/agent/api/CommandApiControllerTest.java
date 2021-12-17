@@ -85,7 +85,7 @@ public class CommandApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
+                .getForEntity(SERVER_PREFIX + port + "/commandsrunning", ApiResponse.class);
 
         body = responseEntityMap.getBody();
         assertThat(((List) body.getDescription()).size()).isEqualTo(0);
@@ -209,7 +209,7 @@ public class CommandApiControllerTest {
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
         ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
+                .getForEntity(SERVER_PREFIX + port + "/commandsrunning", ApiResponse.class);
 
         body = responseEntityMap.getBody();
         assertThat(((List) body.getDescription()).size()).isEqualTo(0);

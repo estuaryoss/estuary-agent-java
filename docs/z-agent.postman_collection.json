@@ -230,6 +230,26 @@
 		{
 			"name": "{{SERVER}}:8080/env",
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "estuaryoss123!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [
 					{
@@ -252,13 +272,89 @@
 					}
 				],
 				"url": {
-					"raw": "{{SERVER}}:8080/env",
+					"raw": "{{SERVER}}:8082/env",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8082",
+					"path": [
+						"env"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/env/system",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8080/env/system",
 					"host": [
 						"{{SERVER}}"
 					],
 					"port": "8080",
 					"path": [
-						"env"
+						"env",
+						"system"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/env/virtual",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8082/env/virtual",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8082",
+					"path": [
+						"env",
+						"virtual"
 					]
 				}
 			},
@@ -760,19 +856,19 @@
 			"response": []
 		},
 		{
-			"name": "{{SERVER}}:8080/commandsfinished",
+			"name": "{{SERVER}}:8080/commands/running",
 			"request": {
 				"auth": {
 					"type": "basic",
 					"basic": [
 						{
-							"key": "username",
-							"value": "user",
+							"key": "password",
+							"value": "estuaryoss123!",
 							"type": "string"
 						},
 						{
-							"key": "password",
-							"value": "password",
+							"key": "username",
+							"value": "admin",
 							"type": "string"
 						},
 						{
@@ -805,13 +901,73 @@
 					}
 				],
 				"url": {
-					"raw": "{{SERVER}}:8080/commandsfinished",
+					"raw": "{{SERVER}}:8082/commands/running",
 					"host": [
 						"{{SERVER}}"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
-						"commandsfinished"
+						"commands",
+						"running"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{SERVER}}:8080/commands/finished",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "estuaryoss123!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "/etc/hostname"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/plain",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{SERVER}}:8082/commands/finished",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8082",
+					"path": [
+						"commands",
+						"finished"
 					]
 				}
 			},
@@ -935,7 +1091,7 @@
 			"response": []
 		},
 		{
-			"name": "{{SERVER}}:8080/commandsyaml",
+			"name": "{{SERVER}}:8080/commands/yaml",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -969,21 +1125,42 @@
 					}
 				},
 				"url": {
-					"raw": "{{SERVER}}:8080/commandsyaml",
+					"raw": "{{SERVER}}:8080/commands/yaml",
 					"host": [
 						"{{SERVER}}"
 					],
 					"port": "8080",
 					"path": [
-						"commandsyaml"
+						"commands",
+						"yaml"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "{{SERVER}}:8080/commandsparallel",
+			"name": "{{SERVER}}:8080/commands/parallel",
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "estuaryoss123!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -1008,23 +1185,24 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "rm -rf /tmp\nls -lrt\n"
+					"raw": "ping -n 3 127.0.0.1\nping -n 2 127.0.0.1\necho 1"
 				},
 				"url": {
-					"raw": "{{SERVER}}:8080/commandsparallel",
+					"raw": "{{SERVER}}:8082/commands/parallel",
 					"host": [
 						"{{SERVER}}"
 					],
-					"port": "8080",
+					"port": "8082",
 					"path": [
-						"commandsparallel"
+						"commands",
+						"parallel"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "{{SERVER}}:8080/commandscustom",
+			"name": "{{SERVER}}:8080/commands/custom",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -1053,13 +1231,14 @@
 					"raw": "rm -rf /tmp\nls -lrt\n"
 				},
 				"url": {
-					"raw": "{{SERVER}}:8080/commandscustom",
+					"raw": "{{SERVER}}:8080/commands/custom",
 					"host": [
 						"{{SERVER}}"
 					],
 					"port": "8080",
 					"path": [
-						"commandscustom"
+						"commands",
+						"custom"
 					]
 				}
 			},

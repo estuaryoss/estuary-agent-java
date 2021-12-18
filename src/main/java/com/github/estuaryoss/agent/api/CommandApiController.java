@@ -8,9 +8,10 @@ import com.github.estuaryoss.agent.component.CommandRunner;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
-import com.github.estuaryoss.agent.entity.ActiveCommand;
+import com.github.estuaryoss.agent.entity.Command;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.ConfigDescriptor;
+import com.github.estuaryoss.agent.model.ExecutionStatus;
 import com.github.estuaryoss.agent.model.YamlConfig;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
@@ -42,7 +43,10 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 public class CommandApiController implements CommandApi {
-    private final int COMMAND_HISTORY_MAX_LENGTH = 100;
+    private final int RUNNING_COMMAND_HISTORY_LENGTH = 1_000;
+    private final int FINISHED_COMMAND_HISTORY_LENGTH = 5_000;
+    private final int ALL_COMMAND_HISTORY_LENGTH = 6_000;
+
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
 
@@ -67,14 +71,16 @@ public class CommandApiController implements CommandApi {
         this.request = request;
     }
 
-    public ResponseEntity<ApiResponse> commandActiveGetAll() {
+    public ResponseEntity<ApiResponse> commandGetAll() {
         String accept = request.getHeader("Accept");
 
-        log.debug("Dumping all active commands from the database");
+        List<Command> allCommands = dbService.getCommands(ALL_COMMAND_HISTORY_LENGTH);
+
+        log.debug("Dumping all commands from the database");
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(dbService.getAllActiveCommands())
+                .description(allCommands)
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -82,9 +88,10 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandFinishedGetAll(@RequestParam(name = "limit", required = false) String limit) {
+    public ResponseEntity<ApiResponse> commandsGetAllByStatus(@PathVariable(name = "status", required = true) String status,
+                                                              @RequestParam(name = "limit", required = false) String limit) {
         String accept = request.getHeader("Accept");
-        Long queryLimit = Long.valueOf(COMMAND_HISTORY_MAX_LENGTH);
+        Long queryLimit = Long.valueOf(RUNNING_COMMAND_HISTORY_LENGTH);
         if (limit != null) {
             try {
                 queryLimit = Long.valueOf(limit);
@@ -93,12 +100,13 @@ public class CommandApiController implements CommandApi {
             }
         }
 
-        log.debug("Dumping all finished commands from the database");
-        log.debug("Dumping all finished commands from the database");
+        List<Command> commandsByStatus = dbService.getCommands(status, queryLimit);
+
+        log.debug("Dumping all running commands from the database");
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(dbService.getFinishedCommands(queryLimit))
+                .description(commandsByStatus)
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -109,10 +117,11 @@ public class CommandApiController implements CommandApi {
     public ResponseEntity<ApiResponse> commandDeleteAll() {
         String accept = request.getHeader("Accept");
         log.debug("Killing all processes associated with active commands");
-        log.debug(String.format("Active commands number: %s", dbService.getAllActiveCommands().size()));
+        List<Command> runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(),
+                RUNNING_COMMAND_HISTORY_LENGTH);
+        log.debug(String.format("Running commands number: %s", runningCommands.size()));
 
-        List<ActiveCommand> activeCommandList = dbService.getAllActiveCommands();
-        activeCommandList.forEach(activeCommand -> {
+        runningCommands.forEach(activeCommand -> {
             try {
                 ProcessUtils.killProcessAndChildren(activeCommand.getPid());
             } catch (Exception e) {
@@ -121,11 +130,13 @@ public class CommandApiController implements CommandApi {
             }
         });
 
-        log.debug(String.format("Active commands number: %s", dbService.getAllActiveCommands().size()));
+        runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), RUNNING_COMMAND_HISTORY_LENGTH);
+        log.debug(String.format("Running commands number: %s", runningCommands.size()));
+
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(dbService.getAllActiveCommands())
+                .description(runningCommands)
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -151,12 +162,14 @@ public class CommandApiController implements CommandApi {
             throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode()));
         }
+        List<Command> runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(),
+                RUNNING_COMMAND_HISTORY_LENGTH);
+        log.debug(String.format("Running commands number: %s", runningCommands.size()));
 
-        log.debug(String.format("Active commands number: %s", dbService.getAllActiveCommands().size()));
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(dbService.getAllActiveCommands())
+                .description(runningCommands)
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -174,7 +187,7 @@ public class CommandApiController implements CommandApi {
         CommandDescription commandDescription;
         try {
             commandDescription = commandRunner.runCommands(commandsList.toArray(new String[0]));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
         }

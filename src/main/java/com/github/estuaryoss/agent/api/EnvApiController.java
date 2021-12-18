@@ -76,6 +76,34 @@ public class EnvApiController implements EnvApi {
                 .build(), HttpStatus.OK);
     }
 
+    public ResponseEntity<ApiResponse> envVirtualGet() {
+        String accept = request.getHeader("Accept");
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(environment.getVirtualEnv())
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse> envSystemGet() {
+        String accept = request.getHeader("Accept");
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(environment.getEnv())
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
+    }
+
     public ResponseEntity<ApiResponse> envDelete() {
         String accept = request.getHeader("Accept");
 
@@ -93,8 +121,8 @@ public class EnvApiController implements EnvApi {
     }
 
     public ResponseEntity<ApiResponse> envPost(@ApiParam(value = "List of env vars by key-value pair in JSON format", required = true) @Valid @RequestBody String envVars) {
-        Map<String, String> envVarsToBeAdded = new LinkedHashMap<>();
-        Map<String, String> virtualEnvVarsAdded = new LinkedHashMap<>();
+        Map<String, String> envVarsToBeAdded;
+        Map<String, String> virtualEnvVarsAdded;
 
         try {
             envVarsToBeAdded = objectMapper.readValue(envVars, LinkedHashMap.class);

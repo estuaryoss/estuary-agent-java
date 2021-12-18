@@ -71,12 +71,12 @@ public class CommandParallelApiControllerTest {
         this.assertSuccessCommandDescriptionFields(commandInfo, body.getDescription());
 
         assertThat(body.getName()).isEqualTo(about.getAppName());
-        assertThat(body.getPath()).isEqualTo("/commandsparallel?");
+        assertThat(body.getPath()).isEqualTo("/commands/parallel?");
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
+                .getForEntity(SERVER_PREFIX + port + "/commands/running", ApiResponse.class);
 
         body = responseEntityMap.getBody();
         assertThat(((List) body.getDescription()).size()).isEqualTo(0);
@@ -198,7 +198,7 @@ public class CommandParallelApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
+                .getForEntity(SERVER_PREFIX + port + "/commands/running", ApiResponse.class);
 
         body = responseEntityMap.getBody();
         assertThat(((List) body.getDescription()).size()).isEqualTo(0);
@@ -208,7 +208,7 @@ public class CommandParallelApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .exchange(SERVER_PREFIX + port + "/commandsparallel",
+                .exchange(SERVER_PREFIX + port + "/commands/parallel",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
                         new ParameterizedTypeReference<ApiResponse<CommandDescription>>() {
@@ -252,6 +252,6 @@ public class CommandParallelApiControllerTest {
         assertThat(body.getCommands().get(command).getStatus()).isEqualTo("finished");
 
         assertThat(body.getCommands().get(command).getDetails().getPid()).isGreaterThanOrEqualTo(0);
-        assertThat(body.getCommands().get(command).getDetails().getArgs()).contains(command);
+        assertThat(body.getCommands().get(command).getDetails().getArgs().length).isGreaterThanOrEqualTo(3); //bash -c cmd OR cmd /c cmdPart1 cmdPart2 etc
     }
 }

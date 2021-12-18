@@ -1,7 +1,7 @@
 package com.github.estuaryoss.agent.model;
 
 public enum ExecutionStatus {
-    IN_PROGRESS("in progress"),
+    RUNNING("running"),
     FINISHED("finished");
 
     private final String status;

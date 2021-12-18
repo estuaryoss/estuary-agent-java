@@ -85,7 +85,7 @@ public class CommandApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
+                .getForEntity(SERVER_PREFIX + port + "/commands/running", ApiResponse.class);
 
         body = responseEntityMap.getBody();
         assertThat(((List) body.getDescription()).size()).isEqualTo(0);
@@ -96,6 +96,7 @@ public class CommandApiControllerTest {
         float sleep = 4f; // default is 3 secs
         float timeout = 3f;
         String command = "sleep " + sleep;
+//        String command = "ping -n 5 127.0.0.1";
         ResponseEntity<ApiResponse<CommandDescription>> responseEntity =
                 postCommand(command);
 
@@ -183,8 +184,8 @@ public class CommandApiControllerTest {
     }
 
     @Test
-    public void whenSendingTwoCommandsOneSuccessOneFailureThenApiReturnsTcoheCorrectDetailsForEachOne() {
-        String command1 = "ls -lrt";
+    public void whenSendingTwoCommandsOneSuccessOneFailureThenApiReturnsTheCorrectDetailsForEachOne() {
+        String command1 = "echo 1";
         String command2 = "whatever";
         String command = command1 + "\n" + command2;
         ResponseEntity<ApiResponse<CommandDescription>> responseEntity =
@@ -209,7 +210,7 @@ public class CommandApiControllerTest {
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
         ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/commands", ApiResponse.class);
+                .getForEntity(SERVER_PREFIX + port + "/commands/running", ApiResponse.class);
 
         body = responseEntityMap.getBody();
         assertThat(((List) body.getDescription()).size()).isEqualTo(0);
@@ -317,7 +318,7 @@ public class CommandApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .exchange(SERVER_PREFIX + port + "/commandsyaml",
+                .exchange(SERVER_PREFIX + port + "/commands/yaml",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(yamlConfig, headers),
                         ApiResponse.class);
@@ -327,7 +328,7 @@ public class CommandApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .exchange(SERVER_PREFIX + port + "/commandsyaml",
+                .exchange(SERVER_PREFIX + port + "/commands/yaml",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(yamlConfig, headers),
                         ApiResponse.class);

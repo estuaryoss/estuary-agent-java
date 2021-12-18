@@ -18,7 +18,7 @@ import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class FinishedCommand {
+public class Command {
     @Id
     @GeneratedValue
     @Column(name = "ID") //DB
@@ -50,4 +50,11 @@ public class FinishedCommand {
 
     @Column(name = "PID")
     private Long pid;
+
+    @Column(name = "STATUS")
+    private String status;
+
+    @Column(name = "ARGS")
+    @Length(max = COMMAND_MAX_SIZE)
+    private String args;
 }

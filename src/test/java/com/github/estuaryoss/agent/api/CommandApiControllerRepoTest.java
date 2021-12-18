@@ -2,10 +2,10 @@ package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.api.utils.HttpRequestUtils;
 import com.github.estuaryoss.agent.component.Authentication;
+import com.github.estuaryoss.agent.model.ExecutionStatus;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
-import com.github.estuaryoss.agent.repository.ActiveCommandRepository;
-import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
+import com.github.estuaryoss.agent.repository.CommandRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,25 +41,21 @@ public class CommandApiControllerRepoTest {
     private Authentication auth;
 
     @Autowired
-    private ActiveCommandRepository activeCommandRepository;
-
-    @Autowired
-    private FinishedCommandRepository finishedCommandRepository;
+    private CommandRepository commandRepository;
 
     @BeforeEach
     public void cleanRepos() {
-        finishedCommandRepository.deleteAll();
-        activeCommandRepository.deleteAll();
+        commandRepository.deleteAll();
     }
 
     @Test
     public void whenSendingSomeCommandsTheReposWillHaveTheCorrectNumberOfEntries() {
-        String commands = "echo 1 && echo 2\nls -lrt";
+        String commands = "echo 1 && echo 2\necho 3";
 
         postCommands(commands);
 
-        assertThat(activeCommandRepository.findAll().size()).isEqualTo(0);
-        assertThat(finishedCommandRepository.findAll().size()).isEqualTo(commands.split("\n").length);
+        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.RUNNING.getStatus()).size()).isEqualTo(0);
+        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.FINISHED.getStatus()).size()).isEqualTo(commands.split("\n").length);
     }
 
     private ResponseEntity<ApiResponse<CommandDescription>> postCommands(String command) {

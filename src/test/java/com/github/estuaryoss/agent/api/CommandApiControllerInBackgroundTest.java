@@ -4,12 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.estuaryoss.agent.api.utils.HttpRequestUtils;
 import com.github.estuaryoss.agent.component.Authentication;
-import com.github.estuaryoss.agent.entity.ActiveCommand;
-import com.github.estuaryoss.agent.entity.FinishedCommand;
+import com.github.estuaryoss.agent.entity.Command;
+import com.github.estuaryoss.agent.model.ExecutionStatus;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
-import com.github.estuaryoss.agent.repository.ActiveCommandRepository;
-import com.github.estuaryoss.agent.repository.FinishedCommandRepository;
+import com.github.estuaryoss.agent.repository.CommandRepository;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,15 +46,11 @@ public class CommandApiControllerInBackgroundTest {
     private Authentication auth;
 
     @Autowired
-    private ActiveCommandRepository activeCommandRepository;
-
-    @Autowired
-    private FinishedCommandRepository finishedCommandRepository;
+    private CommandRepository commandRepository;
 
     @BeforeEach
     public void cleanRepos() {
-        finishedCommandRepository.deleteAll();
-        activeCommandRepository.deleteAll();
+        commandRepository.deleteAll();
     }
 
     @Test
@@ -64,24 +59,24 @@ public class CommandApiControllerInBackgroundTest {
         String command = "echo " + stdOut;
 
         postCommands(command);
-        ResponseEntity<ApiResponse<List<FinishedCommand>>> requestEntity = getFinishedCommands();
-        ApiResponse<List<FinishedCommand>> body = requestEntity.getBody();
-        List<FinishedCommand> finishedCommandList = body.getDescription();
+        ResponseEntity<ApiResponse<List<Command>>> requestEntity = getFinishedCommands();
+        ApiResponse<List<Command>> body = requestEntity.getBody();
+        List<Command> commandList = body.getDescription();
 
-        assertThat(finishedCommandRepository.findAll().size()).isEqualTo(1);
-        assertThat(finishedCommandList.size()).isEqualTo(1); //reads from finishedCommandRepo
-        assertThat(objectMapper.writeValueAsString(finishedCommandList))
-                .isEqualTo(objectMapper.writeValueAsString(finishedCommandRepository.findAll()));
-        assertThat(finishedCommandList.get(0).getCommand()).isEqualTo(command);
-        assertThat(finishedCommandList.get(0).getCode()).isEqualTo(0);
-        assertThat(finishedCommandList.get(0).getOut().trim()).isEqualTo(stdOut);
-        assertThat(finishedCommandList.get(0).getErr()).isEqualTo("");
-        assertThat(finishedCommandList.get(0).getPid()).isGreaterThan(0);
-        assertThat(finishedCommandList.get(0).getDuration()).isGreaterThan(0);
+        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.FINISHED.getStatus()).size()).isEqualTo(1);
+        assertThat(commandList.size()).isEqualTo(1);
+        assertThat(objectMapper.writeValueAsString(commandList))
+                .isEqualTo(objectMapper.writeValueAsString(commandRepository.findCommandByStatus(ExecutionStatus.FINISHED.getStatus())));
+        assertThat(commandList.get(0).getCommand()).isEqualTo(command);
+        assertThat(commandList.get(0).getCode()).isEqualTo(0);
+        assertThat(commandList.get(0).getOut().trim()).isEqualTo(stdOut);
+        assertThat(commandList.get(0).getErr()).isEqualTo("");
+        assertThat(commandList.get(0).getPid()).isGreaterThan(0);
+        assertThat(commandList.get(0).getDuration()).isGreaterThan(0);
     }
 
     @Test
-    public void whenSendingBackgroundCommandAndDeleteTheCommandByPidThenTheCommandGetsDeletedFromActiveCommandRepo() throws JsonProcessingException, InterruptedException {
+    public void whenSendingBackgroundCommandAndDeleteTheCommandByPidThenTheCommandGetsDeletedFromCommandRepo() throws JsonProcessingException, InterruptedException {
         String command = "tail -f /etc/hostname";
 //        String command = "notepad"; //win
 
@@ -91,27 +86,27 @@ public class CommandApiControllerInBackgroundTest {
 
         Thread.sleep(1000);
 
-        ResponseEntity<ApiResponse<List<ActiveCommand>>> requestEntityActiveCmds = getActiveCommands();
-        ApiResponse<List<ActiveCommand>> body = requestEntityActiveCmds.getBody();
-        List<ActiveCommand> activeCommandList = body.getDescription();
+        ResponseEntity<ApiResponse<List<Command>>> requestEntityActiveCmds = getRunningCommands();
+        ApiResponse<List<Command>> body = requestEntityActiveCmds.getBody();
+        List<Command> CommandList = body.getDescription();
 
-        ResponseEntity<ApiResponse<List<FinishedCommand>>> requestEntityFinishedCmd = getFinishedCommands();
-        ApiResponse<List<FinishedCommand>> bodyFinishedCmd = requestEntityFinishedCmd.getBody();
-        List<FinishedCommand> finishedCommandList = bodyFinishedCmd.getDescription();
+        ResponseEntity<ApiResponse<List<Command>>> requestEntityFinishedCmd = getFinishedCommands();
+        ApiResponse<List<Command>> bodyFinishedCmd = requestEntityFinishedCmd.getBody();
+        List<Command> commandList = bodyFinishedCmd.getDescription();
 
-        assertThat(activeCommandList.size()).isEqualTo(1);
-        assertThat(finishedCommandList.size()).isEqualTo(0);
+        assertThat(CommandList.size()).isEqualTo(1);
+        assertThat(commandList.size()).isEqualTo(0);
 
-        ResponseEntity<ApiResponse<List<ActiveCommand>>> requestEntityDelete = deleteCommand(activeCommandList.get(0).getPid());
-        ApiResponse<List<ActiveCommand>> bodyDelete = requestEntityDelete.getBody();
+        ResponseEntity<ApiResponse<List<Command>>> requestEntityDelete = deleteCommand(CommandList.get(0).getPid());
+        ApiResponse<List<Command>> bodyDelete = requestEntityDelete.getBody();
 
         assertThat(bodyDelete.getDescription().size()).isEqualTo(0);
-        assertThat(activeCommandRepository.findAll().size()).isEqualTo(0);
-        assertThat(finishedCommandRepository.findAll().size()).isEqualTo(1);
+        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.RUNNING.getStatus()).size()).isEqualTo(0);
+        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.FINISHED.getStatus()).size()).isEqualTo(1);
     }
 
     @Test
-    public void whenSendingBackgroundCommandAndDeleteAllCommandsThenAllTheCommandsGetsDeletedFromActiveCommandRepo() throws JsonProcessingException, InterruptedException {
+    public void whenSendingBackgroundCommandAndDeleteAllCommandsThenAllTheCommandsGetsDeletedFromCommandRepo() throws JsonProcessingException, InterruptedException {
         String command = "tail -f /etc/hostname";
 //        String command = "notepad"; //win
 
@@ -121,26 +116,50 @@ public class CommandApiControllerInBackgroundTest {
 
         Thread.sleep(1000);
 
-        ResponseEntity<ApiResponse<List<ActiveCommand>>> requestEntityActiveCmds = getActiveCommands();
-        ApiResponse<List<ActiveCommand>> body = requestEntityActiveCmds.getBody();
-        List<ActiveCommand> activeCommandList = body.getDescription();
+        ResponseEntity<ApiResponse<List<Command>>> requestEntityActiveCmds = getRunningCommands();
+        ApiResponse<List<Command>> body = requestEntityActiveCmds.getBody();
+        List<Command> CommandList = body.getDescription();
 
-        ResponseEntity<ApiResponse<List<FinishedCommand>>> requestEntityFinishedCmd = getFinishedCommands();
-        ApiResponse<List<FinishedCommand>> bodyFinishedCmd = requestEntityFinishedCmd.getBody();
-        List<FinishedCommand> finishedCommandList = bodyFinishedCmd.getDescription();
+        ResponseEntity<ApiResponse<List<Command>>> requestEntityFinishedCmd = getFinishedCommands();
+        ApiResponse<List<Command>> bodyFinishedCmd = requestEntityFinishedCmd.getBody();
+        List<Command> commandList = bodyFinishedCmd.getDescription();
 
-        assertThat(activeCommandList.size()).isEqualTo(1);
-        assertThat(finishedCommandList.size()).isEqualTo(0);
+        assertThat(CommandList.size()).isEqualTo(1);
+        assertThat(commandList.size()).isEqualTo(0);
 
-        ResponseEntity<ApiResponse<List<ActiveCommand>>> requestEntityDelete = deleteCommands();
-        ApiResponse<List<ActiveCommand>> bodyDelete = requestEntityDelete.getBody();
+        ResponseEntity<ApiResponse<List<Command>>> requestEntityDelete = deleteCommands();
+        ApiResponse<List<Command>> bodyDelete = requestEntityDelete.getBody();
 
         assertThat(bodyDelete.getDescription().size()).isEqualTo(0);
-        assertThat(activeCommandRepository.findAll().size()).isEqualTo(0);
-        assertThat(finishedCommandRepository.findAll().size()).isEqualTo(1);
+        assertThat(commandRepository.findAll().size()).isEqualTo(1);
+        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.RUNNING.getStatus()).size()).isEqualTo(0);
+        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.FINISHED.getStatus()).size()).isEqualTo(1);
     }
 
-    private ResponseEntity<ApiResponse<List<ActiveCommand>>> deleteCommand(long pid) {
+    @Test
+    public void whenSendingMultipleCommandsThenTheRunningOneItsAlwaysInFrontOfTheList() throws JsonProcessingException, InterruptedException {
+        String commands = "echo 1\ntail -f /etc/hostname";
+//        String commands = "echo 1\nnotepad"; //win
+
+        CompletableFuture.runAsync(() -> {
+            postCommands(commands);
+        });
+
+        Thread.sleep(1000);
+
+        ResponseEntity<ApiResponse<List<Command>>> responseResponseEntity = getAllCommands();
+        ApiResponse<List<Command>> body = responseResponseEntity.getBody();
+        List<Command> commandList = body.getDescription();
+        String[] commandsSplitFromString = commands.split("\n");
+        assertThat(commandList.size()).isEqualTo(commandsSplitFromString.length);
+
+        deleteCommands(); //we already took a response prior to delete the commands
+
+        assertThat(commandList.get(0).getCommand()).isEqualTo(commandsSplitFromString[1]);
+        assertThat(commandList.get(1).getCommand()).isEqualTo(commandsSplitFromString[0]);
+    }
+
+    private ResponseEntity<ApiResponse<List<Command>>> deleteCommand(long pid) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", getEncodedAuthHeader());
 
@@ -154,7 +173,7 @@ public class CommandApiControllerInBackgroundTest {
                         });
     }
 
-    private ResponseEntity<ApiResponse<List<ActiveCommand>>> deleteCommands() {
+    private ResponseEntity<ApiResponse<List<Command>>> deleteCommands() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", getEncodedAuthHeader());
 
@@ -182,21 +201,35 @@ public class CommandApiControllerInBackgroundTest {
                         });
     }
 
-    private ResponseEntity<ApiResponse<List<FinishedCommand>>> getFinishedCommands() {
+    private ResponseEntity<ApiResponse<List<Command>>> getFinishedCommands() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", getEncodedAuthHeader());
 
         HttpEntity httpEntity = httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers);
 
         return this.restTemplate
-                .exchange(SERVER_PREFIX + port + "/commandsfinished",
+                .exchange(SERVER_PREFIX + port + "/commands/finished",
                         HttpMethod.GET,
                         httpEntity,
                         new ParameterizedTypeReference<>() {
                         });
     }
 
-    private ResponseEntity<ApiResponse<List<ActiveCommand>>> getActiveCommands() {
+    private ResponseEntity<ApiResponse<List<Command>>> getRunningCommands() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", getEncodedAuthHeader());
+
+        HttpEntity httpEntity = httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers);
+
+        return this.restTemplate
+                .exchange(SERVER_PREFIX + port + "/commands/running",
+                        HttpMethod.GET,
+                        httpEntity,
+                        new ParameterizedTypeReference<>() {
+                        });
+    }
+
+    private ResponseEntity<ApiResponse<List<Command>>> getAllCommands() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", getEncodedAuthHeader());
 

@@ -51,7 +51,6 @@
         <springfox-version>3.0.0</springfox-version>
         <querydsl.version>5.0.0</querydsl.version>
         <spring-cloud.version>2020.0.2</spring-cloud.version>
-        <spring-boot.version>2.5.7</spring-boot.version>
     </properties>
     <!-- align spring-boot version from properties and from parent !-->
     <parent>
@@ -327,7 +326,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
 
         <dependency>

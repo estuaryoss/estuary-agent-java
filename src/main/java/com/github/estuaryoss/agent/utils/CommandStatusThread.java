@@ -4,6 +4,7 @@ package com.github.estuaryoss.agent.utils;
 import com.github.estuaryoss.agent.component.CommandRunner;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.model.api.CommandParallel;
+import lombok.SneakyThrows;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -19,10 +20,11 @@ public class CommandStatusThread implements Runnable {
         this.pCmd = pCmd;
     }
 
+    @SneakyThrows
     @Override
     public void run() {
         pCmd.getCommandStatuses().get(pCmd.getThreadId()).setDetails(
-                commandRunner.getCmdDetailsOfProcess(new String[]{pCmd.getCommand()}, pCmd.getProcessState()));
+                commandRunner.getCommandDetails(pCmd.getCommand()));
 
         pCmd.getCommandsStatus().put(pCmd.getCommand(), pCmd.getCommandStatuses().get(pCmd.getThreadId()));
         pCmd.getCommandStatuses().get(pCmd.getThreadId()).setFinishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));

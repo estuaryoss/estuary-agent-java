@@ -252,6 +252,6 @@ public class CommandParallelApiControllerTest {
         assertThat(body.getCommands().get(command).getStatus()).isEqualTo("finished");
 
         assertThat(body.getCommands().get(command).getDetails().getPid()).isGreaterThanOrEqualTo(0);
-        assertThat(body.getCommands().get(command).getDetails().getArgs()).contains(command.strip().split(" "));
+        assertThat(body.getCommands().get(command).getDetails().getArgs().length).isGreaterThanOrEqualTo(3); //bash -c cmd OR cmd /c cmdPart1 cmdPart2 etc
     }
 }

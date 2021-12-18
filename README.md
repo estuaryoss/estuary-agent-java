@@ -65,7 +65,7 @@ The postman collection is saved in folder **docs**
 ## Commands in background
 
 Send your command using the classic endpoints, and then timeout from client.   
-Use **/commands** and **/commandsfinished** GET to retrieve your command information.
+Use **/commands**, **/commands/running** and **/commands/finished** GET to retrieve your command information.
 
 ## Eureka client registration
 

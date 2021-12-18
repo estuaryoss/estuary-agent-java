@@ -71,12 +71,12 @@ public class CommandParallelApiControllerTest {
         this.assertSuccessCommandDescriptionFields(commandInfo, body.getDescription());
 
         assertThat(body.getName()).isEqualTo(about.getAppName());
-        assertThat(body.getPath()).isEqualTo("/commandsparallel?");
+        assertThat(body.getPath()).isEqualTo("/commands/parallel?");
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/commandsrunning", ApiResponse.class);
+                .getForEntity(SERVER_PREFIX + port + "/commands/running", ApiResponse.class);
 
         body = responseEntityMap.getBody();
         assertThat(((List) body.getDescription()).size()).isEqualTo(0);
@@ -198,7 +198,7 @@ public class CommandParallelApiControllerTest {
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
 
         ResponseEntity<ApiResponse> responseEntityMap = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/commandsrunning", ApiResponse.class);
+                .getForEntity(SERVER_PREFIX + port + "/commands/running", ApiResponse.class);
 
         body = responseEntityMap.getBody();
         assertThat(((List) body.getDescription()).size()).isEqualTo(0);
@@ -208,7 +208,7 @@ public class CommandParallelApiControllerTest {
         Map<String, String> headers = new HashMap<>();
 
         return this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .exchange(SERVER_PREFIX + port + "/commandsparallel",
+                .exchange(SERVER_PREFIX + port + "/commands/parallel",
                         HttpMethod.POST,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(command, headers),
                         new ParameterizedTypeReference<ApiResponse<CommandDescription>>() {

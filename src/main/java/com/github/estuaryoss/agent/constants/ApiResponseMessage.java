@@ -21,7 +21,7 @@ public class ApiResponseMessage {
         message.put(ApiResponseCode.UPLOAD_FILE_FAILURE.getCode(), "Failed to upload file.");
         message.put(ApiResponseCode.UPLOAD_FILE_FAILURE_NAME.getCode(), "Failed to upload file '%s' in path '%s'.");
         message.put(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode(), "Http header value not provided, '%s'");
-        message.put(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(), "Starting command(s) failed");
+        message.put(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(), "Command execution failed");
         message.put(ApiResponseCode.EXEC_COMMAND_NOT_ALLOWED.getCode(), "'rm' commands are filtered. Command '%s' was not executed.");
         message.put(ApiResponseCode.UNAUTHORIZED.getCode(), "Unauthorized");
         message.put(ApiResponseCode.SET_ENV_VAR_FAILURE.getCode(), "Failed to set env vars \"%s\"");

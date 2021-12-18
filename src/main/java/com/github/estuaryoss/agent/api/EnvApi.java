@@ -30,13 +30,33 @@ public interface EnvApi {
     }
 
 
-    @ApiOperation(value = "Print all environment variables", nickname = "envGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiOperation(value = "Print all environment variables: system & virtual", nickname = "envGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "List of the entire environment variables", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Get all environment variables: system & virtual", response = ApiResponse.class)})
     @RequestMapping(value = "/env",
             produces = {"application/json"},
             method = RequestMethod.GET)
     default ResponseEntity<ApiResponse> envGet() {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ApiOperation(value = "Print all system environment variables", nickname = "envSystemGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Get all system environment variables", response = ApiResponse.class)})
+    @RequestMapping(value = "/env/system",
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    default ResponseEntity<ApiResponse> envSystemGet() {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ApiOperation(value = "Print all virtual environment variables", nickname = "envVirtualGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "List of the virtual environment variables", response = ApiResponse.class)})
+    @RequestMapping(value = "/env/virtual",
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    default ResponseEntity<ApiResponse> envVirtualGet() {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

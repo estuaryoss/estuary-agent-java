@@ -53,9 +53,10 @@ public class EnvApiControllerTest {
     private Authentication auth;
 
     @Test
-    public void whenCallingGetThenInformationIsRetrivedOk() {
+    public void whenGettingAllEnvVarsThenInformationIsRetrivedOk() {
         ResponseEntity<ApiResponse> responseEntity =
-                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword()).getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
 
         ApiResponse body = responseEntity.getBody();
 
@@ -66,6 +67,44 @@ public class EnvApiControllerTest {
         assertThat(((Map) body.getDescription()).get("PATH")).isNotEqualTo("");
         assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getPath()).isEqualTo("/env?");
+        assertThat(body.getVersion()).isEqualTo(about.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenGettingVirtualEnvVarsThenInformationIsRetrivedOk() {
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .getForEntity(SERVER_PREFIX + port + "/env/virtual", ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(((Map) body.getDescription()).get("PATH")).isEqualTo(null); //none of the system vars are here
+        assertThat(body.getName()).isEqualTo(about.getAppName());
+        assertThat(body.getPath()).isEqualTo("/env/virtual?");
+        assertThat(body.getVersion()).isEqualTo(about.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenGettingSystemEnvVarsThenInformationIsRetrivedOk() {
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .getForEntity(SERVER_PREFIX + port + "/env/system", ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
+        assertThat(body.getMessage()).isEqualTo(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()));
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(((Map) body.getDescription()).get("PATH")).isNotEqualTo(""); //PATH is present
+        assertThat(body.getName()).isEqualTo(about.getAppName());
+        assertThat(body.getPath()).isEqualTo("/env/system?");
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }

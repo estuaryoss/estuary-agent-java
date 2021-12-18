@@ -34,6 +34,10 @@ public class DbService {
         commandRepository.save(command);
     }
 
+    public void saveAndFlushCommand(Command command) {
+        commandRepository.saveAndFlush(command);
+    }
+
     public void clearActiveCommandByPid(long pid) {
         commandRepository.deleteByPid(pid);
     }

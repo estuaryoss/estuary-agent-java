@@ -208,7 +208,7 @@ public class CommandApiControllerInBackgroundTest {
         HttpEntity httpEntity = httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers);
 
         return this.restTemplate
-                .exchange(SERVER_PREFIX + port + "/commandsfinished",
+                .exchange(SERVER_PREFIX + port + "/commands/finished",
                         HttpMethod.GET,
                         httpEntity,
                         new ParameterizedTypeReference<>() {
@@ -222,7 +222,7 @@ public class CommandApiControllerInBackgroundTest {
         HttpEntity httpEntity = httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers);
 
         return this.restTemplate
-                .exchange(SERVER_PREFIX + port + "/commandsrunning",
+                .exchange(SERVER_PREFIX + port + "/commands/running",
                         HttpMethod.GET,
                         httpEntity,
                         new ParameterizedTypeReference<>() {

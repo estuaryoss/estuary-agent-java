@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.COMMAND_MAX_SIZE;
+import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.*;
 import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
 
 @Component
@@ -65,7 +65,7 @@ public class CommandRunner {
      * @return The details of the command
      * @throws IOException if the process could not be started
      */
-    public CommandDetails runCommand(String command) throws IOException {
+    public Command runCommand(String command) throws IOException {
         return this.getCommandDetails(command);
     }
 
@@ -88,7 +88,15 @@ public class CommandRunner {
         for (String cmd : commands) {
             CommandStatus commandStatus = new CommandStatus();
             commandStatus.setStartedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
-            commandStatus.setDetails(this.runCommand(cmd));
+            Command commandDb = this.runCommand(cmd);
+            CommandDetails commandDetails = CommandDetails.builder()
+                    .args(commandDb.getCommand().split(" "))
+                    .code(commandDb.getCode())
+                    .out(commandDb.getOut())
+                    .err(commandDb.getErr())
+                    .pid(commandDb.getPid())
+                    .build();
+            commandStatus.setDetails(commandDetails);
             commandStatus.setFinishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             commandStatus.setDuration(Duration.between(
                     LocalDateTime.parse(commandStatus.getStartedat(), DateTimeConstants.PATTERN),
@@ -185,11 +193,11 @@ public class CommandRunner {
     /**
      * @param command      The command to be executed
      * @param processState A reference to a {@link ProcessState}
+     * @param commandDb    A Command object representation form the DB
      * @return The command details of the command executed
      */
     @SneakyThrows
-    public CommandDetails getCmdDetailsOfProcess(String[] command, ProcessState processState, Command commandDb) {
-        CommandDetails commandDetails;
+    public Command getCmdDetailsOfProcess(String[] command, ProcessState processState, Command commandDb) {
         InputStream inputStream = null;
         int timeout = environment.getEnv().get(EnvConstants.COMMAND_TIMEOUT) != null ?
                 Integer.parseInt(environment.getEnv().get(EnvConstants.COMMAND_TIMEOUT)) : DefaultConstants.COMMAND_TIMEOUT_DEFAULT;
@@ -202,16 +210,8 @@ public class CommandRunner {
             inputStream = new ByteArrayInputStream(processState.getErrOutputStream().toByteArray());
             String err = IOUtils.toString(inputStream, Charset.defaultCharset());
 
-            commandDetails = CommandDetails.builder()
-                    .out(out)
-                    .err(err)
-                    .code(code)
-                    .pid(processState.getProcess().pid())
-                    .args(command)
-                    .build();
-
-            commandDb.setOut(out);
-            commandDb.setErr(err);
+            commandDb.setOut(trimString(out, COMMAND_STDOUT_MAX_SIZE));
+            commandDb.setErr(trimString(err, COMMAND_STDERR_MAX_SIZE));
             commandDb.setCode(Long.valueOf(code));
             commandDb.setFinishedAt(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             commandDb.setStatus(ExecutionStatus.FINISHED.getStatus());
@@ -220,13 +220,9 @@ public class CommandRunner {
                     LocalDateTime.parse(commandDb.getFinishedAt(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
         } catch (TimeoutException e) {
             log.debug(ExceptionUtils.getStackTrace(e));
-            commandDetails = CommandDetails.builder()
-                    .err(ExceptionUtils.getStackTrace(e))
-                    .code(DefaultConstants.PROCESS_EXCEPTION_TIMEOUT)
-                    .args(command)
-                    .build();
 
-            commandDb.setErr(ExceptionUtils.getStackTrace(e));
+            commandDb.setOut("");
+            commandDb.setErr(trimString(ExceptionUtils.getStackTrace(e), COMMAND_STDERR_MAX_SIZE));
             commandDb.setCode(Long.valueOf(DefaultConstants.PROCESS_EXCEPTION_TIMEOUT));
             commandDb.setFinishedAt(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             commandDb.setStatus(ExecutionStatus.FINISHED.getStatus());
@@ -237,13 +233,9 @@ public class CommandRunner {
             ProcessUtils.killProcessAndChildren(processState.getProcess().pid());
         } catch (Exception e) {
             log.debug(ExceptionUtils.getStackTrace(e));
-            commandDetails = CommandDetails.builder()
-                    .err(ExceptionUtils.getStackTrace(e))
-                    .code(DefaultConstants.PROCESS_EXCEPTION_GENERAL)
-                    .args(command)
-                    .build();
 
-            commandDb.setErr(ExceptionUtils.getStackTrace(e));
+            commandDb.setOut("");
+            commandDb.setErr(trimString(ExceptionUtils.getStackTrace(e), COMMAND_STDERR_MAX_SIZE));
             commandDb.setCode(Long.valueOf(DefaultConstants.PROCESS_EXCEPTION_GENERAL));
             commandDb.setFinishedAt(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             commandDb.setStatus(ExecutionStatus.FINISHED.getStatus());
@@ -259,9 +251,9 @@ public class CommandRunner {
             }
         }
 
-        dbService.saveCommand(commandDb);
+        dbService.saveAndFlushCommand(commandDb);
 
-        return commandDetails;
+        return commandDb;
     }
 
     private ArrayList<String> getPlatformCommand() {
@@ -288,7 +280,7 @@ public class CommandRunner {
         return processState;
     }
 
-    private CommandDetails getCommandDetails(String cmd) throws IOException {
+    private Command getCommandDetails(String cmd) throws IOException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         List<String> fullCommand = getPlatformCommand();
         String commandWithSingleSpaces = cmd.trim().replaceAll("\\s+", " ");

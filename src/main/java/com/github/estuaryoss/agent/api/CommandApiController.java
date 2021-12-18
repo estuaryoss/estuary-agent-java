@@ -88,7 +88,8 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandRunningGetAll(@RequestParam(name = "limit", required = false) String limit) {
+    public ResponseEntity<ApiResponse> commandsGetAllByStatus(@PathVariable(name = "status", required = true) String status,
+                                                              @RequestParam(name = "limit", required = false) String limit) {
         String accept = request.getHeader("Accept");
         Long queryLimit = Long.valueOf(RUNNING_COMMAND_HISTORY_LENGTH);
         if (limit != null) {
@@ -99,38 +100,13 @@ public class CommandApiController implements CommandApi {
             }
         }
 
-        List<Command> runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), queryLimit);
+        List<Command> commandsByStatus = dbService.getCommands(status, queryLimit);
 
         log.debug("Dumping all running commands from the database");
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
                 .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(runningCommands)
-                .name(about.getAppName())
-                .version(about.getVersion())
-                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                .path(clientRequest.getRequestUri())
-                .build(), HttpStatus.OK);
-    }
-
-    public ResponseEntity<ApiResponse> commandFinishedGetAll(@RequestParam(name = "limit", required = false) String limit) {
-        String accept = request.getHeader("Accept");
-        Long queryLimit = Long.valueOf(FINISHED_COMMAND_HISTORY_LENGTH);
-        if (limit != null) {
-            try {
-                queryLimit = Long.valueOf(limit);
-            } catch (NumberFormatException e) {
-                log.debug(String.format("Received invalid limit number '%s'\n", limit) + ExceptionUtils.getMessage(e));
-            }
-        }
-
-        List<Command> finishedCommands = dbService.getCommands(ExecutionStatus.FINISHED.getStatus(), queryLimit);
-
-        log.debug("Dumping all finished commands from the database");
-        return new ResponseEntity<>(ApiResponse.builder()
-                .code(ApiResponseCode.SUCCESS.getCode())
-                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
-                .description(finishedCommands)
+                .description(commandsByStatus)
                 .name(about.getAppName())
                 .version(about.getVersion())
                 .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
@@ -211,7 +187,7 @@ public class CommandApiController implements CommandApi {
         CommandDescription commandDescription;
         try {
             commandDescription = commandRunner.runCommands(commandsList.toArray(new String[0]));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new ApiException(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_EXEC_FAILURE.getCode()));
         }

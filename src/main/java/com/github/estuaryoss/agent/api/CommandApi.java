@@ -16,10 +16,10 @@ import java.io.IOException;
 @RequestMapping(value = "")
 public interface CommandApi {
 
-    @ApiOperation(value = "Dumps the active commands that are running on the Agent.", nickname = "commandGetAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiOperation(value = "Dumps running and finished commands on the Agent.", nickname = "commandGetAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump active commands success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump active commands failure", response = ApiResponse.class)})
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump commands success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump commands failure", response = ApiResponse.class)})
     @RequestMapping(value = "/commands",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -27,30 +27,19 @@ public interface CommandApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Dumps the running commands on the Agent.", nickname = "commandRunningGetAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiOperation(value = "Dumps all commands on the Agent by status", nickname = "commandsGetAllByStatus", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump running commands success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump running commands failure", response = ApiResponse.class)})
-    @RequestMapping(value = "/commandsrunning",
+            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump commands by status success", response = ApiResponse.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump commands by status failure", response = ApiResponse.class)})
+    @RequestMapping(value = "/commands/{status}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    default ResponseEntity<ApiResponse> commandRunningGetAll(@RequestParam(name = "limit", required = false) String limit) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    @ApiOperation(value = "Dumps the finished commands on the Agent.", nickname = "commandFinishedGetAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump finished commands success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump finished commands failure", response = ApiResponse.class)})
-    @RequestMapping(value = "/commandsfinished",
-            produces = {"application/json"},
-            method = RequestMethod.GET)
-    default ResponseEntity<ApiResponse> commandFinishedGetAll(@RequestParam(name = "limit", required = false) String limit) {
+    default ResponseEntity<ApiResponse> commandsGetAllByStatus(@PathVariable(name = "status", required = true) String status, @RequestParam(name = "limit", required = false) String limit) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
 
-    @ApiOperation(value = "Stops all the active commands on the Agent by terminating their corresponding process", nickname = "commandDeleteAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiOperation(value = "Stops all the running commands on the Agent by terminating their corresponding process", nickname = "commandDeleteAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "All commands process terminated success", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "All commands process terminated failure", response = ApiResponse.class)})
@@ -61,7 +50,7 @@ public interface CommandApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Stops Active Command on the Agent by pid", nickname = "commandDeleteByPid", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
+    @ApiOperation(value = "Stops running Command on the Agent by pid", nickname = "commandDeleteByPid", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Terminate command process success", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "Terminate command process failure", response = ApiResponse.class)})
@@ -90,7 +79,7 @@ public interface CommandApi {
             @io.swagger.annotations.ApiResponse(code = 200, message = "Commands start success", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "Commands start failure", response = ApiResponse.class)
     })
-    @RequestMapping(value = "/commandsyaml",
+    @RequestMapping(value = "/commands/yaml",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},
             method = RequestMethod.POST)

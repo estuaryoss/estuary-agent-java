@@ -3,6 +3,7 @@ package com.github.estuaryoss.agent.utils;
 
 import com.github.estuaryoss.agent.component.CommandRunner;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
+import com.github.estuaryoss.agent.model.api.CommandDetails;
 import com.github.estuaryoss.agent.model.api.CommandParallel;
 
 import java.time.Duration;
@@ -21,10 +22,14 @@ public class CommandStatusThread implements Runnable {
 
     @Override
     public void run() {
-        pCmd.getCommandStatuses().get(pCmd.getThreadId()).setDetails(
-                commandRunner.getCmdDetailsOfProcess(pCmd.getCommand().getCommand().split(" "),
-                        pCmd.getProcessState(),
-                        pCmd.getCommand()));
+        CommandDetails commandDetails = CommandDetails.builder()
+                .out(pCmd.getCommand().getOut())
+                .err(pCmd.getCommand().getErr())
+                .code(pCmd.getCommand().getCode())
+                .pid(pCmd.getCommand().getPid())
+                .args(pCmd.getCommand().getCommand().split(" "))
+                .build();
+        pCmd.getCommandStatuses().get(pCmd.getThreadId()).setDetails(commandDetails);
 
         pCmd.getCommandsStatus().put(pCmd.getCommand().getCommand(), pCmd.getCommandStatuses().get(pCmd.getThreadId()));
         pCmd.getCommandStatuses().get(pCmd.getThreadId()).setFinishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));

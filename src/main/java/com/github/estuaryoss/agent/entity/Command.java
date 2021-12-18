@@ -53,4 +53,8 @@ public class Command {
 
     @Column(name = "STATUS")
     private String status;
+
+    @Column(name = "ARGS")
+    @Length(max = COMMAND_MAX_SIZE)
+    private String args;
 }

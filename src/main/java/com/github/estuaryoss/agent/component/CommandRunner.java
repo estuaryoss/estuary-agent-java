@@ -48,6 +48,7 @@ public class CommandRunner {
     private static final String EXEC_LINUX = "/bin/sh";
     private static final String ARGS_LINUX = "-c";
     public static final float DENOMINATOR = 1000F;
+    public static final String ARGS_DELIMITER = ",";
 
     private final DbService dbService;
     private final VirtualEnvironment environment;
@@ -90,7 +91,7 @@ public class CommandRunner {
             commandStatus.setStartedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             Command commandDb = this.runCommand(cmd);
             CommandDetails commandDetails = CommandDetails.builder()
-                    .args(commandDb.getCommand().split(" "))
+                    .args(commandDb.getArgs().split(ARGS_DELIMITER))
                     .code(commandDb.getCode())
                     .out(commandDb.getOut())
                     .err(commandDb.getErr())
@@ -191,13 +192,12 @@ public class CommandRunner {
     }
 
     /**
-     * @param command      The command to be executed
      * @param processState A reference to a {@link ProcessState}
-     * @param commandDb    A Command object representation form the DB
+     * @param commandDb    A Command object representation from the DB
      * @return The command details of the command executed
      */
     @SneakyThrows
-    public Command getCmdDetailsOfProcess(String[] command, ProcessState processState, Command commandDb) {
+    public Command getCommandDetailsFromProcess(ProcessState processState, Command commandDb) {
         InputStream inputStream = null;
         int timeout = environment.getEnv().get(EnvConstants.COMMAND_TIMEOUT) != null ?
                 Integer.parseInt(environment.getEnv().get(EnvConstants.COMMAND_TIMEOUT)) : DefaultConstants.COMMAND_TIMEOUT_DEFAULT;
@@ -295,7 +295,8 @@ public class CommandRunner {
 
         ProcessState processState = getProcessState(fullCommand.toArray(new String[0]));
         Command command = Command.builder()
-                .command(trimString(cmd, COMMAND_MAX_SIZE))
+                .command(trimString(commandWithSingleSpaces, COMMAND_MAX_SIZE))
+                .args(trimString(String.join(ARGS_DELIMITER, fullCommand), COMMAND_MAX_SIZE))
                 .startedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
                 .pid(processState.getProcess().pid())
                 .status(ExecutionStatus.RUNNING.getStatus())
@@ -303,7 +304,7 @@ public class CommandRunner {
 
         dbService.saveCommand(command);
 
-        return this.getCmdDetailsOfProcess(fullCommand.toArray(new String[0]), processState, command);
+        return this.getCommandDetailsFromProcess(processState, command);
     }
 
     private ProcessState getProcessState(String[] command) throws IOException {

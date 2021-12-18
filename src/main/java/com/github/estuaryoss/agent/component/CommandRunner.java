@@ -140,23 +140,11 @@ public class CommandRunner {
                 .finished(false)
                 .pid(ProcessHandle.current().pid())
                 .build();
-        List<Command> commandList = new ArrayList<>();
         for (int i = 0; i < commands.length; i++) {
             commandStatuses.add(new CommandStatus());
             commandStatuses.get(i).setStartedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             ProcessState processState = this.runCommandDetached(commands[i].split(" "));
             processStates.add(processState);
-
-            Command command = Command.builder()
-                    .command(trimString(commands[i], COMMAND_MAX_SIZE))
-                    .args(trimString(commands[i], COMMAND_MAX_SIZE))
-                    .startedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
-                    .pid(processState.getProcess().pid())
-                    .status(ExecutionStatus.RUNNING.getStatus())
-                    .build();
-
-            dbService.saveCommand(command);
-            commandList.add(command);
         }
 
         //start threads that reads the stdout, stderr, pid and others
@@ -165,7 +153,7 @@ public class CommandRunner {
                     .commandDescription(commandDescription)
                     .commandStatuses(commandStatuses)
                     .commandsStatus(commandsStatus)
-                    .command(commandList.get(i))
+                    .command(commands[i])
                     .processState(processStates.get(i))
                     .threadId(i)
                     .build());
@@ -191,7 +179,7 @@ public class CommandRunner {
      * @return The command details of the command executed
      */
     @SneakyThrows
-    public CommandDetails getCommandDetailsFromProcess(ProcessState processState, Command commandDb) {
+    private CommandDetails getCommandDetailsFromProcess(ProcessState processState, Command commandDb) {
         CommandDetails commandDetails;
         InputStream inputStream = null;
         int timeout = environment.getEnv().get(EnvConstants.COMMAND_TIMEOUT) != null ?
@@ -293,7 +281,7 @@ public class CommandRunner {
         return processState;
     }
 
-    private CommandDetails getCommandDetails(String cmd) throws IOException {
+    public CommandDetails getCommandDetails(String cmd) throws IOException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         List<String> fullCommand = getPlatformCommand();
         String commandWithSingleSpaces = cmd.trim().replaceAll("\\s+", " ");

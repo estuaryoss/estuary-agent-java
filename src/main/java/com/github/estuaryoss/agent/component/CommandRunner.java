@@ -149,7 +149,7 @@ public class CommandRunner {
 
             Command command = Command.builder()
                     .command(trimString(commands[i], COMMAND_MAX_SIZE))
-                    .args(trimString(String.join(ARGS_DELIMITER, commands[i]), COMMAND_MAX_SIZE))
+                    .args(trimString(commands[i], COMMAND_MAX_SIZE))
                     .startedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
                     .pid(processState.getProcess().pid())
                     .status(ExecutionStatus.RUNNING.getStatus())

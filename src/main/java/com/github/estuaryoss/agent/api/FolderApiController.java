@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.estuaryoss.agent.component.ClientRequest;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
+import com.github.estuaryoss.agent.constants.FileTransferType;
+import com.github.estuaryoss.agent.entity.FileTransfer;
 import com.github.estuaryoss.agent.exception.ApiException;
+import com.github.estuaryoss.agent.service.DbService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +38,9 @@ public class FolderApiController implements FolderApi {
     private ClientRequest clientRequest;
 
     @Autowired
+    private DbService dbService;
+
+    @Autowired
     public FolderApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
@@ -52,9 +58,11 @@ public class FolderApiController implements FolderApi {
         }
 
         File file;
+        File sourceFolderPath;
         try {
             file = new File(archiveNamePath);
-            ZipUtil.pack(new File(folderPath), file, name -> name);
+            sourceFolderPath = new File(folderPath);
+            ZipUtil.pack(sourceFolderPath, file, name -> name);
         } catch (Exception e) {
             throw new ApiException(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode(),
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode()), folderPath));
@@ -67,6 +75,15 @@ public class FolderApiController implements FolderApi {
             throw new ApiException(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode(),
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode()), folderPath));
         }
+
+        dbService.saveFileTransfer(FileTransfer.builder()
+                .type(FileTransferType.DOWNLOAD.getType())
+                .sourceFileName(sourceFolderPath.getName())
+                .sourceFilePath(sourceFolderPath.getAbsolutePath())
+                .targetFileName(file.getName())
+                .targetFilePath(file.getAbsolutePath())
+                .fileSize(resource.contentLength())
+                .build());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())

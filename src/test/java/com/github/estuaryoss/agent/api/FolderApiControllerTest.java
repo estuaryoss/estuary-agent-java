@@ -7,6 +7,8 @@ import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.HeaderConstants;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
+import com.github.estuaryoss.agent.repository.FileTransferRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,14 @@ public class FolderApiControllerTest {
     @Autowired
     private Authentication auth;
 
+    @Autowired
+    private FileTransferRepository fileTransferRepository;
+
+    @BeforeEach
+    public void cleanRepo() {
+        fileTransferRepository.deleteAll();
+    }
+
     @Test
     public void whenCallingGetThenTheFolderIsRetrivedOkInZipFormat() {
         Map<String, String> headers = new HashMap<>();
@@ -64,6 +74,8 @@ public class FolderApiControllerTest {
         assertThat(body).isNotEmpty();
         //check also it appeared on disk
         assertThat(new File("archive.zip").exists()).isTrue();
+        //audit transfer in DB
+        assertThat(fileTransferRepository.findAll().size()).isEqualTo(1);
     }
 
     @Test

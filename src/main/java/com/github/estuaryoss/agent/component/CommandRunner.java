@@ -107,7 +107,7 @@ public class CommandRunner {
                     LocalDateTime.parse(commandStatus.getStartedat(), DateTimeConstants.PATTERN),
                     LocalDateTime.parse(commandStatus.getFinishedat(), DateTimeConstants.PATTERN)).toMillis() / DENOMINATOR);
             commandStatus.setStatus(ExecutionStatus.FINISHED.getStatus());
-            commandsStatus.put(cmd, commandStatus);
+            commandsStatus.put(cmd.getCommand(), commandStatus);
             commandDescription.setCommands(commandsStatus);
         }
 

@@ -26,7 +26,7 @@ public class CommandStatusThread implements Runnable {
         pCmd.getCommandStatuses().get(pCmd.getThreadId()).setDetails(
                 commandRunner.getCommandDetails(pCmd.getCommand()));
 
-        pCmd.getCommandsStatus().put(pCmd.getCommand(), pCmd.getCommandStatuses().get(pCmd.getThreadId()));
+        pCmd.getCommandsStatus().put(pCmd.getCommand().getCommand(), pCmd.getCommandStatuses().get(pCmd.getThreadId()));
         pCmd.getCommandStatuses().get(pCmd.getThreadId()).setFinishedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
         pCmd.getCommandStatuses().get(pCmd.getThreadId()).setDuration(Duration.between(
                 LocalDateTime.parse(pCmd.getCommandStatuses().get(pCmd.getThreadId()).getStartedat(), DateTimeConstants.PATTERN),

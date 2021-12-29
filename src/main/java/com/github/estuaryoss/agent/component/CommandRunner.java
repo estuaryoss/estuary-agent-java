@@ -52,6 +52,7 @@ public class CommandRunner {
 
     private final DbService dbService;
     private final VirtualEnvironment environment;
+    private final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss.SSSSSS";
 
     @Autowired
     public CommandRunner(DbService dbService, VirtualEnvironment environment) {
@@ -66,7 +67,7 @@ public class CommandRunner {
      * @return The details of the command
      * @throws IOException if the process could not be started
      */
-    public CommandDetails runCommand(String command) throws IOException {
+    public CommandDetails runCommand(Command command) throws IOException {
         return this.getCommandDetails(command);
     }
 
@@ -86,7 +87,17 @@ public class CommandRunner {
                 .pid(ProcessHandle.current().pid())
                 .build();
 
+        List<Command> commandsDbList = new ArrayList<>();
         for (String cmd : commands) {
+            Command command = Command.builder()
+                    .command(trimString(cmd, COMMAND_MAX_SIZE))
+                    .status(ExecutionStatus.QUEUED.getStatus())
+                    .build();
+            dbService.saveCommand(command);
+
+            commandsDbList.add(command);
+        }
+        for (Command cmd : commandsDbList) {
             CommandStatus commandStatus = new CommandStatus();
             commandStatus.setStartedat(LocalDateTime.now().format(DateTimeConstants.PATTERN));
             CommandDetails commandDetails = this.runCommand(cmd);
@@ -149,11 +160,16 @@ public class CommandRunner {
 
         //start threads that reads the stdout, stderr, pid and others
         for (int i = 0; i < processStates.size(); i++) {
+            Command command = Command.builder()
+                    .command(commands[i])
+                    .status(ExecutionStatus.QUEUED.getStatus())
+                    .build();
+            dbService.saveCommand(command);
             CommandStatusThread cmdStatusThread = new CommandStatusThread(this, CommandParallel.builder()
                     .commandDescription(commandDescription)
                     .commandStatuses(commandStatuses)
                     .commandsStatus(commandsStatus)
-                    .command(commands[i])
+                    .command(command)
                     .processState(processStates.get(i))
                     .threadId(i)
                     .build());
@@ -281,31 +297,29 @@ public class CommandRunner {
         return processState;
     }
 
-    public CommandDetails getCommandDetails(String cmd) throws IOException {
+    public CommandDetails getCommandDetails(Command cmd) throws IOException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         List<String> fullCommand = getPlatformCommand();
-        String commandWithSingleSpaces = cmd.trim().replaceAll("\\s+", " ");
+        String commandWithSingleSpaces = cmd.getCommand().trim().replaceAll("\\s+", " ");
 
         if (isWindows) {
             for (String cmdPart : commandWithSingleSpaces.split(" ")) {
                 fullCommand.add(cmdPart);
             }
         } else {
-            fullCommand.add(cmd);
+            fullCommand.add(cmd.getCommand());
         }
 
         ProcessState processState = getProcessState(fullCommand.toArray(new String[0]));
-        Command command = Command.builder()
-                .command(trimString(commandWithSingleSpaces, COMMAND_MAX_SIZE))
-                .args(trimString(String.join(ARGS_DELIMITER, fullCommand), COMMAND_MAX_SIZE))
-                .startedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")))
-                .pid(processState.getProcess().pid())
-                .status(ExecutionStatus.RUNNING.getStatus())
-                .build();
+        cmd.setCommand(trimString(commandWithSingleSpaces, COMMAND_MAX_SIZE));
+        cmd.setArgs(trimString(String.join(ARGS_DELIMITER, fullCommand), COMMAND_MAX_SIZE));
+        cmd.setStartedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATETIME_PATTERN)));
+        cmd.setPid(processState.getProcess().pid());
+        cmd.setStatus(ExecutionStatus.RUNNING.getStatus());
 
-        dbService.saveCommand(command);
+        dbService.saveCommand(cmd);
 
-        return this.getCommandDetailsFromProcess(processState, command);
+        return this.getCommandDetailsFromProcess(processState, cmd);
     }
 
     private ProcessState getProcessState(String[] command) throws IOException {

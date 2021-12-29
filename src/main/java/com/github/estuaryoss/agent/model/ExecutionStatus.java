@@ -2,7 +2,8 @@ package com.github.estuaryoss.agent.model;
 
 public enum ExecutionStatus {
     RUNNING("running"),
-    FINISHED("finished");
+    FINISHED("finished"),
+    QUEUED("queued");
 
     private final String status;
 

@@ -1,5 +1,6 @@
 package com.github.estuaryoss.agent.model.api;
 
+import com.github.estuaryoss.agent.entity.Command;
 import com.github.estuaryoss.agent.model.ProcessState;
 import lombok.*;
 
@@ -15,7 +16,7 @@ public class CommandParallel {
     private int threadId;
     @Setter
     @Getter
-    private String command;
+    private Command command;
     @Setter
     @Getter
     private CommandDescription commandDescription;

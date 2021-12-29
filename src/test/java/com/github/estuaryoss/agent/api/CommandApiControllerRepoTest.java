@@ -20,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -55,6 +56,25 @@ public class CommandApiControllerRepoTest {
         postCommands(commands);
 
         assertThat(commandRepository.findCommandByStatus(ExecutionStatus.RUNNING.getStatus()).size()).isEqualTo(0);
+        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.FINISHED.getStatus()).size()).isEqualTo(commands.split("\n").length);
+    }
+
+    @Test
+    public void whenSendingSomeCommandsThenSomeOfThemWillBeQueued() throws InterruptedException {
+        String commands = "echo 1\nsleep 1\nsleep 2";
+//        String commands = "echo 1\nping -n 2 127.0.0.1\nping -n 3 127.0.0.1";
+
+        CompletableFuture.runAsync(() -> {
+            postCommands(commands);
+        });
+
+        Thread.sleep(1000);
+
+//        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.RUNNING.getStatus()).size()).isEqualTo(1);
+//        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.FINISHED.getStatus()).size()).isEqualTo(1);
+        assertThat(commandRepository.findCommandByStatus(ExecutionStatus.QUEUED.getStatus()).size()).isGreaterThanOrEqualTo(1);
+
+        Thread.sleep(4000);
         assertThat(commandRepository.findCommandByStatus(ExecutionStatus.FINISHED.getStatus()).size()).isEqualTo(commands.split("\n").length);
     }
 

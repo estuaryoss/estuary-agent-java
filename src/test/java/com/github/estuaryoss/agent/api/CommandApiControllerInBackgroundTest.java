@@ -76,7 +76,7 @@ public class CommandApiControllerInBackgroundTest {
     }
 
     @Test
-    public void whenSendingBackgroundCommandAndDeleteTheCommandByPidThenTheCommandGetsDeletedFromCommandRepo() throws JsonProcessingException, InterruptedException {
+    public void whenSendingBackgroundCommandAndDeleteTheCommandByPidThenTheCommandGetsDeletedFromCommandRepo() throws InterruptedException {
         String command = "tail -f /etc/hostname";
 //        String command = "notepad"; //win
 
@@ -106,7 +106,7 @@ public class CommandApiControllerInBackgroundTest {
     }
 
     @Test
-    public void whenSendingBackgroundCommandAndDeleteAllCommandsThenAllTheCommandsGetsDeletedFromCommandRepo() throws JsonProcessingException, InterruptedException {
+    public void whenSendingBackgroundCommandAndDeleteAllCommandsThenAllTheCommandsGetsDeletedFromCommandRepo() throws InterruptedException {
         String command = "tail -f /etc/hostname";
 //        String command = "notepad"; //win
 
@@ -137,7 +137,7 @@ public class CommandApiControllerInBackgroundTest {
     }
 
     @Test
-    public void whenSendingMultipleCommandsThenTheRunningOneItsAlwaysInFrontOfTheList() throws JsonProcessingException, InterruptedException {
+    public void whenSendingMultipleCommandsThenTheRunningOneItsAlwaysInFrontOfTheList() throws InterruptedException {
         String commands = "echo 1\ntail -f /etc/hostname";
 //        String commands = "echo 1\nnotepad"; //win
 

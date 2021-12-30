@@ -63,7 +63,7 @@ public class FileApiControllerRepoTest {
         assertThat(fileTransferRepository.findAll().size()).isEqualTo(1);
     }
 
-    private ResponseEntity<String> getFileContent(String filePath) {
+    private ResponseEntity<ApiResponse> getFileContent(String filePath) {
         Map<String, String> headers = new HashMap<>();
         headers.put("File-Path", filePath);
 
@@ -72,7 +72,7 @@ public class FileApiControllerRepoTest {
                 .exchange(SERVER_PREFIX + port + "/file",
                         HttpMethod.GET,
                         httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                        String.class);
+                        ApiResponse.class);
     }
 
     private ResponseEntity<ApiResponse> putFileContent(String content) {

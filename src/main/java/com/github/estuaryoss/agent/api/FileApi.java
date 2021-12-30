@@ -24,7 +24,7 @@ public interface FileApi {
     @RequestMapping(value = "/file",
             produces = {"application/json", "application/octet-stream", "text/plain"},
             method = RequestMethod.GET)
-    default ResponseEntity<? extends Object> fileGet(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    default ResponseEntity<ApiResponse> fileGet(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

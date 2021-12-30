@@ -1,13 +1,14 @@
 package com.github.estuaryoss.agent.model.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import com.github.estuaryoss.agent.utils.SystemInformation;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class ApiResponse<T> {
     @Getter
     @Setter
@@ -17,27 +18,32 @@ public class ApiResponse<T> {
     @Getter
     @Setter
     @JsonProperty("message")
-    private String message = null;
+    private String message;
 
     @Getter
     @Setter
     @JsonProperty("description")
-    private T description = null;
+    private T description;
 
     @Getter
     @Setter
     @JsonProperty("timestamp")
-    private String timestamp = null;
+    private String timestamp;
 
     @Getter
     @Setter
     @JsonProperty("path")
-    private String path = null;
+    private String path;
+
+    @Getter
+    @JsonProperty("hostname")
+    @Builder.Default
+    private String hostname = SystemInformation.getHostname();
 
     @Getter
     @Setter
     @JsonProperty("name")
-    private String name = null;
+    private String name;
 
     @Getter
     @Setter

@@ -52,6 +52,7 @@ public class AboutApiControllerTest {
         assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getPath()).isEqualTo("/about?");
+        assertThat(body.getHostname().length()).isGreaterThan(0);
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }

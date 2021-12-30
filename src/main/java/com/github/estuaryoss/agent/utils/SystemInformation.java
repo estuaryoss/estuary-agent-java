@@ -13,12 +13,6 @@ public class SystemInformation {
     private static final Logger log = LoggerFactory.getLogger(SystemInformation.class);
 
     public static final SystemInfo getSystemInfo() {
-        String hostname = "NA";
-        try {
-            hostname = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            log.info("Could not detect hostname: " + ExceptionUtils.getStackTrace(e));
-        }
         String layer = new File("/.dockerenv").exists() ? "Docker" : "Machine";
         long maxMemory = Runtime.getRuntime().maxMemory() / (1024 * 1024 * 1024);
 
@@ -30,13 +24,24 @@ public class SystemInformation {
                 .architecture(System.getProperty("os.arch"))
                 .machine("NA")
                 .layer(layer)
-                .hostname(hostname)
+                .hostname(getHostname())
                 .cpu(System.getenv("PROCESSOR_IDENTIFIER") != null ? System.getenv("PROCESSOR_IDENTIFIER") : "NA")
                 .ram(maxMemory + " GB")
                 .java(System.getProperty("java.vm.vendor") + " " + System.getProperty("java.runtime.version"))
                 .build();
 
         return systemInfo;
+    }
+
+    public static String getHostname() {
+        String hostname = "NA";
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            log.info("Could not detect hostname: " + ExceptionUtils.getStackTrace(e));
+        }
+
+        return hostname;
     }
 
     private static String getSystem() {

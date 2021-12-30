@@ -59,17 +59,17 @@ public class FileApiControllerTest {
         Map<String, String> headers = new HashMap<>();
         headers.put(HeaderConstants.FILE_PATH, "README.md");
 
-        ResponseEntity<String> responseEntity =
+        ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                         .exchange(SERVER_PREFIX + port + "/file",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                                String.class);
+                                ApiResponse.class);
 
-        String body = responseEntity.getBody();
+        ApiResponse body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body).contains("## Build status");
+        assertThat(body.getDescription().toString()).contains("## Build status");
     }
 
     @Test
@@ -254,7 +254,7 @@ public class FileApiControllerTest {
         MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("files", getTestFile());
         requestBody.add("files", getTestFile());
-        String folderPath = "/tmp";
+        String folderPath = "uploads";
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>() {{
             add("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE);
             add("Accept", MediaType.APPLICATION_JSON_VALUE);

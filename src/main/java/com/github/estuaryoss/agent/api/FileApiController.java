@@ -13,6 +13,7 @@ import com.github.estuaryoss.agent.service.StorageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -25,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +62,7 @@ public class FileApiController implements FileApi {
         this.request = request;
     }
 
-    public ResponseEntity<? extends Object> fileGet(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<ApiResponse> fileGet(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
         String headerName = "File-Path";
 
@@ -84,8 +87,23 @@ public class FileApiController implements FileApi {
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode()));
         }
 
-        return ResponseEntity.ok()
-                .body(resource);
+        String fileContent;
+        try (InputStream inputStream = resource.getInputStream()) {
+            fileContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new ApiException(ApiResponseCode.GET_FILE_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode()));
+        }
+
+        return new ResponseEntity<ApiResponse>(ApiResponse.builder()
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(fileContent)
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
     }
 
     public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {

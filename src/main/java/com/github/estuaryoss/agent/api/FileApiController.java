@@ -12,12 +12,15 @@ import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.service.StorageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.estuaryoss.agent.constants.HeaderConstants.FILE_PATH;
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_NAME_MAX_SIZE;
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_PATH_MAX_SIZE;
 import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
@@ -62,14 +66,13 @@ public class FileApiController implements FileApi {
         this.request = request;
     }
 
-    public ResponseEntity<ApiResponse> fileGet(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<ApiResponse> fileRead(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
-        String headerName = "File-Path";
 
-        log.debug(headerName + " Header: " + filePath);
+        log.debug(FILE_PATH + " Header: " + filePath);
         if (filePath == null) {
             throw new ApiException(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode(),
-                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), headerName));
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), FILE_PATH));
         }
 
         Resource resource;
@@ -106,14 +109,46 @@ public class FileApiController implements FileApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
+    @SneakyThrows
+    public ResponseEntity<? extends Object> fileDownload(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
-        String headerName = "File-Path";
 
-        log.debug(headerName + " Header: " + filePath);
+        log.debug(FILE_PATH + " Header: " + filePath);
         if (filePath == null) {
             throw new ApiException(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode(),
-                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), headerName));
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), FILE_PATH));
+        }
+
+        Resource resource;
+        File file;
+        try {
+            resource = storageService.loadAsResource(filePath);
+            file = new File(filePath);
+            dbService.saveFileTransfer(FileTransfer.builder()
+                    .type(FileTransferType.DOWNLOAD.getType())
+                    .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
+                    .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
+                    .fileSize(resource.contentLength())
+                    .build());
+        } catch (IOException e) {
+            throw new ApiException(ApiResponseCode.GET_FILE_FAILURE.getCode(),
+                    ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode()));
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName())
+                .contentType(MediaType.valueOf("application/octet-stream"))
+                .contentLength(resource.contentLength())
+                .body(resource);
+    }
+
+    public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
+        String accept = request.getHeader("Accept");
+
+        log.debug(FILE_PATH + " Header: " + filePath);
+        if (filePath == null) {
+            throw new ApiException(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode(),
+                    String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), FILE_PATH));
         }
 
         try {

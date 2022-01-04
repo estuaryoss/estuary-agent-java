@@ -5,4 +5,5 @@ public class DefaultConstants {
     public static final int PROCESS_EXCEPTION_GENERAL = 1;
     public static final int PROCESS_EXCEPTION_TIMEOUT = -1;
     public static String UPLOADS_FOLDER = "uploads";
+    public static String DOWNLOADS_FOLDER = "downloads";
 }

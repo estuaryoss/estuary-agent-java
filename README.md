@@ -120,7 +120,9 @@ HTTPS_KEYSTORE=file:https/keystore.p12
 If you do not set cert and keystore password env vars, it uses the ones from default *application.properties* in the
 resource folder.
 
-! Please also change the app port by setting the env var called **PORT** to *8443*. Default is 8080.
+! Please also set the following env vars:
+- the app port by setting the env var called **PORT** to *8443*. Default is 8080.
+- **SERVICE_PROTOCOL** to *https*
 
 ## Environment variables injection
 

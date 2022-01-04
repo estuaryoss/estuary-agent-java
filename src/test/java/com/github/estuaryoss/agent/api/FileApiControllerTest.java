@@ -55,13 +55,13 @@ public class FileApiControllerTest {
     private Authentication auth;
 
     @Test
-    public void whenCallingGetThenInformationIsRetrivedOk() {
+    public void whenCallingGetTheFileContentIsRetrievedOk() {
         Map<String, String> headers = new HashMap<>();
         headers.put(HeaderConstants.FILE_PATH, "README.md");
 
         ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                        .exchange(SERVER_PREFIX + port + "/file",
+                        .exchange(SERVER_PREFIX + port + "/file/read",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
                                 ApiResponse.class);
@@ -73,12 +73,30 @@ public class FileApiControllerTest {
     }
 
     @Test
+    public void whenCallingDownloadFileThenItIsRetrievedOk() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HeaderConstants.FILE_PATH, "README.md");
+
+        ResponseEntity<String> responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .exchange(SERVER_PREFIX + port + "/file/download",
+                                HttpMethod.GET,
+                                httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
+                                String.class);
+
+        String body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
+        assertThat(body.toString()).contains("## Build status");
+    }
+
+    @Test
     public void whenFilePathIsMissingThenApiReturnsError() {
         Map<String, String> headers = new HashMap<>();
 
         ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                        .exchange(SERVER_PREFIX + port + "/file",
+                        .exchange(SERVER_PREFIX + port + "/file/read",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
                                 ApiResponse.class);
@@ -94,7 +112,30 @@ public class FileApiControllerTest {
         assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
 
+    @Test
+    public void whenFilePathIsMissingWhenDownloadingFileThenApiReturnsError() {
+        Map<String, String> headers = new HashMap<>();
+
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .exchange(SERVER_PREFIX + port + "/file/download",
+                                HttpMethod.GET,
+                                httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
+                                ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode());
+        assertThat(body.getMessage()).isEqualTo(
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), HeaderConstants.FILE_PATH));
+        assertThat(body.getDescription().toString()).contains(
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), HeaderConstants.FILE_PATH));
+        assertThat(body.getName()).isEqualTo(about.getAppName());
+        assertThat(body.getVersion()).isEqualTo(about.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
     }
 
     @Test
@@ -127,7 +168,31 @@ public class FileApiControllerTest {
 
         ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                        .exchange(SERVER_PREFIX + port + "/file",
+                        .exchange(SERVER_PREFIX + port + "/file/read",
+                                HttpMethod.GET,
+                                httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
+                                ApiResponse.class);
+
+        ApiResponse body = responseEntity.getBody();
+
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(body.getCode()).isEqualTo(ApiResponseCode.GET_FILE_FAILURE.getCode());
+        assertThat(body.getMessage()).isEqualTo(
+                String.format(ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode())));
+        assertThat(body.getDescription().toString()).contains("Exception");
+        assertThat(body.getName()).isEqualTo(about.getAppName());
+        assertThat(body.getVersion()).isEqualTo(about.getVersion());
+        assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+    }
+
+    @Test
+    public void whenFilePathIsWrongWhenDownloadingFileThenApiReturnsError() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HeaderConstants.FILE_PATH, "whateverInvalidPath");
+
+        ResponseEntity<ApiResponse> responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .exchange(SERVER_PREFIX + port + "/file/download",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
                                 ApiResponse.class);

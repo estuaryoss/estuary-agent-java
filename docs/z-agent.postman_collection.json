@@ -514,8 +514,28 @@
 			"response": []
 		},
 		{
-			"name": "{{SERVER}}:8080/file",
+			"name": "https://{{SERVER}}:8444/file/read",
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "estuaryoss123!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [
 					{
@@ -538,13 +558,74 @@
 					}
 				],
 				"url": {
-					"raw": "{{SERVER}}:8082/file",
+					"raw": "https://{{SERVER}}:8444/file/read",
+					"protocol": "https",
 					"host": [
 						"{{SERVER}}"
 					],
-					"port": "8082",
+					"port": "8444",
 					"path": [
-						"file"
+						"file",
+						"read"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://{{SERVER}}:8444/file/download",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "estuaryoss123!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "File-Path",
+						"value": "README.md"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic YWRtaW46U2VjcmV0MDE=",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://{{SERVER}}:8444/file/download",
+					"protocol": "https",
+					"host": [
+						"{{SERVER}}"
+					],
+					"port": "8444",
+					"path": [
+						"file",
+						"download"
 					]
 				}
 			},

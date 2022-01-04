@@ -52,10 +52,8 @@ public class FolderApiController implements FolderApi {
     }
 
     @SneakyThrows
-    public ResponseEntity<? extends Object> folderGet(@ApiParam(value = "Target folder path to get as zip", required = false) @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
+    public ResponseEntity<Resource> folderGet(@ApiParam(value = "Target folder path to get as zip", required = false) @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
         String accept = request.getHeader("Accept");
-
-
         log.debug(FOLDER_PATH + " Header: " + folderPath);
         if (folderPath == null) {
             throw new ApiException(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode(),

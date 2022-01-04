@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public interface FileApi {
     @RequestMapping(value = "/file/download",
             produces = {"application/octet-stream", "application/json"},
             method = RequestMethod.GET)
-    default ResponseEntity<? extends Object> fileDownload(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    default ResponseEntity<Resource> fileDownload(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

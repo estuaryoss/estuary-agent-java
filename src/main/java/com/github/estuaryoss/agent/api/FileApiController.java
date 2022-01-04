@@ -110,7 +110,7 @@ public class FileApiController implements FileApi {
     }
 
     @SneakyThrows
-    public ResponseEntity<? extends Object> fileDownload(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<Resource> fileDownload(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
 
         log.debug(FILE_PATH + " Header: " + filePath);

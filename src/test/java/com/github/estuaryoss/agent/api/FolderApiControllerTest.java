@@ -15,12 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,23 +58,24 @@ public class FolderApiControllerTest {
     }
 
     @Test
-    public void whenCallingGetThenTheFolderIsRetrivedOkInZipFormat() {
+    public void whenCallingGetThenTheFolderIsRetrievedOkInZipFormat() throws IOException {
         Map<String, String> headers = new HashMap<>();
-        headers.put(HeaderConstants.FOLDER_PATH, "src");
+        String folderNameToBeRetrieved = "docs";
+        headers.put(HeaderConstants.FOLDER_PATH, folderNameToBeRetrieved);
 
-        ResponseEntity<String> responseEntity =
+        ResponseEntity<Resource> responseEntity =
                 this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                         .exchange(SERVER_PREFIX + port + "/folder",
                                 HttpMethod.GET,
                                 httpRequestUtils.getRequestEntityContentTypeAppJson(null, headers),
-                                String.class);
+                                Resource.class);
 
-        String body = responseEntity.getBody();
+        Resource body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body).isNotEmpty();
-        //check also it appeared on disk
-        assertThat(new File("archive.zip").exists()).isTrue();
+        assertThat(body.contentLength()).isGreaterThan(0L);
+        //check also has the required name
+        assertThat(body.getFilename()).isEqualTo(folderNameToBeRetrieved);
         //audit transfer in DB
         assertThat(fileTransferRepository.findAll().size()).isEqualTo(1);
     }

@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +18,25 @@ import javax.validation.Valid;
 @RequestMapping(value = "")
 public interface FileApi {
 
-    @ApiOperation(value = "Gets the content of the file", nickname = "fileGet", notes = "", response = Object.class, tags = {"estuary-agent",})
+    @ApiOperation(value = "Gets the content of the file", nickname = "fileRead", notes = "", response = Object.class, tags = {"estuary-agent",})
     @ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the file in plain text, success", response = Object.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the file content could not be read", response = Object.class)})
-    @RequestMapping(value = "/file",
-            produces = {"application/json", "application/octet-stream", "text/plain"},
+    @RequestMapping(value = "/file/read",
+            produces = {"application/json"},
             method = RequestMethod.GET)
-    default ResponseEntity<ApiResponse> fileGet(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    default ResponseEntity<ApiResponse> fileRead(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ApiOperation(value = "Gets the file as an attachment", nickname = "fileDownload", notes = "", response = Object.class, tags = {"estuary-agent",})
+    @ApiResponses(value = {
+            @io.swagger.annotations.ApiResponse(code = 200, message = "The file download, success", response = Object.class),
+            @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the file could not be downloaded", response = Object.class)})
+    @RequestMapping(value = "/file/download",
+            produces = {"application/octet-stream", "application/json"},
+            method = RequestMethod.GET)
+    default ResponseEntity<Resource> fileDownload(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

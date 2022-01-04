@@ -12,9 +12,9 @@ eureka:
       enabled: true
   instance:
     hostname: ${APP_IP:0.0.0.0}
-    statusPageUrl: http://${eureka.hostname}:${PORT:8080}/actuator/info
-    healthCheckUrl: http://${eureka.hostname}:${PORT:8080}/actuator/health
-    homePageUrl: http://${eureka.hostname}:${PORT:8080}/
+    statusPageUrl: ${SERVICE_PROTOCOL:http}://${eureka.hostname}:${PORT:8080}/actuator/info
+    healthCheckUrl: ${SERVICE_PROTOCOL:http}://${eureka.hostname}:${PORT:8080}/actuator/health
+    homePageUrl: ${SERVICE_PROTOCOL:http}://${eureka.hostname}:${PORT:8080}/
     metadata-map:
       name: Estuary-Agent
 

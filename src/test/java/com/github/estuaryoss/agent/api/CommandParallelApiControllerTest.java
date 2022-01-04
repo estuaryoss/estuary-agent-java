@@ -147,8 +147,8 @@ public class CommandParallelApiControllerTest {
 
     @Test
     public void whenSendingTwoCommandsOneSuccessOneFailureThenApiReturnsTheCorrectDetailsForEachOne() {
-        String command1 = "ls -lrt";
-        String command2 = "whatever";
+        String command1 = "echo 1";
+        String command2 = "whateverInvalidCommand";
         String command = command1 + "\n" + command2;
         ResponseEntity<ApiResponse<CommandDescription>> responseEntity =
                 getApiResponseCommandDescriptionResponseEntity(command);

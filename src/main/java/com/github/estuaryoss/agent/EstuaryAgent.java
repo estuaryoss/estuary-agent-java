@@ -44,13 +44,19 @@ public class EstuaryAgent implements CommandLineRunner {
     @Value("${app.folder.uploads}")
     private String uploadsFolderName;
 
+    @Value("${app.folder.downloads}")
+    private String downloadsFolderName;
+
     private void createFolders() {
         File uploadsFolder = new File(DefaultConstants.UPLOADS_FOLDER);
+        File downloadsFolder = new File(DefaultConstants.DOWNLOADS_FOLDER);
         if (!uploadsFolder.exists()) uploadsFolder.mkdirs();
+        if (!downloadsFolder.exists()) downloadsFolder.mkdirs();
     }
 
     private void initFolderConstants() {
         DefaultConstants.UPLOADS_FOLDER = uploadsFolderName;
+        DefaultConstants.DOWNLOADS_FOLDER = downloadsFolderName;
     }
 
     @PostConstruct

@@ -7,7 +7,7 @@ eureka:
       defaultZone: ${EUREKA_SERVER:http://localhost:8080/eureka/v2}
     instance:
     preferIpAddress: true
-    enabled: true
+    enabled: false
     healthcheck:
       enabled: true
   instance:

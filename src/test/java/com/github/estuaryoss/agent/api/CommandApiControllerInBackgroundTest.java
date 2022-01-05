@@ -72,7 +72,7 @@ public class CommandApiControllerInBackgroundTest {
         assertThat(commandList.get(0).getOut().trim()).isEqualTo(stdOut);
         assertThat(commandList.get(0).getErr()).isEqualTo("");
         assertThat(commandList.get(0).getPid()).isGreaterThan(0);
-        assertThat(commandList.get(0).getDuration()).isGreaterThan(0);
+        assertThat(commandList.get(0).getDuration()).isGreaterThanOrEqualTo(0);
     }
 
     @Test

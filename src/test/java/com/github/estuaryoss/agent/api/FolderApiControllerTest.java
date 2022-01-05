@@ -75,7 +75,7 @@ public class FolderApiControllerTest {
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body.contentLength()).isGreaterThan(0L);
         //check also has the required name
-        assertThat(body.getFilename()).isEqualTo(folderNameToBeRetrieved);
+        assertThat(body.getFilename()).isEqualTo(folderNameToBeRetrieved + ".zip");
         //audit transfer in DB
         assertThat(fileTransferRepository.findAll().size()).isEqualTo(1);
     }

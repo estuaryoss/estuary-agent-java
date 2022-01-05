@@ -2,10 +2,8 @@ package com.github.estuaryoss.agent.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.estuaryoss.agent.component.ClientRequest;
-import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
-import com.github.estuaryoss.agent.constants.DefaultConstants;
-import com.github.estuaryoss.agent.constants.FileTransferType;
+import com.github.estuaryoss.agent.constants.*;
 import com.github.estuaryoss.agent.entity.FileTransfer;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.service.DbService;
@@ -26,6 +24,7 @@ import org.zeroturnaround.zip.ZipUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import static com.github.estuaryoss.agent.constants.HeaderConstants.FOLDER_PATH;
 
@@ -84,6 +83,7 @@ public class FolderApiController implements FolderApi {
                     .targetFileName(file.getName())
                     .targetFilePath(file.getAbsolutePath())
                     .fileSize(resource.contentLength())
+                    .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                     .build());
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode(),
@@ -91,7 +91,7 @@ public class FolderApiController implements FolderApi {
         }
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + sourceFolderPath.getName())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
                 .contentType(MediaType.valueOf("application/zip"))
                 .contentLength(resource.contentLength())
                 .body(resource);

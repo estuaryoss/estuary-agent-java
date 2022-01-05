@@ -50,4 +50,7 @@ public class FileTransfer {
 
     @Column(name = "FILE_SIZE")
     private Long fileSize;
+
+    @Column(name = "DATE_TIME", columnDefinition = "TIMESTAMP")
+    private String dateTime;
 }

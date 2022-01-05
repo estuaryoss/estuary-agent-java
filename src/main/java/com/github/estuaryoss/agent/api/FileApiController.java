@@ -84,6 +84,7 @@ public class FileApiController implements FileApi {
                     .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
                     .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
                     .fileSize(resource.contentLength())
+                    .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                     .build());
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_FILE_FAILURE.getCode(),
@@ -129,6 +130,7 @@ public class FileApiController implements FileApi {
                     .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
                     .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
                     .fileSize(resource.contentLength())
+                    .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                     .build());
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_FILE_FAILURE.getCode(),
@@ -160,6 +162,7 @@ public class FileApiController implements FileApi {
                     .targetFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
                     .targetFolder(trimString(file.getParent(), FILE_PATH_MAX_SIZE))
                     .fileSize(content != null ? Long.valueOf(content.length) : 0L)
+                    .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                     .build());
             log.info(String.format("Stored file at '%s'", filePath));
         } catch (IOException e) {
@@ -218,6 +221,7 @@ public class FileApiController implements FileApi {
                         .targetFilePath(trimString(filePath, FILE_PATH_MAX_SIZE))
                         .fileSize(file.getSize())
                         .targetFolder(trimString(fPath, FILE_PATH_MAX_SIZE))
+                        .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
                         .build());
                 log.info(String.format("Stored file '%s' at '%s'", file.getName(), filePath));
             } catch (IOException e) {

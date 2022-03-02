@@ -59,13 +59,9 @@ public class FolderApiController implements FolderApi {
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), FOLDER_PATH));
         }
 
-        File file;
-        File sourceFolderPath;
-        String archivePath;
+        File sourceFolderPath = new File(folderPath);
+        File file = new File(DefaultConstants.DOWNLOADS_FOLDER + File.separator + String.format("%s.zip", sourceFolderPath.getName()));
         try {
-            sourceFolderPath = new File(folderPath);
-            archivePath = DefaultConstants.DOWNLOADS_FOLDER + File.separator + String.format("%s.zip", sourceFolderPath.getName());
-            file = new File(archivePath);
             ZipUtil.pack(sourceFolderPath, file, name -> name);
         } catch (Exception e) {
             throw new ApiException(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode(),
@@ -74,7 +70,7 @@ public class FolderApiController implements FolderApi {
 
         Resource resource;
         try {
-            resource = storageService.loadAsResource(archivePath);
+            resource = storageService.loadAsResource(file.getAbsolutePath());
 
             dbService.saveFileTransfer(FileTransfer.builder()
                     .type(FileTransferType.DOWNLOAD.getType())

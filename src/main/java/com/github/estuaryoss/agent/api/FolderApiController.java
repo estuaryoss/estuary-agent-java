@@ -59,9 +59,12 @@ public class FolderApiController implements FolderApi {
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.HTTP_HEADER_NOT_PROVIDED.getCode()), FOLDER_PATH));
         }
 
-        File sourceFolderPath = new File(folderPath);
-        File file = new File(DefaultConstants.DOWNLOADS_FOLDER + File.separator + String.format("%s.zip", sourceFolderPath.getName()));
+        File sourceFolderPath;
+        File file;
         try {
+            sourceFolderPath = new File(folderPath);
+            file = new File(DefaultConstants.DOWNLOADS_FOLDER + File.separator + String.format("%s.zip", sourceFolderPath.getName()));
+
             ZipUtil.pack(sourceFolderPath, file, name -> name);
         } catch (Exception e) {
             throw new ApiException(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode(),

@@ -21,7 +21,7 @@ public interface FolderApi {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the folder as zip archive", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "The content of the folder could not be obtained", response = ApiResponse.class)})
     @RequestMapping(value = "/folder",
-            produces = {"application/zip", "application/json"},
+            produces = {"application/zip", "application/octet-stream"},
             method = RequestMethod.GET)
     default ResponseEntity<Resource> folderGet(@ApiParam(value = "Target folder path to get as zip", required = false) @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

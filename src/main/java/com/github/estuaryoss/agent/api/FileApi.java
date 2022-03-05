@@ -34,7 +34,7 @@ public interface FileApi {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The file download, success", response = Object.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the file could not be downloaded", response = Object.class)})
     @RequestMapping(value = "/file/download",
-            produces = {"application/octet-stream", "application/json"},
+            produces = {"application/octet-stream"},
             method = RequestMethod.GET)
     default ResponseEntity<Resource> fileDownload(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -80,7 +80,7 @@ public interface FileApi {
             @io.swagger.annotations.ApiResponse(code = 200, message = "The content of the file was uploaded successfully", response = ApiResponse.class),
             @io.swagger.annotations.ApiResponse(code = 500, message = "Failure, the file content could not be uploaded", response = ApiResponse.class)})
     @RequestMapping(value = "/file",
-            produces = {"application/json", "text/plain"},
+            produces = {"application/json"},
             consumes = {"application/json", "multipart/form-data", "application/x-www-form-urlencoded", "application/octet-stream", "text/plain"},
             method = RequestMethod.POST)
     default ResponseEntity<ApiResponse> filePost(@ApiParam(value = "The content of the file") @Valid @RequestBody byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {

@@ -16,9 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
@@ -110,6 +108,7 @@ public class FolderApiControllerTest {
         String folderName = "whateverinvalid";
         Map<String, String> headers = new HashMap<>();
         headers.put(HeaderConstants.FOLDER_PATH, folderName);
+        headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         ResponseEntity<ApiResponse> responseEntity =
                 this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())

@@ -48,8 +48,12 @@ public class AppEnvironment {
 
     public boolean setVirtualEnvVar(String envVarName, String envVarValue) {
         if (environment.containsKey(envVarName)) return false;
-        if (virtualEnvironment.size() >= VIRTUAL_ENVIRONMENT_MAX_SIZE) return false;
+        if (virtualEnvironment.containsKey(envVarName)) {
+            virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
+            return true;
+        }
 
+        if (virtualEnvironment.size() >= VIRTUAL_ENVIRONMENT_MAX_SIZE) return false;
         virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
 
         return true;

@@ -100,13 +100,13 @@ public class CommandParallelApiControllerTest {
         assertThat(body.getCode()).isEqualTo(ApiResponseCode.SUCCESS.getCode());
         assertThat(body.getMessage()).isEqualTo(
                 String.format(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode())));
-        assertThat(Math.round(body.getDescription().getDuration())).isEqualTo(Math.round(timeout));
+        assertThat(Math.floor(body.getDescription().getDuration())).isEqualTo(Math.round(timeout));
         assertThat(body.getDescription().getDuration()).isInstanceOf(Float.class);
 
-        assertThat(Math.round(body.getDescription().getCommands().get(command1).getDuration())).isEqualTo(Math.round(sleep1));
+        assertThat(Math.floor(body.getDescription().getCommands().get(command1).getDuration())).isEqualTo(Math.round(sleep1));
         assertThat(body.getDescription().getCommands().get(command1).getDuration()).isInstanceOf(Float.class);
 
-        assertThat(Math.round(body.getDescription().getCommands().get(command2).getDuration())).isEqualTo(Math.round(timeout));
+        assertThat(Math.floor(body.getDescription().getCommands().get(command2).getDuration())).isEqualTo(Math.round(timeout));
         assertThat(body.getDescription().getCommands().get(command2).getDetails().getErr()).containsIgnoringCase("TimeoutException");
         assertThat(body.getDescription().getCommands().get(command2).getDetails().getOut()).isEqualTo("");
         assertThat(body.getDescription().getCommands().get(command2).getDetails().getCode()).isEqualTo(-1);

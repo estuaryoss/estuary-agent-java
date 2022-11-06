@@ -24,19 +24,16 @@ public class Command {
     @Column(name = "ID") //DB
     private Long id;
 
-    @Column(name = "COMMAND")
-    @Length(max = COMMAND_MAX_SIZE)
+    @Column(name = "COMMAND", length = COMMAND_MAX_SIZE)
     private String command;
 
     @Column(name = "CODE")
     private Long code;
 
-    @Column(name = "OUT")
-    @Length(max = COMMAND_STDOUT_MAX_SIZE)
+    @Column(name = "OUT", length = COMMAND_STDOUT_MAX_SIZE)
     private String out;
 
-    @Column(name = "ERR")
-    @Length(max = COMMAND_STDERR_MAX_SIZE)
+    @Column(name = "ERR", length = COMMAND_STDERR_MAX_SIZE)
     private String err;
 
     @Column(name = "STARTED_AT")

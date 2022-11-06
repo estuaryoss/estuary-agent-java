@@ -1,6 +1,5 @@
 package com.github.estuaryoss.agent.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.component.ClientRequest;
 import com.github.estuaryoss.agent.component.CommandRunner;
@@ -31,21 +30,17 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 public class CommandParallelApiController implements CommandParallelApi {
-    private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
+    private final CommandRunner commandRunner;
+    private final ClientRequest clientRequest;
+    private final About about;
 
     @Autowired
-    private CommandRunner commandRunner;
-
-    @Autowired
-    private ClientRequest clientRequest;
-
-    @Autowired
-    private About about;
-
-    @Autowired
-    public CommandParallelApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
+    public CommandParallelApiController(CommandRunner commandRunner, ClientRequest clientRequest,
+                                        About about, HttpServletRequest request) {
+        this.commandRunner = commandRunner;
+        this.clientRequest = clientRequest;
+        this.about = about;
         this.request = request;
     }
 

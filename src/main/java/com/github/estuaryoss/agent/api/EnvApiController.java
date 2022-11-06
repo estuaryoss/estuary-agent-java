@@ -32,19 +32,17 @@ import java.util.Map;
 public class EnvApiController implements EnvApi {
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
+    private final AppEnvironment environment;
+    private final ClientRequest clientRequest;
+    private final About about;
 
     @Autowired
-    private AppEnvironment environment;
-
-    @Autowired
-    private ClientRequest clientRequest;
-
-    @Autowired
-    private About about;
-
-    @Autowired
-    public EnvApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public EnvApiController(ObjectMapper objectMapper, AppEnvironment appEnvironment, ClientRequest clientRequest,
+                            About about, HttpServletRequest request) {
         this.objectMapper = objectMapper;
+        this.environment = appEnvironment;
+        this.clientRequest = clientRequest;
+        this.about = about;
         this.request = request;
     }
 

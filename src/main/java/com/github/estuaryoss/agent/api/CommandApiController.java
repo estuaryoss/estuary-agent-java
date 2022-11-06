@@ -25,6 +25,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -49,18 +51,15 @@ public class CommandApiController implements CommandApi {
 
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
-    private EnvApiController envApiController;
-    private CommandRunner commandRunner;
-    private ClientRequest clientRequest;
-    private DbService dbService;
-    private About about;
+    private final EnvApiController envApiController;
+    private final CommandRunner commandRunner;
+    private final ClientRequest clientRequest;
+    private final DbService dbService;
+    private final About about;
 
     @Autowired
-    public CommandApiController(ObjectMapper objectMapper, EnvApiController envApiController,
-                                CommandRunner commandRunner,
-                                ClientRequest clientRequest,
-                                DbService dbService,
-                                About about,
+    public CommandApiController(ObjectMapper objectMapper, EnvApiController envApiController, CommandRunner commandRunner,
+                                ClientRequest clientRequest, @Nullable DbService dbService, About about,
                                 HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.envApiController = envApiController;
@@ -74,7 +73,9 @@ public class CommandApiController implements CommandApi {
     public ResponseEntity<ApiResponse> commandGetAll() {
         String accept = request.getHeader("Accept");
 
-        List<Command> allCommands = dbService.getCommands(ALL_COMMAND_HISTORY_LENGTH);
+        List<Command> allCommands = new ArrayList<>();
+        if (dbService != null) allCommands = dbService.getCommands(ALL_COMMAND_HISTORY_LENGTH);
+
 
         log.debug("Dumping all commands from the database");
         return new ResponseEntity<>(ApiResponse.builder()
@@ -100,7 +101,8 @@ public class CommandApiController implements CommandApi {
             }
         }
 
-        List<Command> commandsByStatus = dbService.getCommands(status, queryLimit);
+        List<Command> commandsByStatus = new ArrayList<>();
+        if (dbService != null) commandsByStatus = dbService.getCommands(status, queryLimit);
 
         log.debug("Dumping all running commands from the database");
         return new ResponseEntity<>(ApiResponse.builder()
@@ -117,8 +119,10 @@ public class CommandApiController implements CommandApi {
     public ResponseEntity<ApiResponse> commandDeleteAll() {
         String accept = request.getHeader("Accept");
         log.debug("Killing all processes associated with active commands");
-        List<Command> runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(),
-                RUNNING_COMMAND_HISTORY_LENGTH);
+        List<Command> runningCommands = new ArrayList<>();
+
+        if (dbService != null)
+            runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), RUNNING_COMMAND_HISTORY_LENGTH);
         log.debug(String.format("Running commands number: %s", runningCommands.size()));
 
         runningCommands.forEach(activeCommand -> {
@@ -130,7 +134,8 @@ public class CommandApiController implements CommandApi {
             }
         });
 
-        runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), RUNNING_COMMAND_HISTORY_LENGTH);
+        if (dbService != null)
+            runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), RUNNING_COMMAND_HISTORY_LENGTH);
         log.debug(String.format("Running commands number: %s", runningCommands.size()));
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -162,8 +167,9 @@ public class CommandApiController implements CommandApi {
             throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode()));
         }
-        List<Command> runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(),
-                RUNNING_COMMAND_HISTORY_LENGTH);
+        List<Command> runningCommands = new ArrayList<>();
+        if (dbService != null)
+            dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), RUNNING_COMMAND_HISTORY_LENGTH);
         log.debug(String.format("Running commands number: %s", runningCommands.size()));
 
         return new ResponseEntity<>(ApiResponse.builder()

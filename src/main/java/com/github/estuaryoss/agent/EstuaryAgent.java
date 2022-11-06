@@ -39,10 +39,10 @@ public class EstuaryAgent implements CommandLineRunner {
         SpringApplication.run(EstuaryAgent.class, args);
     }
 
-    @Value("${app.folder.uploads}")
+    @Value("${app.folder.uploads:uploads}")
     private String uploadsFolderName;
 
-    @Value("${app.folder.downloads}")
+    @Value("${app.folder.downloads:downloads}")
     private String downloadsFolderName;
 
     private void createFolders() {

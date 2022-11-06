@@ -1,6 +1,5 @@
 package com.github.estuaryoss.agent.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.component.ClientRequest;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
@@ -21,18 +20,14 @@ import java.time.LocalDateTime;
 @RestController
 @Slf4j
 public class PingApiController implements PingApi {
-    private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
+    private final ClientRequest clientRequest;
+    private final About about;
 
     @Autowired
-    private ClientRequest clientRequest;
-
-    @Autowired
-    private About about;
-
-    @Autowired
-    public PingApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
+    public PingApiController(ClientRequest clientRequest, About about, HttpServletRequest request) {
+        this.clientRequest = clientRequest;
+        this.about = about;
         this.request = request;
     }
 

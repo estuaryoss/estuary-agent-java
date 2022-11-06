@@ -1,7 +1,5 @@
 package com.github.estuaryoss.agent.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.estuaryoss.agent.component.ClientRequest;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.*;
 import com.github.estuaryoss.agent.entity.FileTransfer;
@@ -17,6 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.zeroturnaround.zip.ZipUtil;
@@ -32,21 +31,14 @@ import static com.github.estuaryoss.agent.constants.HeaderConstants.FOLDER_PATH;
 @RestController
 @Slf4j
 public class FolderApiController implements FolderApi {
-    private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
+    private final DbService dbService;
+    private final StorageService storageService;
 
     @Autowired
-    private ClientRequest clientRequest;
-
-    @Autowired
-    private DbService dbService;
-
-    @Autowired
-    private StorageService storageService;
-
-    @Autowired
-    public FolderApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
+    public FolderApiController(@Nullable DbService dbService, StorageService storageService, HttpServletRequest request) {
+        this.dbService = dbService;
+        this.storageService = storageService;
         this.request = request;
     }
 
@@ -75,15 +67,17 @@ public class FolderApiController implements FolderApi {
         try {
             resource = storageService.loadAsResource(file.getAbsolutePath());
 
-            dbService.saveFileTransfer(FileTransfer.builder()
-                    .type(FileTransferType.DOWNLOAD.getType())
-                    .sourceFileName(sourceFolderPath.getName())
-                    .sourceFilePath(sourceFolderPath.getAbsolutePath())
-                    .targetFileName(file.getName())
-                    .targetFilePath(file.getAbsolutePath())
-                    .fileSize(resource.contentLength())
-                    .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .build());
+            if (dbService != null) {
+                dbService.saveFileTransfer(FileTransfer.builder()
+                        .type(FileTransferType.DOWNLOAD.getType())
+                        .sourceFileName(sourceFolderPath.getName())
+                        .sourceFilePath(sourceFolderPath.getAbsolutePath())
+                        .targetFileName(file.getName())
+                        .targetFilePath(file.getAbsolutePath())
+                        .fileSize(resource.contentLength())
+                        .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                        .build());
+            }
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode(),
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode()), folderPath));

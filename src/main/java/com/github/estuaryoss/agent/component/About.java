@@ -9,7 +9,7 @@ public class About {
     @Getter
     private final String appName = "Estuary-Agent";
 
-    @Value("${app.version}")
+    @Value("${app.version:1.0.0}")
     @Getter
     private String version;
 

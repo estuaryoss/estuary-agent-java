@@ -1,10 +1,9 @@
 package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.model.api.ApiResponse;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,19 +13,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.validation.Valid;
 import java.io.IOException;
 
-@Api(value = "command", description = "the command API")
+@Tag(name = "command", description = "the command API")
 @RequestMapping(value = "")
 public interface CommandParallelApi {
 
-    @ApiOperation(value = "Starts multiple commands in blocking mode parallel. Set the client timeout at needed value.", nickname = "commandPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "commands start success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "commands start failure", response = ApiResponse.class)})
+    @Operation(description = "Starts multiple commands in blocking mode parallel. Set the client timeout at needed value.",
+            summary = "commandPost", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Command start success")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Command start failure")
     @RequestMapping(value = "/commands/parallel",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},
             method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> commandsParallelPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    default ResponseEntity<ApiResponse> commandsParallelPost(@Parameter(description = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

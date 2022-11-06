@@ -8,8 +8,8 @@ import com.github.estuaryoss.agent.entity.FileTransfer;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.service.StorageService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 import static com.github.estuaryoss.agent.constants.HeaderConstants.FOLDER_PATH;
 
-@Api(tags = {"estuary-agent"})
+@Tag(name = "estuary-agent")
 @RestController
 @Slf4j
 public class FolderApiController implements FolderApi {
@@ -51,7 +51,7 @@ public class FolderApiController implements FolderApi {
     }
 
     @SneakyThrows
-    public ResponseEntity<Resource> folderGet(@ApiParam(value = "Target folder path to get as zip", required = false) @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
+    public ResponseEntity<Resource> folderGet(@Parameter(description = "Target folder path to get as zip", required = false) @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
         String accept = request.getHeader("Accept");
         log.debug(FOLDER_PATH + " Header: " + folderPath);
         if (folderPath == null) {

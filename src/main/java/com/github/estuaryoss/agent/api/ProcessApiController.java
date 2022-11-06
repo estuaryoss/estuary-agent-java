@@ -8,8 +8,8 @@ import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.utils.ProcessUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
-@Api(tags = {"estuary-agent"}, description = "root")
+@Tag(name = "estuary-agent", description = "root")
 @RestController
 @Slf4j
 public class ProcessApiController implements ProcessApi {
@@ -52,7 +52,7 @@ public class ProcessApiController implements ProcessApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> getProcessesWithName(@ApiParam(value = "The name of the process", required = true) @PathVariable("process_name") String processName) {
+    public ResponseEntity<ApiResponse> getProcessesWithName(@Parameter(description = "The name of the process", required = true) @PathVariable("process_name") String processName) {
         String accept = request.getHeader("Accept");
 
         return new ResponseEntity<>(ApiResponse.builder()

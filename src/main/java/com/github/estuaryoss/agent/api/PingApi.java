@@ -1,21 +1,19 @@
 package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.model.api.ApiResponse;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(value = "ping")
+@Tag(name = "ping")
 @RequestMapping(value = "")
 public interface PingApi {
 
-    @ApiOperation(value = "Ping endpoint which replies with pong", nickname = "pingGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Ping endpoint which replies with pong. Useful when checking the alive status of the service", response = ApiResponse.class)})
+    @Operation(description = "Ping endpoint which replies with pong", summary = "pingGet", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Ping endpoint which replies with pong. Useful when checking the alive status of the service")
     @RequestMapping(value = "/ping",
             produces = {"application/json"},
             method = RequestMethod.GET)

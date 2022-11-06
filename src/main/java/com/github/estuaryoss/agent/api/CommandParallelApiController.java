@@ -10,8 +10,8 @@ import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.api.CommandDescription;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Api(tags = {"estuary-agent"})
+@Tag(name = "estuary-agent")
 @RestController
 @Slf4j
 public class CommandParallelApiController implements CommandParallelApi {
@@ -49,7 +49,7 @@ public class CommandParallelApiController implements CommandParallelApi {
         this.request = request;
     }
 
-    public ResponseEntity<ApiResponse> commandsParallelPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsParallelPost(@Parameter(description = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
         String commandsStripped = commands.replace("\r\n", "\n").stripLeading().stripTrailing();
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
                 .stream().map(elem -> elem.stripLeading().stripTrailing()).collect(Collectors.toList());

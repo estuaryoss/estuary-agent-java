@@ -10,8 +10,8 @@ import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.service.StorageService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -40,7 +40,7 @@ import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_N
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_PATH_MAX_SIZE;
 import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
 
-@Api(tags = {"estuary-agent"})
+@Tag(name = "estuary-agent")
 @RestController
 @Slf4j
 public class FileApiController implements FileApi {
@@ -66,7 +66,7 @@ public class FileApiController implements FileApi {
         this.request = request;
     }
 
-    public ResponseEntity<ApiResponse> fileRead(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<ApiResponse> fileRead(@Parameter(description = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
 
         log.debug(FILE_PATH + " Header: " + filePath);
@@ -111,7 +111,7 @@ public class FileApiController implements FileApi {
     }
 
     @SneakyThrows
-    public ResponseEntity<Resource> fileDownload(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<Resource> fileDownload(@Parameter(description = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
 
         log.debug(FILE_PATH + " Header: " + filePath);
@@ -144,7 +144,7 @@ public class FileApiController implements FileApi {
                 .body(resource);
     }
 
-    public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<ApiResponse> filePut(@Parameter(description = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @Parameter(description = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
 
         log.debug(FILE_PATH + " Header: " + filePath);
@@ -242,7 +242,7 @@ public class FileApiController implements FileApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> filePost(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<ApiResponse> filePost(@Parameter(description = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @Parameter(description = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
         return filePut(content, filePath);
     }
 

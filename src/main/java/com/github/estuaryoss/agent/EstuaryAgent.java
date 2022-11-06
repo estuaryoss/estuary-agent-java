@@ -1,6 +1,6 @@
 package com.github.estuaryoss.agent;
 
-import com.github.estuaryoss.agent.component.VirtualEnvironment;
+import com.github.estuaryoss.agent.component.AppEnvironment;
 import com.github.estuaryoss.agent.constants.DefaultConstants;
 import com.github.estuaryoss.agent.constants.FluentdServiceConstants;
 import com.github.estuaryoss.agent.service.Fluentd;
@@ -14,7 +14,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -22,7 +21,6 @@ import java.io.File;
 @SpringBootApplication
 @EnableEurekaClient
 @RestController
-@EnableSwagger2
 @ComponentScan(basePackages = {
         "com.github.estuaryoss.agent",
         "com.github.estuaryoss.agent.api",
@@ -35,7 +33,7 @@ public class EstuaryAgent implements CommandLineRunner {
     private Fluentd fluentd;
 
     @Autowired
-    private VirtualEnvironment environment;
+    private AppEnvironment environment;
 
     public static void main(String[] args) {
         SpringApplication.run(EstuaryAgent.class, args);

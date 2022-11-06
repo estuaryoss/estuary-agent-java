@@ -51,11 +51,11 @@ public class CommandRunner {
     public static final String ARGS_DELIMITER = ",";
 
     private final DbService dbService;
-    private final VirtualEnvironment environment;
+    private final AppEnvironment environment;
     private final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss.SSSSSS";
 
     @Autowired
-    public CommandRunner(DbService dbService, VirtualEnvironment environment) {
+    public CommandRunner(DbService dbService, AppEnvironment environment) {
         this.dbService = dbService;
         this.environment = environment;
     }

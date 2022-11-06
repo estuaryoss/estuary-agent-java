@@ -18,8 +18,8 @@ import com.github.estuaryoss.agent.model.api.CommandDescription;
 import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.utils.ProcessUtils;
 import com.github.estuaryoss.agent.utils.YamlConfigParser;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Api(tags = {"estuary-agent"})
+@Tag(name = "estuary-agent")
 @RestController
 @Slf4j
 public class CommandApiController implements CommandApi {
@@ -49,25 +49,25 @@ public class CommandApiController implements CommandApi {
 
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
-
-    @Autowired
     private EnvApiController envApiController;
-
-    @Autowired
     private CommandRunner commandRunner;
-
-    @Autowired
     private ClientRequest clientRequest;
-
-    @Autowired
     private DbService dbService;
-
-    @Autowired
     private About about;
 
     @Autowired
-    public CommandApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public CommandApiController(ObjectMapper objectMapper, EnvApiController envApiController,
+                                CommandRunner commandRunner,
+                                ClientRequest clientRequest,
+                                DbService dbService,
+                                About about,
+                                HttpServletRequest request) {
         this.objectMapper = objectMapper;
+        this.envApiController = envApiController;
+        this.commandRunner = commandRunner;
+        this.clientRequest = clientRequest;
+        this.dbService = dbService;
+        this.about = about;
         this.request = request;
     }
 
@@ -177,7 +177,7 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandsPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsPost(@Parameter(description = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.replace("\r\n", "\n").strip();
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
@@ -203,7 +203,7 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandsPostYaml(@ApiParam(value = "Commands to run in yaml format", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsPostYaml(@Parameter(description = "Commands to run in yaml format", required = true) @Valid @RequestBody String commands) throws IOException {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.strip();
         List<String> commandsList;

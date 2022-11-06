@@ -1,10 +1,9 @@
 package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.model.api.ApiResponse;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,25 +13,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
 
-@Api(value = "env", description = "the env API")
+@Tag(name = "env", description = "the env API")
 @RequestMapping(value = "")
 public interface EnvApi {
 
-    @ApiOperation(value = "Gets the environment variable value from the environment", nickname = "envEnvNameGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Get env var success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Get env var failure", response = ApiResponse.class)})
+    @Operation(description = "Gets the environment variable value from the environment", summary = "envEnvNameGet", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Get env var success")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Get env var failure")
     @RequestMapping(value = "/env/{env_name}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    default ResponseEntity<ApiResponse> envEnvNameGet(@ApiParam(value = "The name of the env var to get value from", required = true) @PathVariable("env_name") String envName) {
+    default ResponseEntity<ApiResponse> envEnvNameGet(@Parameter(description = "The name of the env var to get value from", required = true) @PathVariable("env_name") String envName) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
 
-    @ApiOperation(value = "Print all environment variables: system & virtual", nickname = "envGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Get all environment variables: system & virtual", response = ApiResponse.class)})
+    @Operation(description = "Print all environment variables: system & virtual", summary = "envGet", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Get all environment variables: system & virtual")
     @RequestMapping(value = "/env",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -40,9 +37,8 @@ public interface EnvApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Print all system environment variables", nickname = "envSystemGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Get all system environment variables", response = ApiResponse.class)})
+    @Operation(description = "Print all system environment variables", summary = "envSystemGet", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Get all system environment variables: system & virtual")
     @RequestMapping(value = "/env/system",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -50,9 +46,8 @@ public interface EnvApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Print all virtual environment variables", nickname = "envVirtualGet", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "List of the virtual environment variables", response = ApiResponse.class)})
+    @Operation(description = "Print all virtual environment variables", summary = "envVirtualGet", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "List of the virtual environment variables")
     @RequestMapping(value = "/env/virtual",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -60,9 +55,8 @@ public interface EnvApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Deletes the custom defined env vars contained in the virtual environment", nickname = "envDelete", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Deletes the entire virtual env vars, but keeping system env vars.", response = ApiResponse.class)})
+    @Operation(description = "Deletes the custom defined env vars contained in the virtual environment", summary = "envDelete", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Deletes the entire virtual env vars, but keeping system env vars.")
     @RequestMapping(value = "/env",
             produces = {"application/json"},
             method = RequestMethod.DELETE)
@@ -70,14 +64,13 @@ public interface EnvApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Set environment variables", nickname = "envPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Set environment variables success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Set environment variables failure", response = ApiResponse.class)})
+    @Operation(description = "Set environment variables", summary = "envPost", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Set environment variables success")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Set environment variables failure")
     @RequestMapping(value = "/env",
             produces = {"application/json"},
             method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> envPost(@ApiParam(value = "List of env vars by key-value pair in JSON format", required = true) @Valid @RequestBody String envVars) {
+    default ResponseEntity<ApiResponse> envPost(@Parameter(description = "List of env vars by key-value pair in JSON format", required = true) @Valid @RequestBody String envVars) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

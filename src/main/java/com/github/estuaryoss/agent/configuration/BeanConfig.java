@@ -3,6 +3,7 @@ package com.github.estuaryoss.agent.configuration;
 import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.model.api.CommandParallel;
 import com.github.estuaryoss.agent.service.Fluentd;
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,5 +21,13 @@ public class BeanConfig {
     @Bean
     public Fluentd getFluentdService() {
         return new Fluentd(about);
+    }
+
+    @Bean
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+                .group("agent")
+                .packagesToScan("com.github.estuaryoss.agent.api")
+                .build();
     }
 }

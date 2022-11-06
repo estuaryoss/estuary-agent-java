@@ -1,10 +1,9 @@
 package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.model.api.ApiResponse;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 
-@Api(value = "command", description = "the command API")
+@Tag(name = "command", description = "the command API")
 @RequestMapping(value = "")
 public interface CommandApi {
 
-    @ApiOperation(value = "Dumps running and finished commands on the Agent.", nickname = "commandGetAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump commands success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump commands failure", response = ApiResponse.class)})
+    @Operation(description = "Dumps running and finished commands on the Agent.", summary = "commandGetAll", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Dump commands success")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Dump commands failure")
     @RequestMapping(value = "/commands",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -27,10 +25,9 @@ public interface CommandApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Dumps all commands on the Agent by status", nickname = "commandsGetAllByStatus", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Dump commands by status success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Dump commands by status failure", response = ApiResponse.class)})
+    @Operation(description = "Dumps all commands on the Agent by status", summary = "commandsGetAllByStatus", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Dump commands by status success")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Dump commands by status failure")
     @RequestMapping(value = "/commands/{status}",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -39,10 +36,10 @@ public interface CommandApi {
     }
 
 
-    @ApiOperation(value = "Stops all the running commands on the Agent by terminating their corresponding process", nickname = "commandDeleteAll", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "All commands process terminated success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "All commands process terminated failure", response = ApiResponse.class)})
+    @Operation(description = "Stops all the running commands on the Agent by terminating their corresponding process",
+            summary = "commandDeleteAll", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "All commands process terminated success")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "All commands process terminated failure")
     @RequestMapping(value = "/commands",
             produces = {"application/json"},
             method = RequestMethod.DELETE)
@@ -50,10 +47,9 @@ public interface CommandApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Stops running Command on the Agent by pid", nickname = "commandDeleteByPid", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Terminate command process success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Terminate command process failure", response = ApiResponse.class)})
+    @Operation(description = "Stops running Command on the Agent by pid", summary = "commandDeleteByPid", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Terminate command process success")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Terminate command process failure")
     @RequestMapping(value = "/commands/{pid}",
             produces = {"application/json"},
             method = RequestMethod.DELETE)
@@ -61,29 +57,27 @@ public interface CommandApi {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Starts multiple commands in blocking mode sequentially. Set the client timeout at needed value.", nickname = "commandPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Commands start success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Commands start failure", response = ApiResponse.class)})
+    @Operation(description = "Starts multiple commands in blocking mode sequentially. Set the client timeout at needed value.",
+            summary = "commandPost", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Command start success")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Command start failure")
     @RequestMapping(value = "/commands",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},
             method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> commandsPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    default ResponseEntity<ApiResponse> commandsPost(@Parameter(description = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @ApiOperation(value = "Starts multiple commands in blocking mode sequentially. The commands are described in yaml format. " +
-            "Set the client timeout at needed value.", nickname = "commandPost", notes = "", response = ApiResponse.class, tags = {"estuary-agent",})
-    @ApiResponses(value = {
-            @io.swagger.annotations.ApiResponse(code = 200, message = "Commands start success", response = ApiResponse.class),
-            @io.swagger.annotations.ApiResponse(code = 500, message = "Commands start failure", response = ApiResponse.class)
-    })
+    @Operation(description = "Starts multiple commands in blocking mode sequentially. The commands are described in yaml format. " +
+            "Set the client timeout at needed value.", summary = "commandPost", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Command start success")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Command start failure")
     @RequestMapping(value = "/commands/yaml",
             produces = {"application/json"},
             consumes = {"text/plain", "application/json", "application/x-www-form-urlencoded"},
             method = RequestMethod.POST)
-    default ResponseEntity<ApiResponse> commandsPostYaml(@ApiParam(value = "Commands to run described as yaml", required = true) @Valid @RequestBody String commands) throws IOException {
+    default ResponseEntity<ApiResponse> commandsPostYaml(@Parameter(description = "Commands to run described as yaml", required = true) @Valid @RequestBody String commands) throws IOException {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 }

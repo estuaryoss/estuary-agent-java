@@ -41,8 +41,7 @@ public class HomeControllerTest {
     @Test
     public void whenCallingSwaggerUiThenInformationIsRetrivedOk() {
         ResponseEntity<String> responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/swagger-ui/",
-                        String.class);
+                .getForEntity(SERVER_PREFIX + port + "/swagger-ui/index.html", String.class);
 
         String body = responseEntity.getBody();
 
@@ -54,11 +53,11 @@ public class HomeControllerTest {
     @Test
     public void whenCallingApiDocsThenInformationIsRetrivedOk() {
         ResponseEntity<Map> responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-                .getForEntity(SERVER_PREFIX + port + "/apidocs", Map.class);
+                .getForEntity(SERVER_PREFIX + port + "/v3/api-docs", Map.class);
         Map body = responseEntity.getBody();
 
         assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-        assertThat(body.get("swagger")).isEqualTo("2.0");
-        assertThat(((Map) body.get("paths")).size()).isGreaterThanOrEqualTo(14);
+        assertThat(body.get("openapi")).isEqualTo("3.0.1");
+        assertThat(((Map) body.get("paths")).size()).isGreaterThanOrEqualTo(18);
     }
 }

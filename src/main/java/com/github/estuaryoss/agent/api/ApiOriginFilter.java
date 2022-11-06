@@ -1,6 +1,6 @@
 package com.github.estuaryoss.agent.api;
 
-import com.github.estuaryoss.agent.component.VirtualEnvironment;
+import com.github.estuaryoss.agent.component.AppEnvironment;
 import com.github.estuaryoss.agent.constants.HeaderConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +22,12 @@ import static com.github.estuaryoss.agent.constants.EnvConstants.HTTP_AUTH_TOKEN
 @Component
 @Slf4j
 public class ApiOriginFilter extends GenericFilterBean {
+    private final AppEnvironment environment;
+
     @Autowired
-    private VirtualEnvironment environment;
+    public ApiOriginFilter(AppEnvironment environment) {
+        this.environment = environment;
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,

@@ -15,11 +15,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class DbService {
-    @Autowired
-    private CommandRepository commandRepository;
+    private final CommandRepository commandRepository;
+    private final FileTransferRepository fileTransferRepository;
 
     @Autowired
-    private FileTransferRepository fileTransferRepository;
+    public DbService(CommandRepository commandRepository, FileTransferRepository fileTransferRepository) {
+        this.commandRepository = commandRepository;
+        this.fileTransferRepository = fileTransferRepository;
+    }
 
     public void saveFileTransfer(FileTransfer fileTransfer) {
         fileTransferRepository.saveAndFlush(fileTransfer);

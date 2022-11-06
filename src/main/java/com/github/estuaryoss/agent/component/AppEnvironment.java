@@ -16,15 +16,15 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Component
-public class VirtualEnvironment {
-    private static final Logger log = LoggerFactory.getLogger(VirtualEnvironment.class);
+public class AppEnvironment {
+    private static final Logger log = LoggerFactory.getLogger(AppEnvironment.class);
     private static final String EXT_ENV_VAR_PATH = "environment.properties";
     private final ImmutableMap<String, String> environment = ImmutableMap.copyOf(System.getenv());
     private final Map<String, String> virtualEnvironment = new LinkedHashMap<>();
 
     public static final int VIRTUAL_ENVIRONMENT_MAX_SIZE = 1000;
 
-    public VirtualEnvironment() {
+    public AppEnvironment() {
         this.setExtraEnvVarsFromFile();
     }
 
@@ -45,7 +45,7 @@ public class VirtualEnvironment {
         log.debug("External env vars read from file '" + EXT_ENV_VAR_PATH + "' are: " + new JSONObject(virtualEnvironment).toString());
     }
 
-    public boolean setExternalEnvVar(String key, String value) {
+    public boolean setVirtualEnvVar(String key, String value) {
         if (environment.containsKey(key)) return false;
 
         if (virtualEnvironment.containsKey(key)) {
@@ -60,11 +60,11 @@ public class VirtualEnvironment {
         return false;
     }
 
-    public Map<String, String> setExternalEnvVars(Map<String, String> envVars) {
+    public Map<String, String> setVirtualEnvVars(Map<String, String> envVars) {
         Map<String, String> addedEnvVars = new LinkedHashMap<>();
 
         envVars.forEach((key, value) -> {
-            if (this.setExternalEnvVar(key, value)) addedEnvVars.put(key, value);
+            if (this.setVirtualEnvVar(key, value)) addedEnvVars.put(key, value);
         });
 
         return addedEnvVars;

@@ -1,6 +1,6 @@
 package com.github.estuaryoss.agent.unit;
 
-import com.github.estuaryoss.agent.component.VirtualEnvironment;
+import com.github.estuaryoss.agent.component.AppEnvironment;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
@@ -8,7 +8,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class VirtualEnvironmentTest {
+public class AppEnvironmentTest {
 
     @Test
     public void whenSettingEnvVarsAndTheEnvIsCleanThenAllEnvVarsAreSet() {
@@ -16,7 +16,7 @@ public class VirtualEnvironmentTest {
         envVarsToBeSet.put("FOO1", "BAR1");
         envVarsToBeSet.put("FOO2", "BAR2");
 
-        Map<String, String> environment = new VirtualEnvironment().setExternalEnvVars(envVarsToBeSet);
+        Map<String, String> environment = new AppEnvironment().setVirtualEnvVars(envVarsToBeSet);
 
         assertThat(environment).isEqualTo(envVarsToBeSet);
     }
@@ -26,12 +26,12 @@ public class VirtualEnvironmentTest {
         Map<String, String> envVarsToBeSet = new LinkedHashMap<>();
         envVarsToBeSet.put("FOO1", "BAR1");
         envVarsToBeSet.put("FOO2", "BAR2");
-        VirtualEnvironment virtualEnvironment = new VirtualEnvironment();
-        Map<String, String> envVarsSet = virtualEnvironment.setExternalEnvVars(envVarsToBeSet);
+        AppEnvironment appEnvironment = new AppEnvironment();
+        Map<String, String> envVarsSet = appEnvironment.setVirtualEnvVars(envVarsToBeSet);
         assertThat(envVarsSet).isEqualTo(envVarsToBeSet);
 
-        virtualEnvironment.cleanVirtualEnv();
-        assertThat(virtualEnvironment.getVirtualEnv().size()).isEqualTo(0);
+        appEnvironment.cleanVirtualEnv();
+        assertThat(appEnvironment.getVirtualEnv().size()).isEqualTo(0);
     }
 
     @Test
@@ -40,7 +40,7 @@ public class VirtualEnvironmentTest {
         envVarsToBeSet.put("FOO1", "BAR1");
         envVarsToBeSet.put("JAVA_HOME", "BAR2"); // <- system one
 
-        Map<String, String> environment = new VirtualEnvironment().setExternalEnvVars(envVarsToBeSet);
+        Map<String, String> environment = new AppEnvironment().setVirtualEnvVars(envVarsToBeSet);
 
         assertThat(environment).isNotEqualTo(envVarsToBeSet);
     }
@@ -50,9 +50,9 @@ public class VirtualEnvironmentTest {
         Map<String, String> envVarsToBeSet = new LinkedHashMap<>();
         envVarsToBeSet.put("FOO1", "BAR1");
 
-        VirtualEnvironment environment = new VirtualEnvironment();
-        Map<String, String> take1 = environment.setExternalEnvVars(envVarsToBeSet);
-        Map<String, String> take2 = environment.setExternalEnvVars(envVarsToBeSet);
+        AppEnvironment environment = new AppEnvironment();
+        Map<String, String> take1 = environment.setVirtualEnvVars(envVarsToBeSet);
+        Map<String, String> take2 = environment.setVirtualEnvVars(envVarsToBeSet);
 
         assertThat(take1).isEqualTo(envVarsToBeSet);
         assertThat(take2).isEqualTo(envVarsToBeSet);
@@ -63,23 +63,23 @@ public class VirtualEnvironmentTest {
     public void whenSettingEmptyMapVirtualEnvVarThenResponseIsEmpty() {
         Map<String, String> envVarsToBeSet = new LinkedHashMap<>();
 
-        VirtualEnvironment environment = new VirtualEnvironment();
-        Map<String, String> envVarsAdded = environment.setExternalEnvVars(envVarsToBeSet);
+        AppEnvironment environment = new AppEnvironment();
+        Map<String, String> envVarsAdded = environment.setVirtualEnvVars(envVarsToBeSet);
 
         assertThat(envVarsAdded).isEqualTo(envVarsToBeSet);
     }
 
     @Test
     public void whenSettingVirtualEnvVarsThenAHardLimitIsReached() {
-        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = VirtualEnvironment.VIRTUAL_ENVIRONMENT_MAX_SIZE;
+        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = AppEnvironment.VIRTUAL_ENVIRONMENT_MAX_SIZE;
         Map<String, String> envVarsToBeSet = new LinkedHashMap<>();
 
         for (int i = 0; i < 2 * VIRTUAL_ENV_VARS_LIMIT_SIZE; i++) {
             envVarsToBeSet.put(String.valueOf(i), String.valueOf(i));
         }
 
-        VirtualEnvironment environment = new VirtualEnvironment();
-        Map<String, String> envVarsAdded = environment.setExternalEnvVars(envVarsToBeSet);
+        AppEnvironment environment = new AppEnvironment();
+        Map<String, String> envVarsAdded = environment.setVirtualEnvVars(envVarsToBeSet);
 
         assertThat(envVarsAdded).isNotEqualTo(envVarsToBeSet);
         assertThat(envVarsAdded.get(String.valueOf(VIRTUAL_ENV_VARS_LIMIT_SIZE))).isEqualTo(null);

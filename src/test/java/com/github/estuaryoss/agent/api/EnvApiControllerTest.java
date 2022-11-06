@@ -2,8 +2,8 @@ package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.api.utils.HttpRequestUtils;
 import com.github.estuaryoss.agent.component.About;
+import com.github.estuaryoss.agent.component.AppEnvironment;
 import com.github.estuaryoss.agent.component.Authentication;
-import com.github.estuaryoss.agent.component.VirtualEnvironment;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
@@ -293,7 +293,7 @@ public class EnvApiControllerTest {
     @Test
     @Order(9)
     public void whenSettingVirtualEnvVarsThenAHardLimitIsReached() {
-        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = VirtualEnvironment.VIRTUAL_ENVIRONMENT_MAX_SIZE;
+        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = AppEnvironment.VIRTUAL_ENVIRONMENT_MAX_SIZE;
 
         for (int i = 0; i < 2 * VIRTUAL_ENV_VARS_LIMIT_SIZE; i++) {
             String envVarsJson = String.format("{\"%s\":\"%s\"}", i, i);

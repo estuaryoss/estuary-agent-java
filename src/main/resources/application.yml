@@ -30,3 +30,7 @@ management:
       enabled: true
     heapdump:
       enabled: true
+
+springdoc:
+  api-docs:
+    enabled: true

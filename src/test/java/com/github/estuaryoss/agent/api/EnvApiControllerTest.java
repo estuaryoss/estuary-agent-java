@@ -215,15 +215,17 @@ public class EnvApiControllerTest {
     @ParameterizedTest
     @ValueSource(
             strings = {
-                    "FOO1;BARx",
-                    "FOO3;BAR3"
+                    "FOO1;BARx;BARx",
+                    "FOO3;BAR3;BAR3",
+                    "FOO4;{FOO1}/{FOO3};BARx/BAR3"
             }
     )
     @Order(3)
     public void whenSettingExternalEnvVarsWithRestAPIThenInformationIsRetrivedOk(String envVars) {
         String envVarName = envVars.split(";")[0];
-        String expectedEnvVarValue = envVars.split(";")[1];
-        String envVarsJson = String.format("{\"%s\":\"%s\"}", envVarName, expectedEnvVarValue);
+        String envVarValue = envVars.split(";")[1];
+        String expectedEnvVarValue = envVars.split(";")[2];
+        String envVarsJson = String.format("{\"%s\":\"%s\"}", envVarName, envVarValue);
         ResponseEntity<ApiResponse> responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
                 .exchange(SERVER_PREFIX + port + "/env",
                         HttpMethod.POST,
@@ -239,6 +241,7 @@ public class EnvApiControllerTest {
         assertThat(body.getName()).isEqualTo(about.getAppName());
         assertThat(body.getVersion()).isEqualTo(about.getVersion());
         assertThat(LocalDateTime.parse(body.getTimestamp(), PATTERN)).isBefore(LocalDateTime.now());
+        assertThat(((Map) body.getDescription()).get(envVarName)).isEqualTo(expectedEnvVarValue);
 
         responseEntity =
                 this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword()).getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);

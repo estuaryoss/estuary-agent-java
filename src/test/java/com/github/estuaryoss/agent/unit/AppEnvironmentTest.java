@@ -70,6 +70,26 @@ public class AppEnvironmentTest {
     }
 
     @Test
+    public void whenSettingEnvVarWhichHasReferenceToAnotherEnvVar_TheSecondOneIsInterpolated() {
+        String envVarName1 = "FOO1";
+        String envVarName1Value = "/FOO1/BAR1";
+        String envVarName2 = "FOO2";
+        String envVarName2Value = "{FOO1}/BAR2";
+        Map<String, String> envVarsToBeSet = new LinkedHashMap<>();
+        envVarsToBeSet.put(envVarName1, envVarName1Value);
+        envVarsToBeSet.put(envVarName2, envVarName2Value);
+
+        AppEnvironment environment = new AppEnvironment();
+        Map<String, String> envVarsAdded = environment.setVirtualEnvVars(envVarsToBeSet);
+
+        assertThat(envVarsAdded.get(envVarName1)).isEqualTo(envVarName1Value);
+        assertThat(environment.getVirtualEnv().get(envVarName1)).isEqualTo(envVarName1Value);
+        assertThat(envVarsAdded.get(envVarName2)).isEqualTo("/FOO1/BAR1/BAR2");
+        assertThat(environment.getVirtualEnv().get(envVarName2)).isEqualTo("/FOO1/BAR1/BAR2");
+    }
+
+
+    @Test
     public void whenSettingVirtualEnvVarsThenAHardLimitIsReached() {
         final int VIRTUAL_ENV_VARS_LIMIT_SIZE = AppEnvironment.VIRTUAL_ENVIRONMENT_MAX_SIZE;
         Map<String, String> envVarsToBeSet = new LinkedHashMap<>();

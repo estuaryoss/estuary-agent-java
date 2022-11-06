@@ -1,4 +1,4 @@
-package com.github.estuaryoss.agent.unit;
+package com.github.estuaryoss.agent.api.component;
 
 import com.github.estuaryoss.agent.component.AppEnvironment;
 import com.github.estuaryoss.agent.component.CommandRunner;

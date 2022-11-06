@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Authentication {
-    @Value("${app.user}")
+    @Value("${app.user:admin}")
     @Getter
     private String user;
 
-    @Value("${app.password}")
+    @Value("${app.password:secret}")
     @Getter
     private String password;
 }

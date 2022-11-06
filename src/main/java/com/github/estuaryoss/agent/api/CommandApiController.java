@@ -18,13 +18,14 @@ import com.github.estuaryoss.agent.model.api.CommandDescription;
 import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.utils.ProcessUtils;
 import com.github.estuaryoss.agent.utils.YamlConfigParser;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,12 +35,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Api(tags = {"estuary-agent"})
+@Tag(name = "estuary-agent")
 @RestController
 @Slf4j
 public class CommandApiController implements CommandApi {
@@ -49,32 +51,31 @@ public class CommandApiController implements CommandApi {
 
     private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
+    private final EnvApiController envApiController;
+    private final CommandRunner commandRunner;
+    private final ClientRequest clientRequest;
+    private final DbService dbService;
+    private final About about;
 
     @Autowired
-    private EnvApiController envApiController;
-
-    @Autowired
-    private CommandRunner commandRunner;
-
-    @Autowired
-    private ClientRequest clientRequest;
-
-    @Autowired
-    private DbService dbService;
-
-    @Autowired
-    private About about;
-
-    @Autowired
-    public CommandApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public CommandApiController(ObjectMapper objectMapper, EnvApiController envApiController, CommandRunner commandRunner,
+                                ClientRequest clientRequest, @Nullable DbService dbService, About about,
+                                HttpServletRequest request) {
         this.objectMapper = objectMapper;
+        this.envApiController = envApiController;
+        this.commandRunner = commandRunner;
+        this.clientRequest = clientRequest;
+        this.dbService = dbService;
+        this.about = about;
         this.request = request;
     }
 
     public ResponseEntity<ApiResponse> commandGetAll() {
         String accept = request.getHeader("Accept");
 
-        List<Command> allCommands = dbService.getCommands(ALL_COMMAND_HISTORY_LENGTH);
+        List<Command> allCommands = new ArrayList<>();
+        if (dbService != null) allCommands = dbService.getCommands(ALL_COMMAND_HISTORY_LENGTH);
+
 
         log.debug("Dumping all commands from the database");
         return new ResponseEntity<>(ApiResponse.builder()
@@ -100,7 +101,8 @@ public class CommandApiController implements CommandApi {
             }
         }
 
-        List<Command> commandsByStatus = dbService.getCommands(status, queryLimit);
+        List<Command> commandsByStatus = new ArrayList<>();
+        if (dbService != null) commandsByStatus = dbService.getCommands(status, queryLimit);
 
         log.debug("Dumping all running commands from the database");
         return new ResponseEntity<>(ApiResponse.builder()
@@ -117,8 +119,10 @@ public class CommandApiController implements CommandApi {
     public ResponseEntity<ApiResponse> commandDeleteAll() {
         String accept = request.getHeader("Accept");
         log.debug("Killing all processes associated with active commands");
-        List<Command> runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(),
-                RUNNING_COMMAND_HISTORY_LENGTH);
+        List<Command> runningCommands = new ArrayList<>();
+
+        if (dbService != null)
+            runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), RUNNING_COMMAND_HISTORY_LENGTH);
         log.debug(String.format("Running commands number: %s", runningCommands.size()));
 
         runningCommands.forEach(activeCommand -> {
@@ -130,7 +134,8 @@ public class CommandApiController implements CommandApi {
             }
         });
 
-        runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), RUNNING_COMMAND_HISTORY_LENGTH);
+        if (dbService != null)
+            runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), RUNNING_COMMAND_HISTORY_LENGTH);
         log.debug(String.format("Running commands number: %s", runningCommands.size()));
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -162,8 +167,9 @@ public class CommandApiController implements CommandApi {
             throw new ApiException(ApiResponseCode.COMMAND_STOP_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.COMMAND_STOP_FAILURE.getCode()));
         }
-        List<Command> runningCommands = dbService.getCommands(ExecutionStatus.RUNNING.getStatus(),
-                RUNNING_COMMAND_HISTORY_LENGTH);
+        List<Command> runningCommands = new ArrayList<>();
+        if (dbService != null)
+            dbService.getCommands(ExecutionStatus.RUNNING.getStatus(), RUNNING_COMMAND_HISTORY_LENGTH);
         log.debug(String.format("Running commands number: %s", runningCommands.size()));
 
         return new ResponseEntity<>(ApiResponse.builder()
@@ -177,7 +183,7 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandsPost(@ApiParam(value = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsPost(@Parameter(description = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.replace("\r\n", "\n").strip();
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
@@ -203,7 +209,7 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandsPostYaml(@ApiParam(value = "Commands to run in yaml format", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsPostYaml(@Parameter(description = "Commands to run in yaml format", required = true) @Valid @RequestBody String commands) throws IOException {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.strip();
         List<String> commandsList;

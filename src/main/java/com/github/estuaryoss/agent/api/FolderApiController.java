@@ -1,15 +1,13 @@
 package com.github.estuaryoss.agent.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.estuaryoss.agent.component.ClientRequest;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
 import com.github.estuaryoss.agent.constants.*;
 import com.github.estuaryoss.agent.entity.FileTransfer;
 import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.service.StorageService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.zeroturnaround.zip.ZipUtil;
@@ -28,30 +27,23 @@ import java.time.LocalDateTime;
 
 import static com.github.estuaryoss.agent.constants.HeaderConstants.FOLDER_PATH;
 
-@Api(tags = {"estuary-agent"})
+@Tag(name = "estuary-agent")
 @RestController
 @Slf4j
 public class FolderApiController implements FolderApi {
-    private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
+    private final DbService dbService;
+    private final StorageService storageService;
 
     @Autowired
-    private ClientRequest clientRequest;
-
-    @Autowired
-    private DbService dbService;
-
-    @Autowired
-    private StorageService storageService;
-
-    @Autowired
-    public FolderApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
+    public FolderApiController(@Nullable DbService dbService, StorageService storageService, HttpServletRequest request) {
+        this.dbService = dbService;
+        this.storageService = storageService;
         this.request = request;
     }
 
     @SneakyThrows
-    public ResponseEntity<Resource> folderGet(@ApiParam(value = "Target folder path to get as zip", required = false) @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
+    public ResponseEntity<Resource> folderGet(@Parameter(description = "Target folder path to get as zip", required = false) @RequestHeader(value = "Folder-Path", required = false) String folderPath) {
         String accept = request.getHeader("Accept");
         log.debug(FOLDER_PATH + " Header: " + folderPath);
         if (folderPath == null) {
@@ -75,15 +67,17 @@ public class FolderApiController implements FolderApi {
         try {
             resource = storageService.loadAsResource(file.getAbsolutePath());
 
-            dbService.saveFileTransfer(FileTransfer.builder()
-                    .type(FileTransferType.DOWNLOAD.getType())
-                    .sourceFileName(sourceFolderPath.getName())
-                    .sourceFilePath(sourceFolderPath.getAbsolutePath())
-                    .targetFileName(file.getName())
-                    .targetFilePath(file.getAbsolutePath())
-                    .fileSize(resource.contentLength())
-                    .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .build());
+            if (dbService != null) {
+                dbService.saveFileTransfer(FileTransfer.builder()
+                        .type(FileTransferType.DOWNLOAD.getType())
+                        .sourceFileName(sourceFolderPath.getName())
+                        .sourceFilePath(sourceFolderPath.getAbsolutePath())
+                        .targetFileName(file.getName())
+                        .targetFilePath(file.getAbsolutePath())
+                        .fileSize(resource.contentLength())
+                        .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                        .build());
+            }
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode(),
                     String.format(ApiResponseMessage.getMessage(ApiResponseCode.FOLDER_ZIP_FAILURE.getCode()), folderPath));

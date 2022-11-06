@@ -1,6 +1,5 @@
 package com.github.estuaryoss.agent.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.estuaryoss.agent.component.About;
 import com.github.estuaryoss.agent.component.ClientRequest;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
@@ -10,8 +9,8 @@ import com.github.estuaryoss.agent.exception.ApiException;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.service.StorageService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -22,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,33 +41,29 @@ import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_N
 import static com.github.estuaryoss.agent.constants.HibernateJpaConstants.FILE_PATH_MAX_SIZE;
 import static com.github.estuaryoss.agent.utils.StringUtils.trimString;
 
-@Api(tags = {"estuary-agent"})
+@Tag(name = "estuary-agent")
 @RestController
 @Slf4j
 public class FileApiController implements FileApi {
     private final int FILE_TRANSFER_HISTORY_MAX_LENGTH = 100;
-    private final ObjectMapper objectMapper;
     private final HttpServletRequest request;
+    private final ClientRequest clientRequest;
+    private final About about;
+    private final DbService dbService;
+    private final StorageService storageService;
+
 
     @Autowired
-    private ClientRequest clientRequest;
-
-    @Autowired
-    private About about;
-
-    @Autowired
-    private StorageService storageService;
-
-    @Autowired
-    private DbService dbService;
-
-    @Autowired
-    public FileApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
+    public FileApiController(ClientRequest clientRequest, About about, @Nullable DbService dbService,
+                             StorageService storageService, HttpServletRequest request) {
+        this.clientRequest = clientRequest;
+        this.about = about;
+        this.dbService = dbService;
+        this.storageService = storageService;
         this.request = request;
     }
 
-    public ResponseEntity<ApiResponse> fileRead(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<ApiResponse> fileRead(@Parameter(description = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
 
         log.debug(FILE_PATH + " Header: " + filePath);
@@ -79,13 +76,15 @@ public class FileApiController implements FileApi {
         try {
             resource = storageService.loadAsResource(filePath);
             File file = new File(filePath);
-            dbService.saveFileTransfer(FileTransfer.builder()
-                    .type(FileTransferType.DOWNLOAD.getType())
-                    .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
-                    .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
-                    .fileSize(resource.contentLength())
-                    .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .build());
+            if (dbService != null) {
+                dbService.saveFileTransfer(FileTransfer.builder()
+                        .type(FileTransferType.DOWNLOAD.getType())
+                        .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
+                        .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
+                        .fileSize(resource.contentLength())
+                        .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                        .build());
+            }
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_FILE_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode()));
@@ -111,7 +110,7 @@ public class FileApiController implements FileApi {
     }
 
     @SneakyThrows
-    public ResponseEntity<Resource> fileDownload(@ApiParam(value = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<Resource> fileDownload(@Parameter(description = "Target file path to get") @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
 
         log.debug(FILE_PATH + " Header: " + filePath);
@@ -125,13 +124,15 @@ public class FileApiController implements FileApi {
         try {
             resource = storageService.loadAsResource(filePath);
             file = new File(filePath);
-            dbService.saveFileTransfer(FileTransfer.builder()
-                    .type(FileTransferType.DOWNLOAD.getType())
-                    .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
-                    .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
-                    .fileSize(resource.contentLength())
-                    .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .build());
+            if (dbService != null) {
+                dbService.saveFileTransfer(FileTransfer.builder()
+                        .type(FileTransferType.DOWNLOAD.getType())
+                        .sourceFileName(trimString(file.getName(), FILE_PATH_MAX_SIZE))
+                        .sourceFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
+                        .fileSize(resource.contentLength())
+                        .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                        .build());
+            }
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.GET_FILE_FAILURE.getCode(),
                     ApiResponseMessage.getMessage(ApiResponseCode.GET_FILE_FAILURE.getCode()));
@@ -144,7 +145,7 @@ public class FileApiController implements FileApi {
                 .body(resource);
     }
 
-    public ResponseEntity<ApiResponse> filePut(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<ApiResponse> filePut(@Parameter(description = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @Parameter(description = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
         String accept = request.getHeader("Accept");
 
         log.debug(FILE_PATH + " Header: " + filePath);
@@ -156,14 +157,16 @@ public class FileApiController implements FileApi {
         try {
             storageService.store(content, filePath);
             File file = new File(filePath);
-            dbService.saveFileTransfer(FileTransfer.builder()
-                    .type(FileTransferType.UPLOAD.getType())
-                    .targetFileName(trimString(file.getName(), FILE_NAME_MAX_SIZE))
-                    .targetFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
-                    .targetFolder(trimString(file.getParent(), FILE_PATH_MAX_SIZE))
-                    .fileSize(content != null ? Long.valueOf(content.length) : 0L)
-                    .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                    .build());
+            if (dbService != null) {
+                dbService.saveFileTransfer(FileTransfer.builder()
+                        .type(FileTransferType.UPLOAD.getType())
+                        .targetFileName(trimString(file.getName(), FILE_NAME_MAX_SIZE))
+                        .targetFilePath(trimString(file.getAbsolutePath(), FILE_PATH_MAX_SIZE))
+                        .targetFolder(trimString(file.getParent(), FILE_PATH_MAX_SIZE))
+                        .fileSize(content != null ? Long.valueOf(content.length) : 0L)
+                        .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                        .build());
+            }
             log.info(String.format("Stored file at '%s'", filePath));
         } catch (IOException e) {
             throw new ApiException(ApiResponseCode.UPLOAD_FILE_FAILURE.getCode(),
@@ -191,7 +194,10 @@ public class FileApiController implements FileApi {
             }
         }
 
-        List<FileTransfer> fileTransfers = dbService.getFileTransfers(queryLimit);
+        List<FileTransfer> fileTransfers = new ArrayList<>();
+        if (dbService != null) {
+            fileTransfers = dbService.getFileTransfers(queryLimit);
+        }
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())
@@ -214,15 +220,17 @@ public class FileApiController implements FileApi {
             try {
                 String filePath = fPath + File.separator + file.getOriginalFilename();
                 storageService.store(file, filePath);
-                dbService.saveFileTransfer(FileTransfer.builder()
-                        .type(FileTransferType.UPLOAD.getType())
-                        .targetFileName(trimString(file.getOriginalFilename(), FILE_NAME_MAX_SIZE))
-                        .sourceFileName(trimString(file.getOriginalFilename(), FILE_NAME_MAX_SIZE))
-                        .targetFilePath(trimString(filePath, FILE_PATH_MAX_SIZE))
-                        .fileSize(file.getSize())
-                        .targetFolder(trimString(fPath, FILE_PATH_MAX_SIZE))
-                        .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
-                        .build());
+                if (dbService != null) {
+                    dbService.saveFileTransfer(FileTransfer.builder()
+                            .type(FileTransferType.UPLOAD.getType())
+                            .targetFileName(trimString(file.getOriginalFilename(), FILE_NAME_MAX_SIZE))
+                            .sourceFileName(trimString(file.getOriginalFilename(), FILE_NAME_MAX_SIZE))
+                            .targetFilePath(trimString(filePath, FILE_PATH_MAX_SIZE))
+                            .fileSize(file.getSize())
+                            .targetFolder(trimString(fPath, FILE_PATH_MAX_SIZE))
+                            .dateTime(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                            .build());
+                }
                 log.info(String.format("Stored file '%s' at '%s'", file.getName(), filePath));
             } catch (IOException e) {
                 throw new ApiException(ApiResponseCode.UPLOAD_FILE_FAILURE_NAME.getCode(),
@@ -242,7 +250,7 @@ public class FileApiController implements FileApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> filePost(@ApiParam(value = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @ApiParam(value = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
+    public ResponseEntity<ApiResponse> filePost(@Parameter(description = "The content of the file") @Valid @RequestBody(required = false) byte[] content, @Parameter(description = "", required = true) @RequestHeader(value = "File-Path", required = false) String filePath) {
         return filePut(content, filePath);
     }
 

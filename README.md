@@ -236,5 +236,10 @@ To use a snapshot version, set the s01.oss.sonatype.org repo in settings.xml:
 To generate Query classes needed for the DB queries run:  
 mvn clean install (-DskipTests=true for faster compilation)
 
+## Resources
+
+- https://springdoc.org/#migrating-from-springfox
+- https://swagger.io/docs/open-source-tools/swagger-ui/usage/configuration/
+
 Support
 project: <a href="https://paypal.me/catalindinuta?locale.x=en_US"><img src="https://lh3.googleusercontent.com/Y2_nyEd0zJftXnlhQrWoweEvAy4RzbpDah_65JGQDKo9zCcBxHVpajYgXWFZcXdKS_o=s180-rw" height="40" width="40" align="center"></a>   

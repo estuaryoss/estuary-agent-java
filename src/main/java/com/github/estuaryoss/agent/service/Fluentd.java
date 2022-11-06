@@ -3,7 +3,7 @@ package com.github.estuaryoss.agent.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.estuaryoss.agent.component.About;
-import com.github.estuaryoss.agent.component.VirtualEnvironment;
+import com.github.estuaryoss.agent.component.AppEnvironment;
 import com.github.estuaryoss.agent.constants.EnvConstants;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.model.logging.EnrichedMessage;
@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 @Service
 public class Fluentd {
     private static final Logger log = LoggerFactory.getLogger(Fluentd.class);
-    private final VirtualEnvironment virtualEnvironment = new VirtualEnvironment();
+    private final AppEnvironment appEnvironment = new AppEnvironment();
     private FluentLogger fluentLogger;
     private About about;
     private EnrichedMessage enrichedMsgCopy;
@@ -99,7 +99,7 @@ public class Fluentd {
             enrichedMsgCopy.setMsg(parentMessage);
         }
 
-        if (virtualEnvironment.getEnv().get(EnvConstants.FLUENTD_IP_PORT) == null) {
+        if (appEnvironment.getEnv().get(EnvConstants.FLUENTD_IP_PORT) == null) {
             return String.format("Fluentd logging not enabled",
                     EnvConstants.FLUENTD_IP_PORT);
         }
@@ -123,9 +123,9 @@ public class Fluentd {
     }
 
     private void setFluentdLogger() {
-        if (virtualEnvironment.getEnv().get(EnvConstants.FLUENTD_IP_PORT) != null)
+        if (appEnvironment.getEnv().get(EnvConstants.FLUENTD_IP_PORT) != null)
             this.fluentLogger = FluentLogger.getLogger(about.getAppName(),
-                    virtualEnvironment.getEnv().get(EnvConstants.FLUENTD_IP_PORT).split(":")[0],
-                    Integer.parseInt(virtualEnvironment.getEnv().get(EnvConstants.FLUENTD_IP_PORT).split(":")[1]));
+                    appEnvironment.getEnv().get(EnvConstants.FLUENTD_IP_PORT).split(":")[0],
+                    Integer.parseInt(appEnvironment.getEnv().get(EnvConstants.FLUENTD_IP_PORT).split(":")[1]));
     }
 }

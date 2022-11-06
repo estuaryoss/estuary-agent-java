@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
@@ -51,11 +52,11 @@ public class CommandRunner {
     public static final String ARGS_DELIMITER = ",";
 
     private final DbService dbService;
-    private final VirtualEnvironment environment;
+    private final AppEnvironment environment;
     private final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss.SSSSSS";
 
     @Autowired
-    public CommandRunner(DbService dbService, VirtualEnvironment environment) {
+    public CommandRunner(@Nullable DbService dbService, AppEnvironment environment) {
         this.dbService = dbService;
         this.environment = environment;
     }
@@ -93,7 +94,7 @@ public class CommandRunner {
                     .command(trimString(cmd, COMMAND_MAX_SIZE))
                     .status(ExecutionStatus.QUEUED.getStatus())
                     .build();
-            dbService.saveCommand(command);
+            if (dbService != null) dbService.saveCommand(command);
 
             commandsDbList.add(command);
         }
@@ -164,7 +165,7 @@ public class CommandRunner {
                     .command(commands[i])
                     .status(ExecutionStatus.QUEUED.getStatus())
                     .build();
-            dbService.saveCommand(command);
+            if (dbService != null) dbService.saveCommand(command);
             CommandStatusThread cmdStatusThread = new CommandStatusThread(this, CommandParallel.builder()
                     .commandDescription(commandDescription)
                     .commandStatuses(commandStatuses)
@@ -268,7 +269,7 @@ public class CommandRunner {
             }
         }
 
-        dbService.saveAndFlushCommand(commandDb);
+        if (dbService != null) dbService.saveAndFlushCommand(commandDb);
 
         return commandDetails;
     }
@@ -317,7 +318,7 @@ public class CommandRunner {
         cmd.setPid(processState.getProcess().pid());
         cmd.setStatus(ExecutionStatus.RUNNING.getStatus());
 
-        dbService.saveCommand(cmd);
+        if (dbService != null) dbService.saveCommand(cmd);
 
         return this.getCommandDetailsFromProcess(processState, cmd);
     }

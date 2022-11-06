@@ -1,5 +1,6 @@
 package com.github.estuaryoss.agent.component;
 
+import com.github.estuaryoss.agent.utils.TemplateGluer;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONObject;
@@ -20,7 +21,7 @@ public class AppEnvironment {
     private static final Logger log = LoggerFactory.getLogger(AppEnvironment.class);
     private static final String EXT_ENV_VAR_PATH = "environment.properties";
     private final ImmutableMap<String, String> environment = ImmutableMap.copyOf(System.getenv());
-    private final Map<String, String> virtualEnvironment = new LinkedHashMap<>();
+    private Map<String, String> virtualEnvironment = new LinkedHashMap<>();
 
     public static final int VIRTUAL_ENVIRONMENT_MAX_SIZE = 1000;
 
@@ -45,26 +46,22 @@ public class AppEnvironment {
         log.debug("External env vars read from file '" + EXT_ENV_VAR_PATH + "' are: " + new JSONObject(virtualEnvironment).toString());
     }
 
-    public boolean setVirtualEnvVar(String key, String value) {
-        if (environment.containsKey(key)) return false;
+    public boolean setVirtualEnvVar(String envVarName, String envVarValue) {
+        if (environment.containsKey(envVarName)) return false;
+        if (virtualEnvironment.size() >= VIRTUAL_ENVIRONMENT_MAX_SIZE) return false;
 
-        if (virtualEnvironment.containsKey(key)) {
-            virtualEnvironment.put(key, value);
-            return true;
-        }
-        if (virtualEnvironment.size() <= VIRTUAL_ENVIRONMENT_MAX_SIZE) {
-            virtualEnvironment.put(key, value);
-            return true;
-        }
+        virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
 
-        return false;
+        return true;
     }
 
     public Map<String, String> setVirtualEnvVars(Map<String, String> envVars) {
         Map<String, String> addedEnvVars = new LinkedHashMap<>();
 
         envVars.forEach((key, value) -> {
-            if (this.setVirtualEnvVar(key, value)) addedEnvVars.put(key, value);
+            if (this.setVirtualEnvVar(key, value)) {
+                addedEnvVars.put(key, this.getVirtualEnvVar(key));
+            }
         });
 
         return addedEnvVars;
@@ -78,10 +75,7 @@ public class AppEnvironment {
     public Map<String, String> getEnvAndVirtualEnv() {
         Map<String, String> systemAndExternalEnvVars = new LinkedHashMap<>();
         systemAndExternalEnvVars.putAll(environment);
-
-        virtualEnvironment.forEach((key, value) -> {
-            if (!systemAndExternalEnvVars.containsKey(key)) systemAndExternalEnvVars.put(key, value);
-        });
+        systemAndExternalEnvVars.putAll(virtualEnvironment);
 
         return systemAndExternalEnvVars;
     }
@@ -105,9 +99,22 @@ public class AppEnvironment {
     }
 
     /**
+     * Gets the virtual environment variable
+     *
+     * @return String containing the value of the env var set by the user
+     */
+    public String getVirtualEnvVar(String envVarName) {
+        return glueVirtualEnvVar(virtualEnvironment.get(envVarName));
+    }
+
+    /**
      * Deletes all the custom env vars contained in the virtual environment
      */
     public void cleanVirtualEnv() {
         virtualEnvironment.clear();
+    }
+
+    private String glueVirtualEnvVar(String envVarValue) {
+        return TemplateGluer.glue(envVarValue, this.getEnvAndVirtualEnv());
     }
 }

@@ -21,7 +21,7 @@ public class AppEnvironment {
     private static final Logger log = LoggerFactory.getLogger(AppEnvironment.class);
     private static final String EXT_ENV_VAR_PATH = "environment.properties";
     private final ImmutableMap<String, String> environment = ImmutableMap.copyOf(System.getenv());
-    private Map<String, String> virtualEnvironment = new LinkedHashMap<>();
+    private final Map<String, String> virtualEnvironment = new LinkedHashMap<>();
 
     public static final int VIRTUAL_ENVIRONMENT_MAX_SIZE = 1000;
 

@@ -50,11 +50,14 @@ public class AppEnvironment {
         if (environment.containsKey(envVarName)) return false;
         if (virtualEnvironment.containsKey(envVarName)) {
             virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
+            this.reInterpolateVirtualEnv();
+
             return true;
         }
 
         if (virtualEnvironment.size() >= VIRTUAL_ENVIRONMENT_MAX_SIZE) return false;
         virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
+        this.reInterpolateVirtualEnv();
 
         return true;
     }
@@ -120,5 +123,11 @@ public class AppEnvironment {
 
     private String glueVirtualEnvVar(String envVarValue) {
         return TemplateGluer.glue(envVarValue, this.getEnvAndVirtualEnv());
+    }
+
+    private void reInterpolateVirtualEnv() {
+        this.getEnvAndVirtualEnv().forEach((envVarName, envVarValue) -> {
+            this.virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
+        });
     }
 }

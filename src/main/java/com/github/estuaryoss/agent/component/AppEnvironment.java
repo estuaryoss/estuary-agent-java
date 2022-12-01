@@ -50,14 +50,14 @@ public class AppEnvironment {
         if (environment.containsKey(envVarName)) return false;
         if (virtualEnvironment.containsKey(envVarName)) {
             virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
-            this.reInterpolateVirtualEnv();
+            this.reInterpolateVirtualEnv(this.getVirtualEnv());
 
             return true;
         }
 
         if (virtualEnvironment.size() >= VIRTUAL_ENVIRONMENT_MAX_SIZE) return false;
         virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
-        this.reInterpolateVirtualEnv();
+        this.reInterpolateVirtualEnv(this.getVirtualEnv());
 
         return true;
     }
@@ -70,6 +70,7 @@ public class AppEnvironment {
                 addedEnvVars.put(key, this.getVirtualEnvVar(key));
             }
         });
+        this.reInterpolateVirtualEnv(addedEnvVars);
 
         return addedEnvVars;
     }
@@ -111,7 +112,7 @@ public class AppEnvironment {
      * @return String containing the value of the env var set by the user
      */
     public String getVirtualEnvVar(String envVarName) {
-        return glueVirtualEnvVar(virtualEnvironment.get(envVarName));
+        return virtualEnvironment.get(envVarName);
     }
 
     /**
@@ -125,9 +126,9 @@ public class AppEnvironment {
         return TemplateGluer.glue(envVarValue, this.getEnvAndVirtualEnv());
     }
 
-    private void reInterpolateVirtualEnv() {
-        this.getEnvAndVirtualEnv().forEach((envVarName, envVarValue) -> {
-            this.virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
+    private void reInterpolateVirtualEnv(Map<String, String> virtualEnvironment) {
+        virtualEnvironment.forEach((envVarName, envVarValue) -> {
+            virtualEnvironment.put(envVarName, glueVirtualEnvVar(envVarValue));
         });
     }
 }

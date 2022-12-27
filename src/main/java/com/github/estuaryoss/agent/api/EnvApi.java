@@ -60,7 +60,16 @@ public interface EnvApi {
     @RequestMapping(value = "/env",
             produces = {"application/json"},
             method = RequestMethod.DELETE)
-    default ResponseEntity<ApiResponse> envDelete() {
+    default ResponseEntity<ApiResponse> deleteEnvVars() {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Operation(description = "Deletes the custom defined env var name contained in the virtual environment", summary = "envDelete", tags = {"estuary-agent",})
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Deletes the env vars identified by name")
+    @RequestMapping(value = "/env/{envVarName}",
+            produces = {"application/json"},
+            method = RequestMethod.DELETE)
+    default ResponseEntity<ApiResponse> deleteEnvVar(@PathVariable String envVarName) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 

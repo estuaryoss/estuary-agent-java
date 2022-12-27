@@ -102,10 +102,27 @@ public class EnvApiController implements EnvApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> envDelete() {
+    public ResponseEntity<ApiResponse> deleteEnvVars() {
         String accept = request.getHeader("Accept");
 
         environment.cleanVirtualEnv();
+
+        return new ResponseEntity<>(ApiResponse.builder()
+                .code(ApiResponseCode.SUCCESS.getCode())
+                .message(ApiResponseMessage.getMessage(ApiResponseCode.SUCCESS.getCode()))
+                .description(environment.getVirtualEnv())
+                .name(about.getAppName())
+                .version(about.getVersion())
+                .timestamp(LocalDateTime.now().format(DateTimeConstants.PATTERN))
+                .path(clientRequest.getRequestUri())
+                .build(), HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<ApiResponse> deleteEnvVar(@PathVariable String envVarName) {
+        String accept = request.getHeader("Accept");
+
+        environment.getVirtualEnv().remove(envVarName);
 
         return new ResponseEntity<>(ApiResponse.builder()
                 .code(ApiResponseCode.SUCCESS.getCode())

@@ -355,4 +355,37 @@ public class EnvApiControllerTest {
         assertThat(body.getDescription()).isInstanceOf(Map.class);
         assertThat(((Map) body.getDescription()).get(envVarName)).isEqualTo(null);
     }
+
+    @Test
+    public void whenDeletingEnvVar_ThenOk() {
+        String envVarName = "FOO1";
+        String envVarJson = String.format("{\"%s\":\"BAR1\"}", envVarName);
+
+        ResponseEntity responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                .exchange(SERVER_PREFIX + port + "/env",
+                        HttpMethod.POST,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(envVarJson, new HashMap<>()),
+                        ApiResponse.class);
+        ApiResponse body = (ApiResponse) responseEntity.getBody();
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(((Map) body.getDescription()).size()).isGreaterThan(0);
+
+        //delete FOO anv var
+        responseEntity = this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                .exchange(SERVER_PREFIX + port + "/env/" + envVarName,
+                        HttpMethod.DELETE,
+                        httpRequestUtils.getRequestEntityContentTypeAppJson(null, new HashMap<>()),
+                        ApiResponse.class);
+        body = (ApiResponse) responseEntity.getBody();
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(((Map) body.getDescription()).size()).isEqualTo(0);
+
+        //check again with GET if it was deleted
+        responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword()).getForEntity(SERVER_PREFIX + port + "/env", ApiResponse.class);
+        body = (ApiResponse) responseEntity.getBody();
+
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat(((Map) body.getDescription()).get(envVarName)).isEqualTo(null);
+    }
 }

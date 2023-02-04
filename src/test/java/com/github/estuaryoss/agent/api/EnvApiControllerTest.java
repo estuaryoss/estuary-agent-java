@@ -2,6 +2,7 @@ package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.api.utils.HttpRequestUtils;
 import com.github.estuaryoss.agent.component.About;
+import com.github.estuaryoss.agent.component.AppEnvironment;
 import com.github.estuaryoss.agent.component.Authentication;
 import com.github.estuaryoss.agent.constants.ApiResponseCode;
 import com.github.estuaryoss.agent.constants.ApiResponseMessage;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -291,34 +293,34 @@ public class EnvApiControllerTest {
         assertThat(((Map) body.getDescription()).get("SHELL")).isNotEqualTo(attemptedShellEnvVarValue);
     }
 
-//    @Test
-//    @Order(9)
-//    public void whenSettingVirtualEnvVarsThenAHardLimitIsReached() {
-//        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = AppEnvironment.VIRTUAL_ENVIRONMENT_MAX_SIZE;
-//
-//        for (int i = 0; i < 2 * VIRTUAL_ENV_VARS_LIMIT_SIZE; i++) {
-//            String envVarsJson = String.format("{\"%s\":\"%s\"}", i, i);
-//            this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-//                    .exchange(SERVER_PREFIX + port + "/env",
-//                            HttpMethod.POST,
-//                            httpRequestUtils.getRequestEntityContentTypeAppJson(envVarsJson, new HashMap<>()),
-//                            new ParameterizedTypeReference<>() {
-//                            });
-//        }
-//
-//        ResponseEntity<ApiResponse<Map<String, String>>> responseEntity =
-//                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
-//                        .exchange(SERVER_PREFIX + port + "/env",
-//                                HttpMethod.GET,
-//                                httpRequestUtils.getRequestEntityContentTypeAppJson(null, new HashMap<>()),
-//                                new ParameterizedTypeReference<>() {
-//                                });
-//
-//        ApiResponse<Map<String, String>> body = responseEntity.getBody();
-//
-//        assertThat(body.getDescription()).isInstanceOf(Map.class);
-//        assertThat((body.getDescription()).get(String.valueOf(VIRTUAL_ENV_VARS_LIMIT_SIZE))).isEqualTo(null);
-//    }
+    @Test
+    @Order(9)
+    public void whenSettingVirtualEnvVarsThenAHardLimitIsReached() {
+        final int VIRTUAL_ENV_VARS_LIMIT_SIZE = AppEnvironment.VIRTUAL_ENVIRONMENT_MAX_SIZE;
+
+        for (int i = 0; i < 2 * VIRTUAL_ENV_VARS_LIMIT_SIZE; i++) {
+            String envVarsJson = String.format("{\"%s\":\"%s\"}", i, i);
+            this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                    .exchange(SERVER_PREFIX + port + "/env",
+                            HttpMethod.POST,
+                            httpRequestUtils.getRequestEntityContentTypeAppJson(envVarsJson, new HashMap<>()),
+                            new ParameterizedTypeReference<>() {
+                            });
+        }
+
+        ResponseEntity<ApiResponse<Map<String, String>>> responseEntity =
+                this.restTemplate.withBasicAuth(auth.getUser(), auth.getPassword())
+                        .exchange(SERVER_PREFIX + port + "/env",
+                                HttpMethod.GET,
+                                httpRequestUtils.getRequestEntityContentTypeAppJson(null, new HashMap<>()),
+                                new ParameterizedTypeReference<>() {
+                                });
+
+        ApiResponse<Map<String, String>> body = responseEntity.getBody();
+
+        assertThat(body.getDescription()).isInstanceOf(Map.class);
+        assertThat((body.getDescription()).get(String.valueOf(VIRTUAL_ENV_VARS_LIMIT_SIZE))).isEqualTo(null);
+    }
 
     @Test
     @Order(10)

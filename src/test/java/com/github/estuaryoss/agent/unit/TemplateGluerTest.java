@@ -13,9 +13,9 @@ public class TemplateGluerTest {
     @ParameterizedTest
     @ValueSource(
             strings = {
-                    "{FOO1}/A;FOO1;B;B/A",
+                    "{{FOO1}}/A;FOO1;B;B/A",
                     "A;A;A;A",
-                    "A/{FOO1};FOO1;B;A/B",
+                    "A/{{FOO1}};FOO1;B;A/B",
             }
     )
     public void whenSwapping_ThenProfit(String templateInVarNameInVarValueExpectedOut) {

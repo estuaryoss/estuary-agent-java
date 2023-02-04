@@ -349,6 +349,13 @@
             <version>8.0.0.Final</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.samskivert/jmustache -->
+        <dependency>
+            <groupId>com.samskivert</groupId>
+            <artifactId>jmustache</artifactId>
+            <version>1.15</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

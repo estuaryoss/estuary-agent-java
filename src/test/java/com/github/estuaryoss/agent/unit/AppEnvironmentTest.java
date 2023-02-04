@@ -74,7 +74,7 @@ public class AppEnvironmentTest {
         String envVarName1 = "FOO1";
         String envVarName1Value = "/FOO1/BAR1";
         String envVarName2 = "FOO2";
-        String envVarName2Value = "{FOO1}/BAR2";
+        String envVarName2Value = "{{FOO1}}/BAR2";
         Map<String, String> envVarsToBeSet = new LinkedHashMap<>();
         envVarsToBeSet.put(envVarName1, envVarName1Value);
         envVarsToBeSet.put(envVarName2, envVarName2Value);

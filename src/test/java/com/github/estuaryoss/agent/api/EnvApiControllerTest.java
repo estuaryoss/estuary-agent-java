@@ -217,7 +217,7 @@ public class EnvApiControllerTest {
             strings = {
                     "FOO1;BARx;BARx",
                     "FOO3;BAR3;BAR3",
-                    "FOO4;{FOO1}/{FOO3};BARx/BAR3"
+                    "FOO4;{{FOO1}}/{{FOO3}};BARx/BAR3"
             }
     )
     @Order(3)

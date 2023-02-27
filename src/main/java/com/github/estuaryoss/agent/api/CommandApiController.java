@@ -20,6 +20,7 @@ import com.github.estuaryoss.agent.utils.ProcessUtils;
 import com.github.estuaryoss.agent.utils.YamlConfigParser;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -183,7 +182,7 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandsPost(@Parameter(description = "Commands to run. E.g. ls -lrt", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsPost(@Parameter(description = "Commands to run. E.g. ls -lrt", required = true) @RequestBody String commands) throws IOException {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.replace("\r\n", "\n").strip();
         List<String> commandsList = Arrays.asList(commandsStripped.split("\n"))
@@ -209,7 +208,7 @@ public class CommandApiController implements CommandApi {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse> commandsPostYaml(@Parameter(description = "Commands to run in yaml format", required = true) @Valid @RequestBody String commands) throws IOException {
+    public ResponseEntity<ApiResponse> commandsPostYaml(@Parameter(description = "Commands to run in yaml format", required = true) @RequestBody String commands) throws IOException {
         String accept = request.getHeader("Accept");
         String commandsStripped = commands.strip();
         List<String> commandsList;

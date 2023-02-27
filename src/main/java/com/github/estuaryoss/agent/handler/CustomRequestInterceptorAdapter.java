@@ -3,6 +3,8 @@ package com.github.estuaryoss.agent.handler;
 import com.github.estuaryoss.agent.constants.FluentdServiceConstants;
 import com.github.estuaryoss.agent.service.Fluentd;
 import com.github.estuaryoss.agent.utils.MessageDumper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.DispatcherType;
 import org.springframework.http.HttpMethod;
@@ -10,8 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component

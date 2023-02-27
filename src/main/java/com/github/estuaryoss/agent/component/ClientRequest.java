@@ -1,8 +1,8 @@
 package com.github.estuaryoss.agent.component;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 
 @Component
 public class ClientRequest {

@@ -45,18 +45,17 @@
     </distributionManagement>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <springdoc-openapi-ui-version>1.6.12</springdoc-openapi-ui-version>
         <querydsl.version>5.0.0</querydsl.version>
-        <spring-cloud.version>2021.0.5</spring-cloud.version>
+        <spring-cloud.version>2022.0.1</spring-cloud.version>
     </properties>
     <!-- align spring-boot version from properties and from parent !-->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.5</version>
+        <version>3.0.3</version>
     </parent>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -269,13 +268,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>${springdoc-openapi-ui-version}</version>
-        </dependency>
-
         <!-- Bean Validation API support -->
         <dependency>
             <groupId>javax.validation</groupId>
@@ -354,6 +346,27 @@
             <groupId>com.samskivert</groupId>
             <artifactId>jmustache</artifactId>
             <version>1.15</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+            <version>2.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.0.2</version>
         </dependency>
 
     </dependencies>

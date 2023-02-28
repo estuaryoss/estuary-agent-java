@@ -2,18 +2,18 @@ package com.github.estuaryoss.agent.api;
 
 import com.github.estuaryoss.agent.component.AppEnvironment;
 import com.github.estuaryoss.agent.constants.HeaderConstants;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -30,8 +30,7 @@ public class ApiOriginFilter extends GenericFilterBean {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
@@ -55,7 +54,7 @@ public class ApiOriginFilter extends GenericFilterBean {
             return;
         }
 
-        chain.doFilter(httpRequest, httpResponse);
+        filterChain.doFilter(httpRequest, httpResponse);
     }
 
     @Override

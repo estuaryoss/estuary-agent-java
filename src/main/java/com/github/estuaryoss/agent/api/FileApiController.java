@@ -11,6 +11,7 @@ import com.github.estuaryoss.agent.service.DbService;
 import com.github.estuaryoss.agent.service.StorageService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -25,7 +26,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;

@@ -8,13 +8,13 @@ import com.github.estuaryoss.agent.constants.DateTimeConstants;
 import com.github.estuaryoss.agent.model.api.ApiResponse;
 import com.github.estuaryoss.agent.utils.SystemInformation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 @Tag(name = "estuary-agent", description = "estuary-agent swagger API")

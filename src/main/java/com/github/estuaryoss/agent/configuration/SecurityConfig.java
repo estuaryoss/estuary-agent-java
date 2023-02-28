@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 
 import static com.github.estuaryoss.agent.constants.EnvConstants.HTTP_AUTH_PASSWORD;
 import static com.github.estuaryoss.agent.constants.EnvConstants.HTTP_AUTH_USER;
@@ -21,13 +21,13 @@ import static com.github.estuaryoss.agent.constants.EnvConstants.HTTP_AUTH_USER;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Profile("!test")
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
     @Autowired
     Authentication auth;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors()
                 .and()
@@ -41,11 +41,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .permitAll();
 
-        http.headers().frameOptions().sameOrigin();
+        return http.build();
     }
 
     @Bean
-    @Override
     public UserDetailsService userDetailsService() {
         String username = System.getenv(HTTP_AUTH_USER) != null ? System.getenv(HTTP_AUTH_USER) : auth.getUser();
         String password = System.getenv(HTTP_AUTH_PASSWORD) != null ? System.getenv(HTTP_AUTH_PASSWORD) : auth.getPassword();

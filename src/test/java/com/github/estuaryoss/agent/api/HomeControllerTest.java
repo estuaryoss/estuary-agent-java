@@ -45,7 +45,7 @@ public class HomeControllerTest {
 
         String body = responseEntity.getBody();
 
-        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.MOVED_TEMPORARILY.value());
+        assertThat(responseEntity.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(body).isInstanceOf(String.class);
         assertThat(body).contains("<title>Swagger UI</title>");
     }

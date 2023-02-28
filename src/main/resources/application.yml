@@ -33,7 +33,7 @@ management:
 
 springdoc:
   swagger-ui:
-    path: /swagger-ui/index.html
+    path: /index.html
   api-docs:
     enabled: true
   packages-to-scan: com.github.estuaryoss.agent.api
